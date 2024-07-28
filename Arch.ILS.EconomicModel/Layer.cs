@@ -1,7 +1,7 @@
 ﻿
 using Studio.Core;
 
-namespace Arch.EconomicModel
+namespace Arch.ILS.EconomicModel
 {
     public class Layer : IRecord
     {

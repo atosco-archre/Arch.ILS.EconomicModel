@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using Studio.Core;
 using Studio.Core.Sql;
 
-namespace Arch.EconomicModel
+namespace Arch.ILS.EconomicModel
 {
     public class RevoSqlRepository : SqlRepository, IRevoRepository
     {

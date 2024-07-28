@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     public unsafe class RevoLayerYeltYearArray : IBenchmarkYelt
     {

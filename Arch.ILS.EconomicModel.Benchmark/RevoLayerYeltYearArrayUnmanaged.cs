@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     public unsafe class RevoLayerYeltYearArrayUnmanaged : IBenchmarkYelt
     {

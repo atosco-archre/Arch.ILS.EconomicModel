@@ -1,7 +1,7 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     public class LayerUploadBenchmark : Benchmarks<LayerUploadTests>
     {

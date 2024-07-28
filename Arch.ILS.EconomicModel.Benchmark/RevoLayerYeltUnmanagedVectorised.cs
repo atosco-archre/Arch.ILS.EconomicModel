@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     public unsafe class RevoLayerYeltUnmanagedVectorised
     {

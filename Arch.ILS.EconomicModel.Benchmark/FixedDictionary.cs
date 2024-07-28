@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Runtime.CompilerServices.Unsafe;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     public unsafe class FixedDictionary<TKey, TValue> : IReadOnlyCollection<KeyValuePair<TKey, TValue>>, IDisposable

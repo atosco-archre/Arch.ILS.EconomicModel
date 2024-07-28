@@ -1,5 +1,5 @@
 ﻿
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     public class RevoLayerEntryDayEventIdComparer : IComparer<RevoLayerYeltEntry>
     {

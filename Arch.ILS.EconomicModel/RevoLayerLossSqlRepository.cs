@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 
-namespace Arch.EconomicModel
+namespace Arch.ILS.EconomicModel
 {
     public class RevoLayerLossSqlRepository : SqlRepository, IRevoLayerLossRepository
     {

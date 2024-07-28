@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Arch.Common;
-using Arch.EconomicModel;
+
+using Arch.ILS.Common;
+using Arch.ILS.EconomicModel;
 
 ConnectionProtection connectionProtection =
-    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.EconomicModel\Arch.EconomicModel.Console\App.config.config");
+    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
 //if (!connectionProtection.IsProtected())
 //    connectionProtection.EncryptFile();
 //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
@@ -21,59 +22,59 @@ RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetC
 int partitionCount = 8;
 Thread.Sleep(5000);
 Stopwatch sw = Stopwatch.StartNew();
-//revoRepository.GetPortfolioLayerCessions().Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
+revoRepository.GetPortfolioLayerCessions().Wait();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
+Thread.Sleep(5000);
+sw.Restart();
+
+revoRepository.GetPortfolioLayerCessionsFast(partitionCount).Wait();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
+Thread.Sleep(5000);
+sw.Restart();
+
+revoRepository.GetPortfolioLayerCessionsFast2(partitionCount).Wait();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
+Thread.Sleep(5000);
+sw.Restart();
+
+revoRepository.GetPortfolioLayerCessionsFast3(partitionCount).Wait();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
+Thread.Sleep(5000);
+sw.Restart();
+
+revoRepository.GetPortfolioLayerCessionsFast4(partitionCount).Wait();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
+Thread.Sleep(5000);
+sw.Restart();
+
+revoRepository.GetPortfolioLayerCessionsFast6(partitionCount);
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
 //Thread.Sleep(5000);
-//sw.Restart();
+sw.Restart();
 
-//revoRepository.GetPortfolioLayerCessionsFast(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
+revoRepository.GetPortfolioLayerCessionsNoStorage();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
 //Thread.Sleep(5000);
-//sw.Restart();
+sw.Restart();
 
-//revoRepository.GetPortfolioLayerCessionsFast2(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
+revoRepository.GetPortfolioLayerCessionsNoStorageParallel();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
 //Thread.Sleep(5000);
-//sw.Restart();
+sw.Restart();
 
-//revoRepository.GetPortfolioLayerCessionsFast3(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
+revoRepository.GetPortfolioLayerCessionsNoStorageTasks();
+sw.Stop();
+Console.WriteLine(sw.Elapsed);
 //Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsFast4(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsFast6(partitionCount);
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-////Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsNoStorage();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-////Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsNoStorageParallel();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-////Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsNoStorageTasks();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-////Thread.Sleep(5000);
-//sw.Restart();
+sw.Restart();
 
 revoRepository.GetLayerView();
 sw.Stop();

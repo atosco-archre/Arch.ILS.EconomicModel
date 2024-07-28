@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Arch.EconomicModel
+namespace Arch.ILS.EconomicModel
 {
     [StructLayout(LayoutKind.Auto)]
     public unsafe struct RevoLayerYeltEntry

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Runtime.CompilerServices.Unsafe;
 
-namespace Arch.EconomicModel.Benchmark
+namespace Arch.ILS.EconomicModel.Benchmark
 {
     [DebuggerDisplay("Size = {" + nameof(Size) + "}")]
     public unsafe class YearArray<TValue> : IDisposable, IEnumerable<TValue>

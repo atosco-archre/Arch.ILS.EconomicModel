@@ -1,4 +1,4 @@
-﻿using Arch.EconomicModel.Benchmark;
+﻿using Arch.ILS.EconomicModel.Benchmark;
 
 //LayerUploadBenchmark layerUploadBenchmark = new LayerUploadBenchmark();
 //layerUploadBenchmark.RunBenchmarks();

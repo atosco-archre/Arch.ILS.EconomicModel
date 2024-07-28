@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Arch.EconomicModel
+namespace Arch.ILS.EconomicModel
 {
     public unsafe class RevoLayerYelt : IYelt
     {
