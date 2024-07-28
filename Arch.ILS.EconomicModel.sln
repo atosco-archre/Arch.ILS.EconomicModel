@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.Benc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.Console", "Arch.ILS.EconomicModel.Console\Arch.ILS.EconomicModel.Console.csproj", "{3411F895-31B3-4A68-982E-107B919F3118}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Snowflake", "..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj", "{9C8A0611-72E8-4176-A6DD-D40CF153BF8C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core", "..\Studio.Core\Studio.Core\Studio.Core.csproj", "{6899DD8C-554A-4881-A045-6F26476B3E37}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core.Sql", "..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj", "{C64026DA-3EEB-4610-8944-7EF60FFCF748}"
@@ -20,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Core", "..\Arch.ILS.Core\Arch.ILS.Core\Arch.ILS.Core.csproj", "{39002927-96A7-4650-B1FB-BCA7774C11D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.DependencyEngine", "..\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine.csproj", "{1A8310A6-FB19-485F-B0A7-532372AF0504}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Snowflake", "..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj", "{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,6 @@ Global
 		{3411F895-31B3-4A68-982E-107B919F3118}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3411F895-31B3-4A68-982E-107B919F3118}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3411F895-31B3-4A68-982E-107B919F3118}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C8A0611-72E8-4176-A6DD-D40CF153BF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C8A0611-72E8-4176-A6DD-D40CF153BF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C8A0611-72E8-4176-A6DD-D40CF153BF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C8A0611-72E8-4176-A6DD-D40CF153BF8C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6899DD8C-554A-4881-A045-6F26476B3E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6899DD8C-554A-4881-A045-6F26476B3E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6899DD8C-554A-4881-A045-6F26476B3E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +59,10 @@ Global
 		{1A8310A6-FB19-485F-B0A7-532372AF0504}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A8310A6-FB19-485F-B0A7-532372AF0504}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A8310A6-FB19-485F-B0A7-532372AF0504}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

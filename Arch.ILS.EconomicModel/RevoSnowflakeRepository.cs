@@ -6,8 +6,10 @@ using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 using Studio.Core;
 using Studio.Core.Sql;
+using Arch.ILS.Snowflake;
 
 namespace Arch.ILS.EconomicModel
 {

@@ -3,8 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|solutionrelative:arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\utf8span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\utf8span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1A8310A6-FB19-485F-B0A7-532372AF0504}|..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.dependencyengine\\arch.ils.dependencyengine\\dependencytree.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
@@ -50,10 +62,6 @@
       "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayerlosssqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayerlosssqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -81,203 +89,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DependencyTree.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:51.97Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "IAdjacencyMatrix.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:48.388Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DependencyEngineException.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:44.375Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "AdjacencySets.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAPAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:34.864Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "AdjacencyBits.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAASAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:21.337Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "OperationExtensions.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:14.376Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "IDeepCloneable.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:10.622Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "EnumExtensions.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:07.21Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Program.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Program.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAPAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T00:14:04.526Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "DefaultNumberArrayEqualityComparer.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:03.229Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "ConnectionStrings.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:42:59.801Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "SnowflakeConnectionStrings.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:42:54.458Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "RevoConnectionStrings.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:42:51.075Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "ConnectionProtection.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
-              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAPAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:42:41.467Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "IRevoLayerLossRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:34:44.678Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -288,20 +101,227 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 0,
+              "Title": "RevoSnowflakeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "ViewState": "AQIAAAUAAAAAAAAAAADgvwgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T02:14:16.123Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Utf8Span.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Utf8Span.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Utf8Span.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Utf8Span.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Utf8Span.cs",
+              "ViewState": "AQIAADgAAAAAAAAAAAAuwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:59:50.6Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IAdjacencyMatrix.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:48.388Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DependencyEngineException.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:44.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AdjacencySets.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencySets.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:34.864Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AdjacencyBits.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\AdjacencyBits.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:21.337Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "OperationExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:14.376Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IDeepCloneable.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\IDeepCloneable.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:10.622Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "EnumExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\EnumExtensions.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:07.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Program.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Program.cs",
+              "ViewState": "AQIAADIAAAAAAAAAAAAAABcAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T00:14:04.526Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "RevoSqlRepository.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
               "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
               "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "ViewState": "AQIAAGYAAAAAAAAAAAAwwAAAAAAAAAAA",
+              "ViewState": "AQIAAOoAAAAAAAAAAAAQwP0AAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-28T01:35:03.173Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DependencyTree.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyTree.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:51.97Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "DefaultNumberArrayEqualityComparer.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:03.229Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ConnectionStrings.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\ConnectionStrings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:42:59.801Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "SnowflakeConnectionStrings.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:42:54.458Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "RevoConnectionStrings.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\RevoConnectionStrings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:42:51.075Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 16,
+              "Title": "ConnectionProtection.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\ConnectionProtection.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:42:41.467Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "IRevoLayerLossRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:34:44.678Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
               "Title": "RevoLayerLossSqlRepository.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
@@ -309,12 +329,11 @@
               "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
               "ViewState": "AQIAALUAAAAAAAAAAAAQwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:34:45.897Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T01:34:45.897Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "LayerUploadBenchmark.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
@@ -322,12 +341,11 @@
               "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
               "ViewState": "AQIAACMAAAAAAAAAAADgvzcAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T00:18:17.983Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T00:18:17.983Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 22,
               "Title": "RevoLayerYeltEntry.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerYeltEntry.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerYeltEntry.cs",
@@ -335,12 +353,11 @@
               "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerYeltEntry.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T00:16:57.627Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T00:16:57.627Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "Arch.ILS.EconomicModel.Console.csproj",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj",
@@ -348,12 +365,11 @@
               "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-07-28T00:16:07.772Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T00:16:07.772Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Program.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Program.cs",
@@ -361,8 +377,7 @@
               "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Program.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T00:12:23.3Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T00:12:23.3Z"
             }
           ]
         }
