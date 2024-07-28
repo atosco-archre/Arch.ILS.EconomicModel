@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Arch.Common\Arch.Common\Arch.Common.csproj" />
+    <ProjectReference Include="..\..\Arch.Core\Arch.Core\Arch.Core.csproj" />
+    <ProjectReference Include="..\..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj" />
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
+  </ItemGroup>
+
+</Project>
