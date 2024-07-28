@@ -12,6 +12,8 @@ namespace Arch.ILS.EconomicModel
         [Field(2)]
         public DateTime Expiration { get; set; }
         [Field(3)]
-        public int RetroProgramType { get; set; }
+        public RetroProgramType RetroProgramType { get; set; }
+        [Field(4)]
+        public byte RetroLevelType { get; set; }
     }
 }

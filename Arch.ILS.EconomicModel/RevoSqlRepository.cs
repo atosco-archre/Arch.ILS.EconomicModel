@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Data;
@@ -32,7 +33,8 @@ namespace Arch.ILS.EconomicModel
         private const string GET_RETRO_PROGRAM = @"SELECT [RetroProgramId]
      , [Inception]
      , [Expiration]
-     , [RetroProgramType]
+     , CONVERT(TINYINT, [RetroProgramType]) AS [RetroProgramType]
+     , CONVERT(TINYINT, [RetroLevelType] + 1) AS [RetroLevelType]
   FROM [dbo].[RetroProgram]
  WHERE [Status] IN (22,10)/*remove projection retros*/
    AND IsActive = 1
@@ -42,7 +44,7 @@ namespace Arch.ILS.EconomicModel
      , [PortLayerId]
      , [RetroProgramId]
      , [CessionGross]
-     , [CessionNet]
+     /*, [CessionNet]*/
   FROM [dbo].[PortLayerCession]
  WHERE IsActive = 1
    AND ShouldCessionApply = 1
@@ -53,7 +55,7 @@ namespace Arch.ILS.EconomicModel
      , [PortLayerId]
      , [RetroProgramId]
      , [CessionGross]
-     , [CessionNet]
+     /*, [CessionNet]*/
   FROM [dbo].[PortLayerCession]
  WHERE (PortLayerCessionId % {1}) = {0} 
    AND IsActive = 1
@@ -136,14 +138,18 @@ namespace Arch.ILS.EconomicModel
             Dictionary<int, Layer> layers = layersTask.Result;
             Dictionary<int, Portfolio> portfolios = portfoliosTask.Result;
             Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
+            List<PortLayerCessionExtended>[] partitionedPortLayerCessions = new List<PortLayerCessionExtended>[partitionCount];
+
+            for (int i = 0; i < partitionedPortLayerCessions.Length; i++)
+                partitionedPortLayerCessions[i] = new();
 
             Task[] portLayerCessionsTasks = new Task[partitionCount];
             for (int i = 0; i < portLayerCessionsTasks.Length; i++)
                 portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
                 {
-                    int index = (int)state!;
+                    var input = ((int index, List<PortLayerCessionExtended> layerCessionRepo))state!;
                     
-                    foreach(var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>())
+                    foreach(var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, input.index, partitionCount)).GetObjects<PortLayerCessionExtended>())
                     {
                         if (!retroPrograms.TryGetValue(portLayerCession.RetroProgramId, out RetroProgram retroProgram))
                             continue;
@@ -151,6 +157,9 @@ namespace Arch.ILS.EconomicModel
                         PortLayer portLayer = portLayers[portLayerCession.PortLayerId];
                         Portfolio portfolio = portfolios[portLayer.PortfolioId];
                         Layer layer = layers[portLayer.LayerId];
+                        portLayerCession.PortfolioId = portfolio.PortfolioId;
+                        portLayerCession.LayerId = layer.LayerId;
+                        portLayerCession.RetroLevelType = retroProgram.RetroLevelType;
                         DateTime? inception;
                         if ((inception = GetPortfolioLayerInception(portfolio, layer)) == null)
                             continue;
@@ -159,18 +168,27 @@ namespace Arch.ILS.EconomicModel
 
                         if (portLayerExpiration < retroProgram.Inception
                             || portLayerInception > retroProgram.Expiration
-                            || (retroProgram.RetroProgramType != 1 /*1 = LOD*/ && portLayerInception < retroProgram.Inception))/*if RAD, discard ones where the layer started before the retro*/
+                            || (retroProgram.RetroProgramType != RetroProgramType.LOD /*1 = LOD*/ && portLayerInception < retroProgram.Inception))/*if RAD, discard ones where the layer started before the retro*/
                             continue;
 
-                        DateTime overlapStart = retroProgram.RetroProgramType != 2 /*2 = RAD*/ && retroProgram.Inception > portLayerInception
+                        portLayerCession.OverlapStart = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Inception > portLayerInception
                             ? retroProgram.Inception
                             : portLayerInception;
-                        DateTime overlapEnd = retroProgram.RetroProgramType != 2 /*2 = RAD*/ && retroProgram.Expiration < portLayerExpiration
+                        portLayerCession.OverlapEnd = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Expiration < portLayerExpiration
                             ? retroProgram.Expiration
                             : portLayerExpiration;
+
+                        input.layerCessionRepo.Add(portLayerCession);
                     }
-                }, i);
+                }, (i, partitionedPortLayerCessions[i]));
             Task.WaitAll(portLayerCessionsTasks);
+
+            Dictionary<int, Dictionary<byte, PortLayerCessionExtended[]>> portfolioLevelCessions = partitionedPortLayerCessions
+                .SelectMany(x => x)
+                .GroupBy(x => x.PortfolioId)
+                .ToDictionary(k => k.Key, v => v
+                    .GroupBy(xx => xx.RetroLevelType)
+                    .ToDictionary(kk => kk.Key, vv => vv.ToArray()));
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             static DateTime? GetPortfolioLayerInception(Portfolio portfolio, Layer layer)
