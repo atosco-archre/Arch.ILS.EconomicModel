@@ -110,174 +110,22 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsFast(int partitionCount = 8)
+        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsParallel(int partitionCount = 8)
         {
-            Console.Write("1 - Parallel For - Storage in common concurrent bag ");
-            return Task.Factory.StartNew<IEnumerable<PortLayerCession>>(() =>
+            return Task.Factory.StartNew(() =>
             {
-                ConcurrentBag<PortLayerCession> portLayerCessions = new ConcurrentBag<PortLayerCession>();
-                Parallel.For(0, partitionCount, i =>
-                {
-                    foreach (var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, i, partitionCount)).GetObjects<PortLayerCession>())
-                        portLayerCessions.Add(portLayerCession);
-                });
-                return portLayerCessions;
-            });
-        }
-
-        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsFast2(int partitionCount = 8)
-        {
-            Console.Write("2 - Parallel For - Storage in Blocking Collection Array using AddToAny and then SelectMany into same IEnumerable output ");
-            return Task.Factory.StartNew<IEnumerable<PortLayerCession>>(() =>
-            {
-                BlockingCollection<PortLayerCession>[] portLayerCessions = new BlockingCollection<PortLayerCession>[partitionCount << 1];
-                for (int i = 0; i < portLayerCessions.Length; i++)
-                    portLayerCessions[i] = new BlockingCollection<PortLayerCession>();
-                Parallel.For(0, partitionCount, i =>
-                {
-                    foreach (var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, i, partitionCount)).GetObjects<PortLayerCession>())
-                        BlockingCollection<PortLayerCession>.AddToAny(portLayerCessions, portLayerCession);
-                });
-                return portLayerCessions.SelectMany(x => x);
-            });
-        }
-
-        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsFast3(int partitionCount = 8)
-        {
-            Console.Write("3 - Parallel Task - First ExecuteReader and then Continue With Storage in common Concurrent bag passed to the cache of each Task ");
-            return Task.Factory.StartNew<IEnumerable<PortLayerCession>>(() =>
-            {
-                ConcurrentBag<PortLayerCession> portLayerCessions = new ConcurrentBag<PortLayerCession>();
-                Task[] portLayerCessionsTasks = new Task[partitionCount];
-                for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-                    portLayerCessionsTasks[i] = Task.Factory.StartNew((index) =>
-                    {
-                        return ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>();
-                    }, i).ContinueWith((res, state) =>
-                    {
-                        ConcurrentBag<PortLayerCession> storage = (ConcurrentBag<PortLayerCession>)state!;
-                        foreach (var portLayerCession in res.Result)
-                            storage.Add(portLayerCession);
-                    }, portLayerCessions);
-                Task.WaitAll(portLayerCessionsTasks);
-                return portLayerCessions;
-            });
-        }
-
-        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsFast4(int partitionCount = 8)
-        {
-            Console.Write("4 - Parallel Task - Storage in common Concurrent bag passed to the cache of each Task ");
-            return Task.Factory.StartNew<IEnumerable<PortLayerCession>>(() =>
-            {
-                ConcurrentBag<PortLayerCession> portLayerCessions = new ConcurrentBag<PortLayerCession>();
-                Task[] portLayerCessionsTasks = new Task[partitionCount];
-                for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-                    portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
-                    {
-                        Tuple<int, ConcurrentBag<PortLayerCession>> parameters = (Tuple<int, ConcurrentBag<PortLayerCession>>)state!;
-                        int index = parameters!.Item1;
-                        ConcurrentBag<PortLayerCession> storage = parameters.Item2;
-                        foreach (var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>())
-                            storage.Add(portLayerCession);
-                    }, new Tuple<int, ConcurrentBag<PortLayerCession>>(i, portLayerCessions));
-                Task.WaitAll(portLayerCessionsTasks);
-                return portLayerCessions;
-            });
-        }
-
-        public Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessionsFast5(int partitionCount = 8)
-        {
-            Console.Write("5 - Parallel Task - Storage in individual list for each task and then SelectMany into one IEnumerable ");
-            return Task.Factory.StartNew<IEnumerable<PortLayerCession>>(() =>
-            {
-                List<PortLayerCession>[] portLayerCessions = new List<PortLayerCession>[partitionCount];
+                PortLayerCession[][] portLayerCessions = new PortLayerCession[partitionCount][];
                 Task[] portLayerCessionsTasks = new Task[partitionCount];
                 for (int i = 0; i < portLayerCessionsTasks.Length; i++)
                     portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
                     {
                         int index = (int)state!;
-                        portLayerCessions[index] = ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>().ToList();
+                        portLayerCessions[index] = ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>().ToArray();
                     }, i);
                 Task.WaitAll(portLayerCessionsTasks);
                 return portLayerCessions.SelectMany(x => x);
             });
         }
-
-        public IEnumerable<PortLayerCession> GetPortfolioLayerCessionsFast6(int partitionCount = 8)
-        {
-            Console.Write("5 - Parallel Task - Storage in individual list for each task and then SelectMany into one IEnumerable ");
-            PortLayerCession[][] portLayerCessions = new PortLayerCession[partitionCount][];
-            Task[] portLayerCessionsTasks = new Task[partitionCount];
-            for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-                portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
-                {
-                    int index = (int)state!;
-                    portLayerCessions[index] = ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>().ToArray();
-                }, i);
-            Task.WaitAll(portLayerCessionsTasks);
-            return portLayerCessions.SelectMany(x => x);
-        }
-
-
-        public void GetPortfolioLayerCessionsNoStorage()
-        {
-            Console.Write("0 - Non Parallel ");
-            foreach (var portLayerCession in ExecuteReaderSql(GET_PORTFOLIO_LAYER_CESSIONS).GetObjects<PortLayerCession>())
-            {
-            }
-        }
-
-        public void GetPortfolioLayerCessionsNoStorageParallel(int partitionCount = 8)
-        {
-            Console.Write("1 - Parallel For");
-            Parallel.For(0, partitionCount, i =>
-            {
-                foreach (var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, i, partitionCount)).GetObjects<PortLayerCession>())
-                {
-                }
-            });
-        }
-
-        public void GetPortfolioLayerCessionsNoStorageTasks(int partitionCount = 8)
-        {
-            Console.Write("5 - Parallel Task");
-            Task[] portLayerCessionsTasks = new Task[partitionCount];
-            for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-                portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
-                {
-                    int index = (int)state!;
-                    foreach(var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount)).GetObjects<PortLayerCession>())
-                    {
-                    }
-                }, i);
-            Task.WaitAll(portLayerCessionsTasks);
-        }
-
-        //public void GetLayerView(int partitionCount = 8)
-        //{
-        //    const int ROWSIZE = 45;
-        //    Task[] portLayerCessionsTasks = new Task[partitionCount];
-        //    for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-        //        portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
-        //        {
-        //            int index = (int)state!;
-        //            byte[] buffer = ArrayPool<byte>.Shared.Rent(ROWSIZE);
-        //            ref byte bufferStart = ref MemoryMarshal.GetArrayDataReference(buffer);
-        //            SqlDataReader reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, index, partitionCount), CommandBehavior.SequentialAccess);
-        //            if(reader.Read()) 
-        //            {
-        //                using (Stream stream = reader.GetStream(0))
-        //                {
-        //                    while(stream.Read(buffer, 0, ROWSIZE) == ROWSIZE)
-        //                    {
-        //                        PortLayerCessionRefStruct portLayerCession = new PortLayerCessionRefStruct(ref bufferStart);
-        //                        Console.WriteLine(portLayerCession.CessionNet);
-        //                    }
-        //                }
-        //            }
-        //        }, i);
-        //    Task.WaitAll(portLayerCessionsTasks);
-        //}
 
         public void GetLayerView(int partitionCount = 8)
         {

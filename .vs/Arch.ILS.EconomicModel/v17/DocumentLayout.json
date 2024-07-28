@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|solutionrelative:arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -89,7 +89,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -101,13 +101,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "RevoSnowflakeRepository.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
               "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
               "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
-              "ViewState": "AQIAAAUAAAAAAAAAAADgvwgAAAAAAAAA",
+              "ViewState": "AQIAADMAAAAAAAAAAAAhwEMAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-28T02:14:16.123Z",
               "EditorCaption": ""
@@ -124,30 +124,6 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-28T01:59:50.6Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "IAdjacencyMatrix.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:48.388Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "DependencyEngineException.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:43:44.375Z"
             },
             {
               "$type": "Document",
@@ -211,29 +187,40 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Program.cs",
               "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
               "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Program.cs",
-              "ViewState": "AQIAADIAAAAAAAAAAAAAABcAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAWAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-28T00:14:04.526Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "RevoSqlRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "ViewState": "AQIAAOoAAAAAAAAAAAAQwP0AAAAUAAAA",
+              "DocumentIndex": 6,
+              "Title": "DependencyEngineException.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\DependencyEngineException.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-28T01:35:03.173Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-28T01:43:44.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IAdjacencyMatrix.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "RelativeToolTip": "..\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\IAdjacencyMatrix.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:43:48.388Z"
             },
             {
               "$type": "Document",
@@ -378,6 +365,40 @@
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-28T00:12:23.3Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "9910101e-0ab7-40ee-a218-8622258f2843",
+        "Display": 0,
+        "X": 399,
+        "Y": 317,
+        "Width": 1555,
+        "Height": 718,
+        "WindowState": 2
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RevoSqlRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "ViewState": "AQIAAFAAAAAAAAAAAAAwwA8AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-28T01:35:03.173Z",
+              "EditorCaption": ""
             }
           ]
         }

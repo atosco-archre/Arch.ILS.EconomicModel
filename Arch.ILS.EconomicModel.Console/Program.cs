@@ -1,87 +1,41 @@
 ﻿
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 using Arch.ILS.Common;
 using Arch.ILS.EconomicModel;
 
-ConnectionProtection connectionProtection =
-    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
-//if (!connectionProtection.IsProtected())
-//    connectionProtection.EncryptFile();
-//RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
-//var layers = revoSnowflakeRepository.GetLayers().Result;
-RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
-RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
-//var Layers = revoRepository.GetLayers().Result.ToDictionary(x => x.LayerId);
-//var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
-//var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
+namespace Arch.ILS.EconomicModel.Console
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            /*Authentication*/
+            ConnectionProtection connectionProtection =
+                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
+            //if (!connectionProtection.IsProtected())
+            //    connectionProtection.EncryptFile();
+            //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
+            //var layers = revoSnowflakeRepository.GetLayers().Result;
+            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
 
-int partitionCount = 8;
-//Thread.Sleep(5000);
-Stopwatch sw = Stopwatch.StartNew();
-//revoRepository.GetPortfolioLayerCessions().Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
 
-//revoRepository.GetPortfolioLayerCessionsFast(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
+            /*Queries*/
+            //var Layers = revoRepository.GetLayers().Result.ToDictionary(x => x.LayerId);
+            //var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
+            //var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
 
-//revoRepository.GetPortfolioLayerCessionsFast2(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
+            const int partitionCount = 8;
+            Stopwatch sw = Stopwatch.StartNew();
+            revoRepository.GetLayerView();
+            sw.Stop();
+            System.Console.WriteLine(sw.Elapsed);
+            //Thread.Sleep(5000);
+            //sw.Restart();
 
-//revoRepository.GetPortfolioLayerCessionsFast3(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
+            System.Console.WriteLine("End.");
+        }
+    }
+}
 
-//revoRepository.GetPortfolioLayerCessionsFast4(partitionCount).Wait();
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-//sw.Restart();
-
-//revoRepository.GetPortfolioLayerCessionsFast6(partitionCount);
-//sw.Stop();
-//Console.WriteLine(sw.Elapsed);
-////Thread.Sleep(5000);
-//sw.Restart();
-
-revoRepository.GetPortfolioLayerCessionsNoStorage();
-sw.Stop();
-Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-sw.Restart();
-
-revoRepository.GetPortfolioLayerCessionsNoStorageParallel();
-sw.Stop();
-Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-sw.Restart();
-
-revoRepository.GetPortfolioLayerCessionsNoStorageTasks();
-sw.Stop();
-Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-sw.Restart();
-
-revoRepository.GetLayerView();
-sw.Stop();
-Console.WriteLine(sw.Elapsed);
-//Thread.Sleep(5000);
-sw.Restart();
-
-Console.WriteLine("End.");
-
-Console.WriteLine("End.");
