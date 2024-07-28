@@ -4,14 +4,14 @@
     "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj": {}
   },
   "projects": {
-    "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj": {
+    "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj",
-        "projectName": "Arch.Common",
-        "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj",
+        "projectUniqueName": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj",
+        "projectName": "Arch.ILS.Common",
+        "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj",
         "packagesPath": "C:\\Users\\atosco\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\obj\\",
+        "outputPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -79,14 +79,14 @@
         }
       }
     },
-    "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\Arch.Core.csproj": {
+    "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\Arch.Core.csproj",
-        "projectName": "Arch.Core",
-        "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\Arch.Core.csproj",
+        "projectUniqueName": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
+        "projectName": "Arch.ILS.Core",
+        "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
         "packagesPath": "C:\\Users\\atosco\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\obj\\",
+        "outputPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -150,6 +150,71 @@
         }
       }
     },
+    "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj",
+        "projectName": "Arch.ILS.DependencyEngine",
+        "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj",
+        "packagesPath": "C:\\Users\\atosco\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\atosco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -179,11 +244,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj": {
-                "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj"
+              "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj": {
+                "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj"
               },
-              "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\Arch.Core.csproj": {
-                "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.Core\\Arch.Core\\Arch.Core.csproj"
+              "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj": {
+                "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj"
+              },
+              "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj": {
+                "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine\\Arch.ILS.DependencyEngine.csproj"
               },
               "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Snowflake\\Arch.ILS.Snowflake\\Arch.ILS.Snowflake.csproj": {
                 "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Snowflake\\Arch.ILS.Snowflake\\Arch.ILS.Snowflake.csproj"

@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "Arch.ILS.EconomicModel.Console/1.0.0": {
         "dependencies": {
-          "Arch.Common": "1.0.0",
+          "Arch.ILS.Common": "1.0.0",
           "Arch.ILS.EconomicModel": "1.0.0"
         },
         "runtime": {
@@ -590,27 +590,33 @@
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {},
-      "Arch.Common/1.0.0": {
+      "Arch.ILS.Common/1.0.0": {
         "dependencies": {
           "Snowflake.Data": "4.0.0",
           "System.Configuration.ConfigurationManager": "8.0.0"
         },
         "runtime": {
-          "Arch.Common.dll": {}
+          "Arch.ILS.Common.dll": {}
         }
       },
-      "Arch.Core/1.0.0": {
+      "Arch.ILS.Core/1.0.0": {
         "dependencies": {
           "System.Configuration.ConfigurationManager": "8.0.0"
         },
         "runtime": {
-          "Arch.Core.dll": {}
+          "Arch.ILS.Core.dll": {}
+        }
+      },
+      "Arch.ILS.DependencyEngine/1.0.0": {
+        "runtime": {
+          "Arch.ILS.DependencyEngine.dll": {}
         }
       },
       "Arch.ILS.EconomicModel/1.0.0": {
         "dependencies": {
-          "Arch.Common": "1.0.0",
-          "Arch.Core": "1.0.0",
+          "Arch.ILS.Common": "1.0.0",
+          "Arch.ILS.Core": "1.0.0",
+          "Arch.ILS.DependencyEngine": "1.0.0",
           "Arch.ILS.Snowflake": "1.0.0",
           "Studio.Core.Sql": "1.0.0"
         },
@@ -1049,12 +1055,17 @@
       "path": "system.threading.tasks.extensions/4.5.4",
       "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
     },
-    "Arch.Common/1.0.0": {
+    "Arch.ILS.Common/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Arch.Core/1.0.0": {
+    "Arch.ILS.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Arch.ILS.DependencyEngine/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

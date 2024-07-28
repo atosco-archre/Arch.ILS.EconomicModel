@@ -106,3 +106,4 @@ C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Bench
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Benchmark\obj\Debug\net8.0\Arch.ILS.EconomicModel.Benchmark.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Benchmark\obj\Debug\net8.0\Arch.ILS.EconomicModel.Benchmark.genruntimeconfig.cache
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Benchmark\obj\Debug\net8.0\ref\Arch.ILS.EconomicModel.Benchmark.dll
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Benchmark\obj\Debug\net8.0\Arch.ILS.EconomicModel.Benchmark.sourcelink.json

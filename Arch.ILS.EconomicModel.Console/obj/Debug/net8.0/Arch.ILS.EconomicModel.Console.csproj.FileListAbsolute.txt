@@ -69,15 +69,11 @@ C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Conso
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Management.dll
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.Common.dll
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.Core.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.EconomicModel.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Snowflake.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Studio.Core.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Studio.Core.Sql.dll
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.Common.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.EconomicModel.pdb
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.Core.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Snowflake.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Studio.Core.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Studio.Core.dll.config
@@ -89,3 +85,10 @@ C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Conso
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Debug\net8.0\Arch.ILS.EconomicModel.Console.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Debug\net8.0\Arch.ILS.EconomicModel.Console.genruntimeconfig.cache
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Debug\net8.0\ref\Arch.ILS.EconomicModel.Console.dll
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Common.dll
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Core.dll
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.DependencyEngine.dll
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Common.pdb
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.Core.pdb
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Debug\net8.0\Arch.ILS.DependencyEngine.pdb
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Debug\net8.0\Arch.ILS.EconomicModel.Console.sourcelink.json

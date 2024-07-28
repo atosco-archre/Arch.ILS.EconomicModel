@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Arch.Common\Arch.Common\Arch.Common.csproj" />
+    <ProjectReference Include="..\..\Arch.ILS.Common\Arch.ILS.Common\Arch.ILS.Common.csproj" />
     <ProjectReference Include="..\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.csproj" />
   </ItemGroup>
 

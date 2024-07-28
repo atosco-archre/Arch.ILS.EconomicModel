@@ -938,7 +938,7 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
-      "Arch.Common/1.0.0": {
+      "Arch.ILS.Common/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
@@ -946,31 +946,42 @@
           "System.Configuration.ConfigurationManager": "8.0.0"
         },
         "compile": {
-          "bin/placeholder/Arch.Common.dll": {}
+          "bin/placeholder/Arch.ILS.Common.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Arch.Common.dll": {}
+          "bin/placeholder/Arch.ILS.Common.dll": {}
         }
       },
-      "Arch.Core/1.0.0": {
+      "Arch.ILS.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "System.Configuration.ConfigurationManager": "8.0.0"
         },
         "compile": {
-          "bin/placeholder/Arch.Core.dll": {}
+          "bin/placeholder/Arch.ILS.Core.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Arch.Core.dll": {}
+          "bin/placeholder/Arch.ILS.Core.dll": {}
+        }
+      },
+      "Arch.ILS.DependencyEngine/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Arch.ILS.DependencyEngine.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Arch.ILS.DependencyEngine.dll": {}
         }
       },
       "Arch.ILS.EconomicModel/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
-          "Arch.Common": "1.0.0",
-          "Arch.Core": "1.0.0",
+          "Arch.ILS.Common": "1.0.0",
+          "Arch.ILS.Core": "1.0.0",
+          "Arch.ILS.DependencyEngine": "1.0.0",
           "Arch.ILS.Snowflake": "1.0.0",
           "Studio.Core.Sql": "1.0.0"
         },
@@ -2779,15 +2790,20 @@
         "version.txt"
       ]
     },
-    "Arch.Common/1.0.0": {
+    "Arch.ILS.Common/1.0.0": {
       "type": "project",
-      "path": "../../Arch.Common/Arch.Common/Arch.Common.csproj",
-      "msbuildProject": "../../Arch.Common/Arch.Common/Arch.Common.csproj"
+      "path": "../../Arch.ILS.Common/Arch.ILS.Common/Arch.ILS.Common.csproj",
+      "msbuildProject": "../../Arch.ILS.Common/Arch.ILS.Common/Arch.ILS.Common.csproj"
     },
-    "Arch.Core/1.0.0": {
+    "Arch.ILS.Core/1.0.0": {
       "type": "project",
-      "path": "../../Arch.Core/Arch.Core/Arch.Core.csproj",
-      "msbuildProject": "../../Arch.Core/Arch.Core/Arch.Core.csproj"
+      "path": "../../Arch.ILS.Core/Arch.ILS.Core/Arch.ILS.Core.csproj",
+      "msbuildProject": "../../Arch.ILS.Core/Arch.ILS.Core/Arch.ILS.Core.csproj"
+    },
+    "Arch.ILS.DependencyEngine/1.0.0": {
+      "type": "project",
+      "path": "../../Arch.ILS.DependencyEngine/Arch.ILS.DependencyEngine/Arch.ILS.DependencyEngine.csproj",
+      "msbuildProject": "../../Arch.ILS.DependencyEngine/Arch.ILS.DependencyEngine/Arch.ILS.DependencyEngine.csproj"
     },
     "Arch.ILS.EconomicModel/1.0.0": {
       "type": "project",
@@ -2812,7 +2828,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Arch.Common >= 1.0.0",
+      "Arch.ILS.Common >= 1.0.0",
       "Arch.ILS.EconomicModel >= 1.0.0"
     ]
   },
@@ -2849,8 +2865,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj": {
-              "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.Common\\Arch.Common\\Arch.Common.csproj"
+            "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj": {
+              "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj"
             },
             "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj": {
               "projectPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj"
