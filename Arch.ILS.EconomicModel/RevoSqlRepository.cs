@@ -1,12 +1,7 @@
 ﻿
-using System;
 using System.Buffers;
-using System.Collections.Concurrent;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+
 using Studio.Core;
 using Studio.Core.Sql;
 
@@ -16,47 +11,47 @@ namespace Arch.ILS.EconomicModel
     {
         #region Constants
 
-        private const string GET_LAYERS = @"SELECT [LayerId]
-     , [Inception]
-  FROM [dbo].[Layer]";
+        private const string GET_LAYERS = @"SELECT LayerId
+     , Inception
+  FROM dbo.Layer";
 
-        private const string GET_PORTFOLIOS = @"SELECT [PortfolioId]
-     , [PortfolioType]
-     , [AsOfDate]
-  FROM [dbo].[Portfolio]";
+        private const string GET_PORTFOLIOS = @"SELECT PortfolioId
+     , PortfolioType
+     , AsOfDate
+  FROM dbo.Portfolio";
 
-        private const string GET_PORTFOLIO_LAYERS = @"SELECT [PortLayerId]
-     , [LayerId]
-     , [PortfolioId]
-  FROM [dbo].[PortLayer]";
+        private const string GET_PORTFOLIO_LAYERS = @"SELECT PortLayerId
+     , LayerId
+     , PortfolioId
+  FROM dbo.PortLayer";
 
-        private const string GET_RETRO_PROGRAM = @"SELECT [RetroProgramId]
-     , [Inception]
-     , [Expiration]
-     , CONVERT(TINYINT, [RetroProgramType]) AS [RetroProgramType]
-     , CONVERT(TINYINT, [RetroLevelType] + 1) AS [RetroLevelType]
-  FROM [dbo].[RetroProgram]
- WHERE [Status] IN (22,10)/*remove projection retros*/
+        private const string GET_RETRO_PROGRAM = @"SELECT RetroProgramId
+     , Inception
+     , Expiration
+     , CONVERT(TINYINT, RetroProgramType) AS RetroProgramType
+     , CONVERT(TINYINT, RetroLevelType + 1) AS RetroLevelType
+  FROM dbo.RetroProgram
+ WHERE Status IN (22,10)/*remove projection retros*/
    AND IsActive = 1
    AND IsDeleted = 0";
 
-        private const string GET_PORTFOLIO_LAYER_CESSIONS = @"SELECT [PortLayerCessionId]
-     , [PortLayerId]
-     , [RetroProgramId]
-     , [CessionGross]
-     /*, [CessionNet]*/
-  FROM [dbo].[PortLayerCession]
+        private const string GET_PORTFOLIO_LAYER_CESSIONS = @"SELECT PortLayerCessionId
+     , PortLayerId
+     , RetroProgramId
+     , CessionGross
+     /*, CessionNet*/
+  FROM dbo.PortLayerCession
  WHERE IsActive = 1
    AND ShouldCessionApply = 1
    AND IsDeleted = 0
    AND CessionGross > 0";
 
-        private const string GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION = @"SELECT [PortLayerCessionId]
-     , [PortLayerId]
-     , [RetroProgramId]
-     , [CessionGross]
-     /*, [CessionNet]*/
-  FROM [dbo].[PortLayerCession]
+        private const string GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION = @"SELECT PortLayerCessionId
+     , PortLayerId
+     , RetroProgramId
+     , CessionGross
+     /*, CessionNet*/
+  FROM dbo.PortLayerCession
  WHERE (PortLayerCessionId % {1}) = {0} 
    AND IsActive = 1
    AND ShouldCessionApply = 1
@@ -183,12 +178,7 @@ namespace Arch.ILS.EconomicModel
                 }, (i, partitionedPortLayerCessions[i]));
             Task.WaitAll(portLayerCessionsTasks);
 
-            Dictionary<int, Dictionary<byte, PortLayerCessionExtended[]>> portfolioLevelCessions = partitionedPortLayerCessions
-                .SelectMany(x => x)
-                .GroupBy(x => x.PortfolioId)
-                .ToDictionary(k => k.Key, v => v
-                    .GroupBy(xx => xx.RetroLevelType)
-                    .ToDictionary(kk => kk.Key, vv => vv.ToArray()));
+            PortfolioRetroCessions portfolioLevelRetroCessions = new(partitionedPortLayerCessions.SelectMany(cession => cession));
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             static DateTime? GetPortfolioLayerInception(Portfolio portfolio, Layer layer)

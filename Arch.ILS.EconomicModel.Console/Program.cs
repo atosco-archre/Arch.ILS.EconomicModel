@@ -17,14 +17,16 @@ namespace Arch.ILS.EconomicModel.Console
             //    connectionProtection.EncryptFile();
             //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
             //var layers = revoSnowflakeRepository.GetLayers().Result;
+            //var portLayersCessions = revoSnowflakeRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
             RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
 
 
             /*Queries*/
-            //var Layers = revoRepository.GetLayers().Result.ToDictionary(x => x.LayerId);
-            //var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
-            //var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
+            //var Layers2 = revoRepository.GetLayers().Result;
+            ////var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
+            ////var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
+            //var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
 
             const int partitionCount = 8;
             Stopwatch sw = Stopwatch.StartNew();

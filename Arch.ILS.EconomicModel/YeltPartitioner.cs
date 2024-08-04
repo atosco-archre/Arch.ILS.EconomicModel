@@ -25,8 +25,7 @@ namespace Arch.ILS.EconomicModel
                     throw new Exception("Overlapping day ranges not allowed.");
 
                 _startDays[i] = (short)range.Start.Value;
-                previousEndDay = (short)range.End.Value;
-                _endDays[i++] = previousEndDay;
+                _endDays[i++] = (short)range.End.Value;
             }
             MoveNext = true;
         }

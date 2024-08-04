@@ -3,10 +3,10 @@ namespace Arch.ILS.EconomicModel
 {
     public sealed class PortLayerCessionExtended : PortLayerCession
     {
-        public int PortfolioId { get; set; }
-        public int LayerId { get; set; }
-        public byte RetroLevelType {  get; set; }
-        public DateTime OverlapStart { get; set; }
-        public DateTime OverlapEnd { get; set; }
+        public int PortfolioId;
+        public int LayerId;
+        public byte RetroLevelType;
+        public DateTime OverlapStart;
+        public DateTime OverlapEnd;
     }
 }

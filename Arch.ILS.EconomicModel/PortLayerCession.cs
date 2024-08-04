@@ -13,7 +13,5 @@ namespace Arch.ILS.EconomicModel
         public int RetroProgramId { get; set; }
         [Field(3)]
         public decimal CessionGross {  get; set; }
-
-        //public decimal CessionNet { get; set; }
     }
 }
