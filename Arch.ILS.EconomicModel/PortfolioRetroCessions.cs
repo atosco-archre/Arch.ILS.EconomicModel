@@ -64,16 +64,11 @@ namespace Arch.ILS.EconomicModel
 
         private void SetNetCessions()
         {
-            Stopwatch sw = Stopwatch.StartNew();
-            sw.Start();
 #if DEBUG
              Parallel.ForEach(_portfolioLevelLayerRetroCessions.Keys, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (portfolioId) => { SetNetCessions(portfolioId);});
 #else
             Parallel.ForEach(_portfolioLevelLayerRetroCessions.Keys, (portfolioId) => { SetNetCessions(portfolioId);});
 #endif
-            sw.Stop();
-            Console.WriteLine($"Net Cession elapsed {sw.Elapsed}.");
-            var max = _portfolioLevelLayerPeriodRetroCessions.Values.Select(x => x.Values.Select(x => x.GroupBy(g => g.RetroProgramId).Count())).Max();
         }
 
         private unsafe void SetNetCessions(in int portfolioId)
