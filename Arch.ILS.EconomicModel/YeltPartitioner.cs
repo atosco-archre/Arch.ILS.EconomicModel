@@ -30,16 +30,16 @@ namespace Arch.ILS.EconomicModel
             MoveNext = true;
         }
 
-        public ref short CurrentStartDay => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(_endDays), _dayIndex);
-        public ref short CurrentEndDay => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(_endDays), _dayIndex);
+        public ref short CurrentStartDayInclusive => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(_startDays), _dayIndex);
+        public ref short CurrentEndDayExclusive => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(_endDays), _dayIndex);
         public bool MoveNext { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetCurrentPartition(out YeltDayPartition yeltDayPartition)
         {
             //Note that the end index is exclusive.
-            ref short currentStartDay = ref CurrentStartDay;
-            ref short currentEndDay = ref CurrentEndDay;
+            ref short currentStartDay = ref CurrentStartDayInclusive;
+            ref short currentEndDay = ref CurrentEndDayExclusive;
 
             while (_outBufferIndex < _yelt.BufferCount)
             {
@@ -61,11 +61,10 @@ namespace Arch.ILS.EconomicModel
                 }
 
                 days = days[startIndex..];
-                int endIndex = days.BinarySearch<short>(currentEndDay);
-                if (endIndex < 0)
-                    endIndex = ~endIndex;
+                int length = days.BinarySearch<short>(currentEndDay);
+                length = length < 0 ? ~length : length + 1;
 
-                if ((uint)endIndex == (uint)days.Length)
+                if ((uint)length == (uint)days.Length)
                 {
                     _outBufferIndex++;
                     _inBufferIndex = 0;
@@ -73,13 +72,13 @@ namespace Arch.ILS.EconomicModel
                 else
                 {
                     _dayIndex++;
-                    _inBufferIndex = endIndex;
+                    _inBufferIndex = length;
                     if (_dayIndex >= (uint)_startDays.Length)
                         MoveNext = false;//prevent continuing to try get partition when all day partitions are processed.
                 }                    
                 
-                days = days[..endIndex];
-                yeltDayPartition = new YeltDayPartition(days, yearDayEventIdKeys[startIndex..endIndex], lossPcts[startIndex..endIndex], rps[startIndex..endIndex], rbs[startIndex..endIndex]);
+                days = days[..length];
+                yeltDayPartition = new YeltDayPartition(days, yearDayEventIdKeys.Slice(startIndex, length), lossPcts.Slice(startIndex, length), rps.Slice(startIndex, length), rbs.Slice(startIndex, length));
                 return true;
             }
 

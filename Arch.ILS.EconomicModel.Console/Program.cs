@@ -28,6 +28,10 @@ namespace Arch.ILS.EconomicModel.Console
             ////var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
             //var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
 
+            RevoLayerLossSqlRepository revoLayerLossSqlRepository = new RevoLayerLossSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVOLAYERLOSS));
+            var layerYelt = revoLayerLossSqlRepository.GetLayerDayYelVectorised(10619, 38252).Result;
+            YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] {new Range(1, 50)}, layerYelt);
+            yeltPartitioner.TryGetCurrentPartition(out var yeltDayPartition);
             const int partitionCount = 8;
             Stopwatch sw = Stopwatch.StartNew();
             revoRepository.GetLayerView();

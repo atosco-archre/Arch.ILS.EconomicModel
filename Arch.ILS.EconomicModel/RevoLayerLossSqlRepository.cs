@@ -181,51 +181,44 @@ namespace Arch.ILS.EconomicModel
         //    }, lossAnalysisIdLayerIds);
         //}
 
-        //public Task<RevoLayerYeltUnmanaged> GetLayerYeltUnmanaged(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltUnmanaged>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
+        public Task<RevoLayerYeltVectorised> GetLayerYelVectorised(in int lossAnalysisId, in int layerId)
+        {
+            return Task.Factory.StartNew<RevoLayerYeltVectorised>((ids) =>
+            {
+                (int analysisId, int layerId) = ((int, int))ids!;
+                return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
+            }, (lossAnalysisId, layerId));
+        }
 
-        //public Task<IEnumerable<RevoLayerYeltUnmanaged>> GetLayerYeltsUnmanaged(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltUnmanaged>[] tasks = new Task<RevoLayerYeltUnmanaged>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltUnmanaged(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
+        public Task<RevoLayerDayYeltVectorised> GetLayerDayYelVectorised(in int lossAnalysisId, in int layerId)
+        {
+            return Task.Factory.StartNew<RevoLayerDayYeltVectorised>((ids) =>
+            {
+                (int analysisId, int layerId) = ((int, int))ids!;
+                return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
+            }, (lossAnalysisId, layerId));
+        }
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //private IEnumerable<RevoLayerYeltEntry> GetRevoLayerYeltEntries(int lossAnalysisId, int layerId)
-        //{
-        //    using (var reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_MODELLED_LAYER_YELT_QUERY, lossAnalysisId, layerId)))
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            yield return new RevoLayerYeltEntry
-        //            {
-        //                Year = (short)reader.GetInt32(0),
-        //                EventId = reader.GetInt32(1),
-        //                Peril = reader.GetString(2),
-        //                Day = reader.GetInt16(3),
-        //                LossPct = reader.GetDouble(4),
-        //                RP = reader.GetDouble(5),
-        //                RB = reader.GetDouble(6),
-        //            };
-        //        }
-        //    }
-        //}
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IEnumerable<RevoLayerYeltEntry> GetRevoLayerYeltEntries(int lossAnalysisId, int layerId)
+        {
+            using (var reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_MODELLED_LAYER_YELT_QUERY, lossAnalysisId, layerId)))
+            {
+                while (reader.Read())
+                {
+                    yield return new RevoLayerYeltEntry
+                    {
+                        Year = (short)reader.GetInt32(0),
+                        EventId = reader.GetInt32(1),
+                        Peril = reader.GetString(2),
+                        Day = reader.GetInt16(3),
+                        LossPct = reader.GetDouble(4),
+                        RP = reader.GetDouble(5),
+                        RB = reader.GetDouble(6),
+                    };
+                }
+            }
+        }
 
 
         #endregion Methods
