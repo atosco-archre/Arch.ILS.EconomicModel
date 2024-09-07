@@ -2,11 +2,19 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-*/**/bin/Debug
-*/**/bin/Release
-*/**/obj/Debug
-*/**/obj/Release
+Debug/
+Release/
+.vs/
 /.vs/Arch.ILS.EconomicModel/v17/TestStore/0
 /.vs/Arch.ILS.EconomicModel/FileContentIndex
 /Arch.ILS.EconomicModel.Console/App.config
 /Arch.ILS.EconomicModel.Console/App.config.config
+/Arch.ILS.EconomicModel/bin/
+/Arch.ILS.EconomicModel/obj/
+/Arch.ILS.EconomicModel/.vs/
+/Arch.ILS.EconomicModel.Benchmark/bin/
+/Arch.ILS.EconomicModel.Benchmark/obj/
+/Arch.ILS.EconomicModel.Benchmark/.vs/
+/Arch.ILS.EconomicModel.Console/bin/
+/Arch.ILS.EconomicModel.Console/obj/
+/Arch.ILS.EconomicModel.Console/.vs/
