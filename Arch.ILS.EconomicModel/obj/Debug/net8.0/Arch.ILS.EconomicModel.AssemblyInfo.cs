@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Arch.ILS.EconomicModel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32ed6a3ce926879d776164c00d4876f20c9c3cbf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a9e920ce278fb7bf0ef611d6eb9bd23aac742440")]
 [assembly: System.Reflection.AssemblyProductAttribute("Arch.ILS.EconomicModel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Arch.ILS.EconomicModel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

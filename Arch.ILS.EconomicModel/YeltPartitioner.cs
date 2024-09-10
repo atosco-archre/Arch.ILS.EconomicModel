@@ -59,24 +59,48 @@ namespace Arch.ILS.EconomicModel
                         continue;
                     }                        
                 }
+                else if(startIndex > 0)
+                {
+                    int previousStartIndex = days[..startIndex].BinarySearch<short>((short)(currentStartDay - 1));
+                    if (previousStartIndex < 0)
+                    {
+                        startIndex = ~previousStartIndex;
+                    }
+                    else
+                    {
+                        startIndex = ++previousStartIndex + days[previousStartIndex..(startIndex + 1)].IndexOf(currentStartDay);
+                    }
+                }
 
                 days = days[startIndex..];
                 int length = days.BinarySearch<short>(currentEndDay);
-                length = length < 0 ? ~length : length + 1;
 
-                if ((uint)length == (uint)days.Length)
+                if (length < 0)
                 {
-                    _outBufferIndex++;
-                    _inBufferIndex = 0;
+                    length = ~length;
+                    if ((uint)length == (uint)days.Length)
+                    {
+                        _outBufferIndex++;
+                        _inBufferIndex = 0;
+                    }
                 }
                 else
                 {
+                    int previousEndIndex = days[..length].BinarySearch<short>((short)(currentEndDay - 1));
+                    if (previousEndIndex < 0)
+                    {
+                        length = ~previousEndIndex;
+                    }
+                    else
+                    {
+                        length = ++previousEndIndex + days[previousEndIndex..length].IndexOf(currentEndDay);
+                    }
                     _dayIndex++;
-                    _inBufferIndex = length;
+                    _inBufferIndex = startIndex + length;
                     if (_dayIndex >= (uint)_startDays.Length)
                         MoveNext = false;//prevent continuing to try get partition when all day partitions are processed.
-                }                    
-                
+                }
+
                 days = days[..length];
                 yeltDayPartition = new YeltDayPartition(days, yearDayEventIdKeys.Slice(startIndex, length), lossPcts.Slice(startIndex, length), rps.Slice(startIndex, length), rbs.Slice(startIndex, length));
                 return true;

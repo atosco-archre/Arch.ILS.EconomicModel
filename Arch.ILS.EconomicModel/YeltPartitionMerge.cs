@@ -13,12 +13,12 @@ namespace Arch.ILS.EconomicModel
         public static unsafe int Merge_ScalarOptimised_2(YeltPartitionLinkedList partitionsA, YeltPartitionLinkedList partitionsB, long* dst)
         {
             int i = 0, j = 0, k = 0;
-            YeltPartitionLinkedList* currentPartitionA = &partitionsA;
-            YeltPartitionLinkedList* currentPartitionB = &partitionsB;
-            long* aArr = (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys));
-            long* bArr = (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys));
-            int aCnt = (*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys.Length;
-            int bCnt = (*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys.Length;
+            YeltPartitionLinkedList currentPartitionA = partitionsA;
+            YeltPartitionLinkedList currentPartitionB = partitionsB;
+            long* aArr = currentPartitionA.CurrentStartKey;
+            long* bArr = currentPartitionB.CurrentStartKey;
+            int aCnt = currentPartitionA.CurrentLength;
+            int bCnt = currentPartitionB.CurrentLength;
 
             while (currentPartitionA != null && currentPartitionB != null)
             {
@@ -41,12 +41,12 @@ namespace Arch.ILS.EconomicModel
                     j += (a >= b) ? 1 : 0;
                 }
 
-                currentPartitionA = (i == aCnt) ? (*currentPartitionA).NextNode : currentPartitionA;
-                currentPartitionB = (j == bCnt) ? (*currentPartitionB).NextNode : currentPartitionB;
-                aArr = (i == aCnt) ? (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys)) : aArr;
-                bArr = (j == bCnt) ? (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys)) : bArr;
-                aCnt = (i == aCnt) ? (*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys.Length : aCnt;
-                bCnt = (j == bCnt) ? (*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys.Length : bCnt;
+                currentPartitionA = (i == aCnt) ? currentPartitionA.NextNode : currentPartitionA;
+                currentPartitionB = (j == bCnt) ? currentPartitionB.NextNode : currentPartitionB;
+                aArr = (i == aCnt) ? currentPartitionA.CurrentStartKey : aArr;
+                bArr = (j == bCnt) ? currentPartitionB.CurrentStartKey : bArr;
+                aCnt = (i == aCnt) ? currentPartitionA.CurrentLength : aCnt;
+                bCnt = (j == bCnt) ? currentPartitionB.CurrentLength : bCnt;
                 i = (i == aCnt) ? 0 : i;
                 j = (j == bCnt) ? 0 : j;
             } 
@@ -56,25 +56,25 @@ namespace Arch.ILS.EconomicModel
             Unsafe.CopyBlock(dst + k, bArr + j, (uint)(bCnt - j) * sizeof(long));
             k += (bCnt - j);
 
-            currentPartitionA = (*currentPartitionA).NextNode;
+            currentPartitionA = currentPartitionA.NextNode;
             while (currentPartitionA != null)
             {
-                aArr = (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys));
-                aCnt = (*currentPartitionA).CurrentNode.PartitionYearDayEventIdKeys.Length;
+                aArr = currentPartitionA.CurrentStartKey;
+                aCnt = currentPartitionA.CurrentLength;
                 Unsafe.CopyBlock(dst + k, aArr, (uint)aCnt * sizeof(long));
                 k += aCnt;
-                currentPartitionA = (*currentPartitionA).NextNode;
+                currentPartitionA = currentPartitionA.NextNode;
             }
 
 
-            currentPartitionB = (*currentPartitionB).NextNode;
+            currentPartitionB = currentPartitionB.NextNode;
             while (currentPartitionB != null)
             {
-                bArr = (long*)Unsafe.AsPointer(ref MemoryMarshal.GetReference((*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys));
-                bCnt = (*currentPartitionB).CurrentNode.PartitionYearDayEventIdKeys.Length;
+                bArr = currentPartitionB.CurrentStartKey;
+                bCnt = currentPartitionB.CurrentLength;
                 Unsafe.CopyBlock(dst + k, bArr, (uint)bCnt * sizeof(long));
                 k += bCnt;
-                currentPartitionB = (*currentPartitionB).NextNode;
+                currentPartitionB = currentPartitionB.NextNode;
             }
 
             return k;

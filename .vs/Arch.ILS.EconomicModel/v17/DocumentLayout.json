@@ -3,66 +3,166 @@
   "WorkspaceRootPath": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portfolioretrocessions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portfolioretrocessions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|solutionrelative:arch.ils.economicmodel.console\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portlayercessionextended.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portlayercessionextended.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\yeltpartitionlinkedlistreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\yeltpartitionlinkedlistreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\yeltpartitioner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\yeltpartitioner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\datetimerange.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\datetimerange.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\periodcession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\periodcession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayerdayyeltvectorised.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayerdayyeltvectorised.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C64026DA-3EEB-4610-8944-7EF60FFCF748}|..\\Studio.Core\\Studio.Core.Sql\\Studio.Core.Sql.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core.sql\\sqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayerlosssqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayerlosssqlrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portlayercession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portlayercession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\yeltpartitionlinkedlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\yeltpartitionlinkedlist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\yeltpartitionmerge.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\yeltpartitionmerge.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\irevolayerlossrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\irevolayerlossrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\revolayeryeltyeararrayunmanagedunsafe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\revolayeryeltyeararrayunmanagedunsafe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\revolayeryeltyeararrayunmanaged.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\revolayeryeltyeararrayunmanaged.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\revolayeryeltstandardunmanaged.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\revolayeryeltstandardunmanaged.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\mockrevolayerlossrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\mockrevolayerlossrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{06176188-B895-45CB-A544-0116A52241FB}|..\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.common\\arch.ils.common\\snowflakeconnectionstrings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\datetimerange.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\datetimerange.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revosnowflakerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{06176188-B895-45CB-A544-0116A52241FB}|..\\Arch.ILS.Common\\Arch.ILS.Common\\Arch.ILS.Common.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.common\\arch.ils.common\\snowflakeconnectionstrings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portfolioretrocessions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portfolioretrocessions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.console\\app.config.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{3411F895-31B3-4A68-982E-107B919F3118}|Arch.ILS.EconomicModel.Console\\Arch.ILS.EconomicModel.Console.csproj|solutionrelative:arch.ils.economicmodel.console\\app.config.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{39002927-96A7-4650-B1FB-BCA7774C11D4}|..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.core\\arch.ils.core\\mergeremoveduplicate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\retroprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\retroprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{39002927-96A7-4650-B1FB-BCA7774C11D4}|..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.core\\arch.ils.core\\merge.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\yeltpartitioner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\yeltpartitioner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\pagelist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\record.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\pagestream.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\dataobjectreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\page.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\irecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayeryelt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayeryelt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\periodcession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\periodcession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\layerview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\layerview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\layeruploadbenchmark.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\layeruploadbenchmark.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\benchmarks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\benchmarks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayerentryyeareventidcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayerentryyeareventidcomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\revolayerdayyelt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\revolayerdayyelt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{39002927-96A7-4650-B1FB-BCA7774C11D4}|..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.core\\arch.ils.core\\defaultnumberarrayequalitycomparer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\fixeddictionary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\fixeddictionary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\yeararray.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\yeararray.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{39002927-96A7-4650-B1FB-BCA7774C11D4}|..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.core\\arch.ils.core\\operationextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\int32span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\int32span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel.benchmark\\int16span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BFEBB7BE-C9EB-47FA-8783-E556F31D0B90}|Arch.ILS.EconomicModel.Benchmark\\Arch.ILS.EconomicModel.Benchmark.csproj|solutionrelative:arch.ils.economicmodel.benchmark\\int16span.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{39002927-96A7-4650-B1FB-BCA7774C11D4}|..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.core\\arch.ils.core\\arch.ils.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\fileeventsink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6899DD8C-554A-4881-A045-6F26476B3E37}|..\\Studio.Core\\Studio.Core\\Studio.Core.csproj|c:\\users\\atosco\\source\\repos\\studio.core\\studio.core\\studio.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|c:\\users\\atosco\\source\\repos\\arch.ils.economicmodel\\arch.ils.economicmodel\\portlayercession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{687DE46E-B964-4E39-B0D1-3F2C8B5A5411}|Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.csproj|solutionrelative:arch.ils.economicmodel\\portlayercession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -72,7 +172,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -81,180 +181,161 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "PortLayerPeriodCession.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayerPeriodCession.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAA6wAsAAAAIAAAA",
+              "Title": "RevoLayerDayYeltVectorised.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerDayYeltVectorised.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerDayYeltVectorised.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerDayYeltVectorised.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerDayYeltVectorised.cs",
+              "ViewState": "AQIAAJMAAAAAAAAAAAAUwDIAAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T12:17:41.866Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-13T00:09:50.942Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "DateTimeRange.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\DateTimeRange.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\DateTimeRange.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\DateTimeRange.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\DateTimeRange.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAAAUwCwAAAAbAAAA",
+              "DocumentIndex": 7,
+              "Title": "YeltPartitionMerge.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionMerge.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\YeltPartitionMerge.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionMerge.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\YeltPartitionMerge.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAEwAAAA1AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T03:40:14.467Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "App.config.config",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\App.config.config",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\App.config.config",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\App.config.config",
-              "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\App.config.config",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2024-08-01T00:22:07.406Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "PortLayer.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayer.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayer.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayer.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayer.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T13:02:41.624Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "RetroProgram.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RetroProgram.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RetroProgram.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RetroProgram.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\RetroProgram.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T13:03:00.053Z"
+              "WhenOpened": "2024-08-15T03:36:03.222Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "PortLayerCessionExtended.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCessionExtended.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayerCessionExtended.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCessionExtended.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayerCessionExtended.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T13:02:44.963Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "PortLayerCession.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCession.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayerCession.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCession.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayerCession.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T11:43:46.479Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "PortfolioRetroCessions.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
-              "ViewState": "AQIAADUAAAAAAAAAAAAIwEEAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T11:43:49.512Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "IRevoLayerLossRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\IRevoLayerLossRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-01T14:31:29.862Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "PeriodCession.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PeriodCession.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PeriodCession.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PeriodCession.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\PeriodCession.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-04T17:47:30.497Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "RevoSnowflakeRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
-              "ViewState": "AQIAAFAAAAAAAAAAAAAowGoAAABUAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-30T12:07:13.538Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "RevoSqlRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
-              "ViewState": "AQIAAKsAAAAAAAAAAAD4v30AAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-30T12:06:11.283Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
-              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Program.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
-              "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Program.cs",
-              "ViewState": "AQIAABMAAAAAAAAAAAAgwCAAAAAMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-30T12:06:06.262Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
               "Title": "YeltPartitioner.cs",
               "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitioner.cs",
               "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\YeltPartitioner.cs",
               "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitioner.cs",
               "RelativeToolTip": "Arch.ILS.EconomicModel\\YeltPartitioner.cs",
-              "ViewState": "AQIAABMAAAAAAAAAAADwvx8AAAAAAAAA",
+              "ViewState": "AQIAAE0AAAAAAAAAAAAkwGQAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-30T01:13:26.077Z",
+              "WhenOpened": "2024-08-08T12:14:49.47Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Console\\Program.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Console\\Program.cs*",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Console\\Program.cs*",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAiwCAAAABeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-12T23:02:07.731Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RevoSqlRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSqlRepository.cs",
+              "ViewState": "AQIAAKgAAAAAAAAAAAAQwLMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-08T01:05:37.207Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "YeltPartitionLinkedListReader.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionLinkedListReader.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\YeltPartitionLinkedListReader.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionLinkedListReader.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\YeltPartitionLinkedListReader.cs",
+              "ViewState": "AQIAAC0AAAAAAAAAAAAswEAAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-15T04:00:24.898Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "RevoLayerLossSqlRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerLossSqlRepository.cs",
+              "ViewState": "AQIAALcAAAAAAAAAAAAqwMAAAAAwAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-12T23:16:28.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "YeltPartitionLinkedList.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionLinkedList.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\YeltPartitionLinkedList.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\YeltPartitionLinkedList.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\YeltPartitionLinkedList.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-07T19:15:11.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "RevoLayerYeltYearArrayUnmanaged.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanaged.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanaged.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanaged.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanaged.cs",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAYwBwAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-12T23:18:18.448Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "RevoLayerYeltYearArrayUnmanagedUnsafe.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanagedUnsafe.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanagedUnsafe.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanagedUnsafe.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltYearArrayUnmanagedUnsafe.cs",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAYwBwAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-07T20:34:30.811Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "RevoLayerYeltStandardUnmanaged.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltStandardUnmanaged.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltStandardUnmanaged.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltStandardUnmanaged.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\RevoLayerYeltStandardUnmanaged.cs",
+              "ViewState": "AQIAABIAAAAAAAAAAAAYwB8AAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-07T20:34:51.254Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "MockRevoLayerLossRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\MockRevoLayerLossRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\MockRevoLayerLossRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\MockRevoLayerLossRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\MockRevoLayerLossRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACsAAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-07T20:35:04.65Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "PortLayer.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayer.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayer.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayer.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:42:07.926Z"
             },
             {
               "$type": "Document",
@@ -264,23 +345,369 @@
               "RelativeDocumentMoniker": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
               "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
               "RelativeToolTip": "..\\Arch.ILS.Common\\Arch.ILS.Common\\SnowflakeConnectionStrings.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAAAAABwAAAAMAAAA",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-29T23:56:13.281Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-20T19:19:23.552Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "SqlRepository.cs",
-              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core.Sql\\SqlRepository.cs",
-              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core.Sql\\SqlRepository.cs",
-              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core.Sql\\SqlRepository.cs",
-              "RelativeToolTip": "..\\Studio.Core\\Studio.Core.Sql\\SqlRepository.cs",
-              "ViewState": "AQIAAF4AAAAAAAAAAAArwHEAAAANAAAA",
+              "DocumentIndex": 22,
+              "Title": "Page.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Page.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\Page.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Page.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\Page.cs",
+              "ViewState": "AQIAAEwAAAAAAAAAAAAqwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-31T00:14:59.738Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-13T17:43:08.455Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "RevoSnowflakeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoSnowflakeRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAEUAAAAiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-20T19:19:49.458Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "DateTimeRange.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\DateTimeRange.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\DateTimeRange.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\DateTimeRange.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\DateTimeRange.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T00:15:42.275Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "DataObjectReader.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\DataObjectReader.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\DataObjectReader.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\DataObjectReader.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\DataObjectReader.cs",
+              "ViewState": "AQIAAH0AAAAAAAAAAAA9wAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:43:14.508Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "PageList.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\PageList.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\PageList.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\PageList.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\PageList.cs",
+              "ViewState": "AQIAABUAAAAAAAAAAAAYwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:43:24.963Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "PageStream.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\PageStream.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\PageStream.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\PageStream.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\PageStream.cs",
+              "ViewState": "AQIAAJsAAAAAAAAAAAAAwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:43:27.242Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "PortfolioRetroCessions.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortfolioRetroCessions.cs",
+              "ViewState": "AQIAAEEAAAAAAAAAAAAAAFEAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-09T23:45:55.185Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "MergeRemoveDuplicate.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\MergeRemoveDuplicate.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\MergeRemoveDuplicate.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\MergeRemoveDuplicate.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\MergeRemoveDuplicate.cs",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAQwEMAAAAVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T02:26:57.309Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Merge.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Merge.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\Merge.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Merge.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\Merge.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAIoAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T00:35:51.474Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Record.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Record.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\Record.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Record.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\Record.cs",
+              "ViewState": "AQIAACsAAAAAAAAAAAAuwDUAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:43:32.386Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "IRecord.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\IRecord.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\IRecord.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\IRecord.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\IRecord.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T17:41:59.199Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "PeriodCession.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PeriodCession.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PeriodCession.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PeriodCession.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\PeriodCession.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwAUAAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-09T23:46:16.18Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "LayerUploadBenchmark.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\LayerUploadBenchmark.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAAAEwAAAAnAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T17:35:29.982Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "RevoLayerYelt.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerYelt.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerYelt.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerYelt.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerYelt.cs",
+              "ViewState": "AQIAABoAAAAAAAAAAAAQwCUAAAAcAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T02:27:33.622Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "LayerView.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\LayerView.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\LayerView.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\LayerView.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\LayerView.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-13T00:33:54.058Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "Benchmarks.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Benchmarks.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Benchmarks.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Benchmarks.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Benchmarks.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-12T23:18:35.933Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "RevoLayerEntryYearEventIdComparer.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerEntryYearEventIdComparer.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerEntryYearEventIdComparer.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerEntryYearEventIdComparer.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerEntryYearEventIdComparer.cs",
+              "ViewState": "AQIAAAUAAAAAAAAAAAAzwBIAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T03:10:21.66Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "RevoLayerDayYelt.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerDayYelt.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\RevoLayerDayYelt.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\RevoLayerDayYelt.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\RevoLayerDayYelt.cs",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAQwFIAAAA0AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T02:41:58.687Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Program.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Program.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Program.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAACAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T13:09:51.011Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "DefaultNumberArrayEqualityComparer.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\DefaultNumberArrayEqualityComparer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T02:26:39.876Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "FixedDictionary.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\FixedDictionary.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\FixedDictionary.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\FixedDictionary.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\FixedDictionary.cs",
+              "ViewState": "AQIAADsAAAAAAAAAAAAwwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T22:50:08.55Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "YearArray.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\YearArray.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\YearArray.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\YearArray.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\YearArray.cs",
+              "ViewState": "AQIAAG8AAAAAAAAAAAAiwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T22:45:45.878Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "OperationExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\OperationExtensions.cs",
+              "ViewState": "AQIAACQAAAAAAAAAAAAowAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T16:52:54.968Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "Arch.ILS.EconomicModel.GlobalUsings.g.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\obj\\Release\\net9.0\\Arch.ILS.EconomicModel.GlobalUsings.g.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T15:40:05.558Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "Arch.ILS.Core.csproj",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
+              "RelativeDocumentMoniker": "..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
+              "RelativeToolTip": "..\\Arch.ILS.Core\\Arch.ILS.Core\\Arch.ILS.Core.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAZAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-08-10T01:08:05.051Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "Studio.Core.csproj",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Studio.Core.csproj",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\Studio.Core.csproj",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\Studio.Core.csproj",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\Studio.Core.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-08-10T01:05:25.773Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "FileEventSink.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\FileEventSink.cs",
+              "RelativeDocumentMoniker": "..\\Studio.Core\\Studio.Core\\FileEventSink.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Studio.Core\\Studio.Core\\FileEventSink.cs",
+              "RelativeToolTip": "..\\Studio.Core\\Studio.Core\\FileEventSink.cs",
+              "ViewState": "AQIAACMAAAAAAAAAAAAiwDkAAAAUAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-10T01:05:19.793Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "PortLayerCession.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCession.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel\\PortLayerCession.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel\\PortLayerCession.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel\\PortLayerCession.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAyAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-09T23:51:56.234Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "Int32Span.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Int32Span.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Int32Span.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Int32Span.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Int32Span.cs",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAvwCQAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-09T22:45:18.539Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "Int16Span.cs",
+              "DocumentMoniker": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Int16Span.cs",
+              "RelativeDocumentMoniker": "Arch.ILS.EconomicModel.Benchmark\\Int16Span.cs",
+              "ToolTip": "C:\\Users\\atosco\\source\\repos\\Arch.ILS.EconomicModel\\Arch.ILS.EconomicModel.Benchmark\\Int16Span.cs",
+              "RelativeToolTip": "Arch.ILS.EconomicModel.Benchmark\\Int16Span.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-09T22:56:58.243Z"
             }
           ]
         }
