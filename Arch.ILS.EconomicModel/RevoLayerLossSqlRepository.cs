@@ -190,7 +190,7 @@ namespace Arch.ILS.EconomicModel
             }, (lossAnalysisId, layerId));
         }
 
-        public Task<RevoLayerDayYeltVectorised> GetLayerDayYelVectorised(in int lossAnalysisId, in int layerId)
+        public Task<RevoLayerDayYeltVectorised> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId)
         {
             return Task.Factory.StartNew<RevoLayerDayYeltVectorised>((ids) =>
             {

@@ -1,3 +1,9 @@
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.csproj.AssemblyReference.cache
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.AssemblyInfoInputs.cache
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.AssemblyInfo.cs
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.csproj.CoreCompileInputs.cache
+C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.sourcelink.json
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Arch.ILS.EconomicModel.Console.exe
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Arch.ILS.EconomicModel.Console.dll.config
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Arch.ILS.EconomicModel.Console.deps.json
@@ -80,12 +86,6 @@ C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Conso
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Studio.Core.dll.config
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Studio.Core.Sql.pdb
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\bin\Release\net8.0\Studio.Core.Sql.dll.config
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.csproj.AssemblyReference.cache
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.AssemblyInfoInputs.cache
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.AssemblyInfo.cs
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.csproj.CoreCompileInputs.cache
-C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.sourcelink.json
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.983D3241.Up2Date
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\Arch.ILS.EconomicModel.Console.dll
 C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\obj\Release\net8.0\refint\Arch.ILS.EconomicModel.Console.dll

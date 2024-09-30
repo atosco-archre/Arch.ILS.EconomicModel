@@ -21,7 +21,7 @@ namespace Arch.ILS.EconomicModel.Benchmark
         [Params(1_000, 10_000, 100_000, 1_000_000/*, 10_000_000, 100_000_000, 100_000_000*/)]
         public int N;
 
-        private MockRevoLayerLossRepository _revoLayerLossRepository;
+        private MockRevoLayerYeltRepository _revoLayerLossRepository;
 
         [GlobalSetup(Targets = new[] 
             { nameof(GetLayerYeltsFixedDictionary_Benchmark)
@@ -32,7 +32,7 @@ namespace Arch.ILS.EconomicModel.Benchmark
             , nameof(GetLayerYeltUnmanaged_Benchmark) })]
         public void Setup()
         {
-            _revoLayerLossRepository = new MockRevoLayerLossRepository(N);
+            _revoLayerLossRepository = new MockRevoLayerYeltRepository(N);
         }
 
         [GlobalCleanup]

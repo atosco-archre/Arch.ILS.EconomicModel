@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace Arch.ILS.EconomicModel
 {
-    public unsafe class YeltPartitionLinkedList
+    public unsafe class YeltPartition
     {
-        public YeltPartitionLinkedList(ref YeltDayPartition dayYearEventIdKeySpan)
+        public YeltPartition(ref YeltDayPartition dayYearEventIdKeySpan)
         {
             fixed (short* startDayPtr = dayYearEventIdKeySpan.PartitionDays)
             {
@@ -49,11 +49,11 @@ namespace Arch.ILS.EconomicModel
         public double* CurrentEndRP;
         public double* CurrentStartRB;
         public double* CurrentEndRB;
-        public YeltPartitionLinkedList NextNode;
+        public YeltPartition NextNode { get; private set; }
         public int CurrentLength { get; }
         public int TotalLength => CurrentLength + (NextNode?.TotalLength ?? 0);
 
-        public void AddNext(ref YeltPartitionLinkedList nextNode)
+        public void AddNext(YeltPartition nextNode)
         {
             NextNode = nextNode;
         }

@@ -1,25 +1,26 @@
 ﻿
-namespace Arch.ILS.EconomicModel
+namespace Arch.ILS.EconomicModel.Benchmark
 {
-    public unsafe class YeltPartitionLinkedListReader
+    public unsafe class YeltPartitionReader
     {
         private static int Zero = 0;
-        public unsafe YeltPartitionLinkedListReader(ref YeltPartitionLinkedList yeltPartitionLinkedList)
+        public unsafe YeltPartitionReader(ref YeltPartition yeltPartitionLinkedList)
         {
             Head = yeltPartitionLinkedList;
             CurrentPartition = Head;
             CurrentPartitionCurrentItem = CurrentPartition.CurrentStartKey;
             CurrentPartitionLastItem = CurrentPartition.CurrentEndKey;
-            MoveNext = yeltPartitionLinkedList.TotalLength > 0;
+            IsOpen = yeltPartitionLinkedList.TotalLength > 0;
         }
 
-        public YeltPartitionLinkedList Head;
-        public YeltPartitionLinkedList CurrentPartition;
+        public YeltPartition Head;
+        public YeltPartition CurrentPartition;
         public long* CurrentPartitionCurrentItem;
         public long* CurrentPartitionLastItem;
-        public bool MoveNext;
+        public bool IsOpen;
+        public int TotalLength => Head.TotalLength;
 
-        public unsafe void SetNext()
+        public unsafe bool SetNext()
         {
             if(CurrentPartitionCurrentItem < CurrentPartitionLastItem)
             {
@@ -33,14 +34,26 @@ namespace Arch.ILS.EconomicModel
             }
             else
             {
-                MoveNext = false;
+                IsOpen = false;
+                CurrentPartition = null;
+                CurrentPartitionCurrentItem = null;
+                CurrentPartitionLastItem= null;
             }
+            return IsOpen;
         }
 
-        public unsafe static YeltPartitionLinkedListReader Initialise(YeltPartitioner yeltPartitioner)
+        public void Reset()
         {
-            YeltPartitionLinkedList headPtr = null;
-            YeltPartitionLinkedList currentPtr = null;
+            CurrentPartition = Head;
+            CurrentPartitionCurrentItem = CurrentPartition.CurrentStartKey;
+            CurrentPartitionLastItem = CurrentPartition.CurrentEndKey;
+            IsOpen = Head.TotalLength > 0;
+        }
+
+        public unsafe static YeltPartitionReader Initialise(YeltPartitioner yeltPartitioner)
+        {
+            YeltPartition headPtr = null;
+            YeltPartition currentPtr = null;
             while (yeltPartitioner.MoveNext)
             {
                 if (yeltPartitioner.TryGetCurrentPartition(out var partition))
@@ -52,14 +65,14 @@ namespace Arch.ILS.EconomicModel
                     }
                     else
                     {
-                        YeltPartitionLinkedList nextNode = new(ref partition);
-                        currentPtr.AddNext(ref nextNode);
+                        YeltPartition nextNode = new(ref partition);
+                        currentPtr.AddNext(nextNode);
                         currentPtr = nextNode;
                     }
                 }
             }
 
-            return new YeltPartitionLinkedListReader(ref headPtr);
+            return new YeltPartitionReader(ref headPtr);
         }
     }
 }

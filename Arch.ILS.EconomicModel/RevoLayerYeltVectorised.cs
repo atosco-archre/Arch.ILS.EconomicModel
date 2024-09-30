@@ -26,9 +26,11 @@ namespace Arch.ILS.EconomicModel
         private readonly nint[] _RBs;
         private readonly int _lastBufferIndex;
         private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble, _lastBufferSizeLong;
+        private bool _disposed;
 
         public RevoLayerYeltVectorised(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
         {
+            _disposed = false;
             if (!Avx.IsSupported && !Avx2.IsSupported)
                 throw new Exception("AVX and AVX2 not supported on this machine. Please use the non vectorised version of this class.");
             LossAnalysisId = lossAnalysisId;
@@ -204,23 +206,34 @@ namespace Arch.ILS.EconomicModel
 
         public void Dispose(bool disposing)
         {
-            for (int i = 0; i < _yearDayEventIdKeys.Length; i++)
+            if(!_disposed)
             {
-                Marshal.FreeHGlobal(_yearDayEventIdKeys[i]);
-                Marshal.FreeHGlobal(_days[i]);
-                Marshal.FreeHGlobal(_lossPcts[i]);
-                Marshal.FreeHGlobal(_RPs[i]);
-                Marshal.FreeHGlobal(_RBs[i]);
-                _yearDayEventIdKeys[i] = nint.Zero;
-                _days[i] = nint.Zero;
-                _lossPcts[i] = nint.Zero;
-                _RPs[i] = nint.Zero;
-                _RBs[i] = nint.Zero;
+                if(disposing)
+                {
+                }
+
+                for (int i = 0; i < _yearDayEventIdKeys.Length; i++)
+                {
+                    Marshal.FreeHGlobal(_yearDayEventIdKeys[i]);
+                    Marshal.FreeHGlobal(_days[i]);
+                    Marshal.FreeHGlobal(_lossPcts[i]);
+                    Marshal.FreeHGlobal(_RPs[i]);
+                    Marshal.FreeHGlobal(_RBs[i]);
+                    _yearDayEventIdKeys[i] = nint.Zero;
+                    _days[i] = nint.Zero;
+                    _lossPcts[i] = nint.Zero;
+                    _RPs[i] = nint.Zero;
+                    _RBs[i] = nint.Zero;
+                }
             }
+
+            _disposed = true;
         }
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

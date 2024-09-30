@@ -3,7 +3,8 @@ using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using static System.Runtime.CompilerServices.Unsafe;
+
+using Arch.ILS.Core;
 
 namespace Arch.ILS.EconomicModel.Benchmark
 {
@@ -210,26 +211,6 @@ namespace Arch.ILS.EconomicModel.Benchmark
         ~FixedDictionary()
         {
             ReleaseUnmanagedResources();
-        }
-    }
-
-    public static class VectorExtensions
-    {
-        /// <summary>
-        /// Get an <paramref name="array"/> element at <paramref name="index"/> in a very unsafe way.
-        /// There are no checks for null or bounds, the validity of the call must be ensured before using this method.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref T GetAtUnsafe<T>(this T[] array, nuint index)
-        {
-            const nuint arrayOffset = 8; // Depends on implementation. Should be stable since .NET Core and going forward.
-            Debug.Assert((uint)index < array.Length, "GetAtUnsafe: (uint)index < array.Length");
-            return ref Add(ref AddByteOffset(ref As<Box<T>>(array).Value, arrayOffset), index);
-        }
-
-        public class Box<T>
-        {
-            public T Value = default!;
         }
     }
 }

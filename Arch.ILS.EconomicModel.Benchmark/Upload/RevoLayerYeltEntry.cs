@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Arch.ILS.EconomicModel.Benchmark
 {
     [StructLayout(LayoutKind.Auto)]
-    public unsafe struct RevoLayerYeltEntry
+    public unsafe record struct RevoLayerYeltEntry
     {
         public RevoLayerYeltEntry()
         {

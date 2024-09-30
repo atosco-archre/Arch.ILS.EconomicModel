@@ -3,10 +3,10 @@ using System.Runtime.CompilerServices;
 
 namespace Arch.ILS.EconomicModel.Benchmark
 {
-    internal class MockRevoLayerLossRepository : IRevoLayerLossUploadRepository
+    internal class MockRevoLayerYeltRepository : IRevoLayerLossUploadRepository
     {
         private readonly RevoLayerYeltEntry[] _data;
-        public MockRevoLayerLossRepository(int sampleSize)
+        public MockRevoLayerYeltRepository(int sampleSize)
         {
             _data = GetRevoLayerYeltEntries(sampleSize).ToArray();
         }

@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Arch.ILS.EconomicModel
 {
     public class YeltPartitionMerge
     {
-        public static unsafe int Merge_ScalarOptimised_2(YeltPartitionLinkedList partitionsA, YeltPartitionLinkedList partitionsB, long* dst)
+        public static unsafe int Merge_ScalarOptimised_2(YeltPartition partitionsA, YeltPartition partitionsB, long* dst)
         {
             int i = 0, j = 0, k = 0;
-            YeltPartitionLinkedList currentPartitionA = partitionsA;
-            YeltPartitionLinkedList currentPartitionB = partitionsB;
+            YeltPartition currentPartitionA = partitionsA;
+            YeltPartition currentPartitionB = partitionsB;
             long* aArr = currentPartitionA.CurrentStartKey;
             long* bArr = currentPartitionB.CurrentStartKey;
             int aCnt = currentPartitionA.CurrentLength;
@@ -22,6 +17,11 @@ namespace Arch.ILS.EconomicModel
 
             while (currentPartitionA != null && currentPartitionB != null)
             {
+                aArr = currentPartitionA.CurrentStartKey;
+                bArr = currentPartitionB.CurrentStartKey;
+                aCnt = currentPartitionA.CurrentLength;
+                bCnt = currentPartitionB.CurrentLength;
+
                 while (i < aCnt - 32 && j < bCnt - 32)
                 {
                     for (int t = 0; t < 32; t++)
@@ -43,20 +43,18 @@ namespace Arch.ILS.EconomicModel
 
                 currentPartitionA = (i == aCnt) ? currentPartitionA.NextNode : currentPartitionA;
                 currentPartitionB = (j == bCnt) ? currentPartitionB.NextNode : currentPartitionB;
-                aArr = (i == aCnt) ? currentPartitionA.CurrentStartKey : aArr;
-                bArr = (j == bCnt) ? currentPartitionB.CurrentStartKey : bArr;
-                aCnt = (i == aCnt) ? currentPartitionA.CurrentLength : aCnt;
-                bCnt = (j == bCnt) ? currentPartitionB.CurrentLength : bCnt;
                 i = (i == aCnt) ? 0 : i;
                 j = (j == bCnt) ? 0 : j;
-            } 
+            }
 
+            aCnt = currentPartitionA == null ? 0 : aCnt;
+            bCnt = currentPartitionB == null ? 0 : bCnt;
             Unsafe.CopyBlock(dst + k, aArr + i, (uint)(aCnt - i) * sizeof(long));
             k += (aCnt - i);
             Unsafe.CopyBlock(dst + k, bArr + j, (uint)(bCnt - j) * sizeof(long));
             k += (bCnt - j);
 
-            currentPartitionA = currentPartitionA.NextNode;
+            currentPartitionA = currentPartitionA?.NextNode ?? null;
             while (currentPartitionA != null)
             {
                 aArr = currentPartitionA.CurrentStartKey;
@@ -67,7 +65,7 @@ namespace Arch.ILS.EconomicModel
             }
 
 
-            currentPartitionB = currentPartitionB.NextNode;
+            currentPartitionB = currentPartitionB?.NextNode ?? null;
             while (currentPartitionB != null)
             {
                 bArr = currentPartitionB.CurrentStartKey;
