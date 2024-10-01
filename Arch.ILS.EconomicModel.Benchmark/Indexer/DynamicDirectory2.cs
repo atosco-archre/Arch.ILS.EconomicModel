@@ -123,7 +123,7 @@ namespace Arch.ILS.EconomicModel.Benchmark
             return ref _default;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(ref readonly TKey key, ref readonly TValue value)
         {
             int index = _count++;
@@ -142,7 +142,7 @@ namespace Arch.ILS.EconomicModel.Benchmark
             _buckets.GetAtUnsafe(bucketIndex) = index + 1; // Value in _buckets is 1-based
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Move(ref readonly TKey oldKey, ref readonly TKey newKey, ref Entry entry)
         {
             Entry[] entries = _entries;
