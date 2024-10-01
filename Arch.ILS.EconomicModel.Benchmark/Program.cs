@@ -11,7 +11,7 @@ using Arch.ILS.EconomicModel.Benchmark.Indexer;
 //Console.ReadLine();
 
 /*Indexer*/
-LayerKeyIndexerBenchmark layerIndexerBenchmark = new LayerKeyIndexerBenchmark();
-layerIndexerBenchmark.RunBenchmarks();
+//LayerKeyIndexerBenchmark layerIndexerBenchmark = new LayerKeyIndexerBenchmark();
+//layerIndexerBenchmark.RunBenchmarks();
 
-//IndexerCheckTest.Execute();
+IndexerCheckTest.Execute();

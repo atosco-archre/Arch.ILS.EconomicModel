@@ -7,7 +7,7 @@ namespace Arch.ILS.EconomicModel.Benchmark.Indexer
     {
         public static unsafe void Execute()
         {
-            MockRevoLayerDayYeltRepository revoLayerDayYeltRepository = new MockRevoLayerDayYeltRepository(10000000);
+            MockRevoLayerDayYeltRepository revoLayerDayYeltRepository = new MockRevoLayerDayYeltRepository(1000000);
             var layerYelt0 = revoLayerDayYeltRepository.GetLayerYelt0().Result;
             Range[] ranges = [new Range(2, 50)];
             YeltPartitioner yeltPartitioner0 = new YeltPartitioner(ranges, layerYelt0);

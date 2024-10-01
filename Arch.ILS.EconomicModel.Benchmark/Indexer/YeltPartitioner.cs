@@ -83,6 +83,13 @@ namespace Arch.ILS.EconomicModel.Benchmark
                         _outBufferIndex++;
                         _inBufferIndex = 0;
                     }
+                    else
+                    {
+                        _dayIndex++;
+                        _inBufferIndex = startIndex + length;
+                        if (_dayIndex >= (uint)_startDays.Length)
+                            MoveNext = false;//prevent continuing to try get partition when all day partitions are processed.
+                    }
                 }
                 else
                 {

@@ -1,6 +1,4 @@
 ﻿
-using System.Buffers;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
@@ -8,7 +6,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Arch.ILS.EconomicModel
 {
-    public unsafe class RevoLayerYeltVectorised : IYelt, IDisposable
+    public unsafe class RevoLayerYeltVectorised2 : IYelt, IDisposable
     {
         public const int YEAR_COUNT = 10000;
         public const int YEAR_BUFFER_SIZE = YEAR_COUNT + 1;
@@ -19,16 +17,16 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
-        private readonly nint[] _yearDayEventIdKeys;
-        private readonly nint[] _days;
-        private readonly nint[] _lossPcts;
-        private readonly nint[] _RPs;
-        private readonly nint[] _RBs;
+        private long** _yearDayEventIdKeys;
+        private short** _days;
+        private double** _lossPcts;
+        private double** _RPs;
+        private double** _RBs;
         private readonly int _lastBufferIndex;
         private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble, _lastBufferSizeLong;
         private bool _disposed;
 
-        public RevoLayerYeltVectorised(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
+        public RevoLayerYeltVectorised2(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
         {
             _disposed = false;
             if (!Avx.IsSupported && !Avx2.IsSupported)
@@ -58,7 +56,7 @@ namespace Arch.ILS.EconomicModel
             yearRefs = yearRefs[1..];
             _lastBufferIndex = count / BUFFER_ITEM_COUNT;
             BufferCount = _lastBufferIndex + 1;
-            _lastBufferItemCount = (count % BUFFER_ITEM_COUNT);
+            _lastBufferItemCount = (int)(count % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
             _lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
@@ -67,22 +65,20 @@ namespace Arch.ILS.EconomicModel
             int currentInBufferIndex = 0;
 
             int vectorLongCount = Avx2.IsSupported ? Vector256<long>.Count : Vector128<long>.Count;
-            nint tempYearAlloc = Marshal.AllocHGlobal(vectorLongCount << 1);
-            short* tempYears = (short*)tempYearAlloc.ToPointer();
+            short* tempYears = (short*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 1), (nuint)Unsafe.SizeOf<short>());
             short* tempCurrentYear = tempYears;
             short* tempLastYear = tempYears + vectorLongCount;
-            nint tempDayAlloc = Marshal.AllocHGlobal(vectorLongCount << 1);
-            short* tempDays = (short*)tempDayAlloc.ToPointer();
+            short* tempDays = (short*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 1), (nuint)Unsafe.SizeOf<short>());
             short* tempCurrentDay = tempDays;
-            nint tempEventIdAlloc = Marshal.AllocHGlobal(vectorLongCount << 2);
-            int* tempEventIds = (int*)tempEventIdAlloc.ToPointer();
+            int* tempEventIds = (int*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 2), (nuint)Unsafe.SizeOf<int>());
             int* tempCurrentEventId = tempEventIds;
 
-            _yearDayEventIdKeys = new nint[BufferCount];
-            _days = new nint[BufferCount];
-            _lossPcts = new nint[BufferCount];
-            _RPs = new nint[BufferCount];
-            _RBs = new nint[BufferCount];
+            nuint ptrSize = (nuint)(Unsafe.SizeOf<IntPtr>() * BufferCount);
+            _yearDayEventIdKeys = (long**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+            _days = (short**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+            _lossPcts = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+            _RPs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+            _RBs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             ref nint spanStart = ref MemoryMarshal.GetReference(yearRefs);
             ref nint spanEnd = ref Unsafe.Add(ref spanStart, yearRefs.Length);
             long* currentYearDayEventIdPtr = null;
@@ -102,31 +98,31 @@ namespace Arch.ILS.EconomicModel
                         {
                             if (++currentBuffer == _lastBufferIndex)
                             {
-                                _yearDayEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeLong);
-                                _days[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeShort);                                
-                                _lossPcts[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
-                                _RPs[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
-                                _RBs[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
+                                _yearDayEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeLong, sizeof(long));
+                                _days[currentBuffer] = (short*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeShort, sizeof(short));
+                                _lossPcts[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
+                                _RPs[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
+                                _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
 
-                                currentYearDayEventIdPtr = (long*)_yearDayEventIdKeys[currentBuffer].ToPointer();
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), _lastBufferSizeShort);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), _lastBufferSizeDouble);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), _lastBufferSizeDouble);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), _lastBufferSizeDouble);
+                                currentYearDayEventIdPtr = _yearDayEventIdKeys[currentBuffer];
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], _lastBufferSizeShort);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], _lastBufferSizeDouble);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], _lastBufferSizeDouble);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], _lastBufferSizeDouble);
                             }
                             else
                             {
-                                _yearDayEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_LONG); 
-                                _days[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_SHORT);
-                                _lossPcts[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
-                                _RPs[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
-                                _RBs[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
+                                _yearDayEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc(BUFFER_SIZE_LONG, sizeof(long));
+                                _days[currentBuffer] = (short*)NativeMemory.AlignedAlloc(BUFFER_SIZE_SHORT, sizeof(short));
+                                _lossPcts[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
+                                _RPs[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
+                                _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
 
-                                currentYearDayEventIdPtr = (long*)_yearDayEventIdKeys[currentBuffer].ToPointer();
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), BUFFER_SIZE_SHORT);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
+                                currentYearDayEventIdPtr = _yearDayEventIdKeys[currentBuffer];
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], BUFFER_SIZE_SHORT);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], BUFFER_SIZE_DOUBLE);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], BUFFER_SIZE_DOUBLE);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], BUFFER_SIZE_DOUBLE);
                             }
 
                             currentInBufferIndex = 0;
@@ -190,19 +186,19 @@ namespace Arch.ILS.EconomicModel
         public int TotalEntryCount { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<long> YearDayEventIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayEventIdKeys[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<long> YearDayEventIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayEventIdKeys[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<short> Days(in uint i) => new ReadOnlySpan<short>(_days[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<short> Days(in uint i) => new ReadOnlySpan<short>(_days[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<double> LossPcts(in uint i) => new ReadOnlySpan<double>(_lossPcts[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<double> LossPcts(in uint i) => new ReadOnlySpan<double>(_lossPcts[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<double> RPs(in uint i) => new ReadOnlySpan<double>(_RPs[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<double> RPs(in uint i) => new ReadOnlySpan<double>(_RPs[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<double> RBs(in uint i) => new ReadOnlySpan<double>(_RBs[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<double> RBs(in uint i) => new ReadOnlySpan<double>(_RBs[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         public void Dispose(bool disposing)
         {
@@ -212,19 +208,30 @@ namespace Arch.ILS.EconomicModel
                 {
                 }
 
-                for (int i = 0; i < _yearDayEventIdKeys.Length; i++)
+                for (int i = 0; i < BufferCount; i++)
                 {
-                    Marshal.FreeHGlobal(_yearDayEventIdKeys[i]);
-                    Marshal.FreeHGlobal(_days[i]);
-                    Marshal.FreeHGlobal(_lossPcts[i]);
-                    Marshal.FreeHGlobal(_RPs[i]);
-                    Marshal.FreeHGlobal(_RBs[i]);
-                    _yearDayEventIdKeys[i] = nint.Zero;
-                    _days[i] = nint.Zero;
-                    _lossPcts[i] = nint.Zero;
-                    _RPs[i] = nint.Zero;
-                    _RBs[i] = nint.Zero;
+                    NativeMemory.AlignedFree(_yearDayEventIdKeys[i]);
+                    NativeMemory.AlignedFree(_days[i]);
+                    NativeMemory.AlignedFree(_lossPcts[i]);
+                    NativeMemory.AlignedFree(_RPs[i]);
+                    NativeMemory.AlignedFree(_RBs[i]);
+                    _yearDayEventIdKeys[i] = null;
+                    _days[i] = null;
+                    _lossPcts[i] = null;
+                    _RPs[i] = null;
+                    _RBs[i] = null;
                 }
+
+                NativeMemory.AlignedFree(_yearDayEventIdKeys);
+                NativeMemory.AlignedFree(_days);
+                NativeMemory.AlignedFree(_lossPcts);
+                NativeMemory.AlignedFree(_RPs);
+                NativeMemory.AlignedFree(_RBs);
+                _yearDayEventIdKeys = null;
+                _days = null;
+                _lossPcts = null;
+                _RPs = null;
+                _RBs = null;
             }
 
             _disposed = true;

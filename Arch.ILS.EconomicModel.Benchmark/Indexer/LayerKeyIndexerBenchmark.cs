@@ -23,8 +23,8 @@ namespace Arch.ILS.EconomicModel.Benchmark
         public int N;
 
         private MockRevoLayerDayYeltRepository _revoLayerDayYeltRepository;
-        private RevoLayerDayYeltVectorised _dayYelt0;
-        private RevoLayerDayYeltVectorised _dayYelt1;
+        private RevoLayerDayYeltVectorised2 _dayYelt0;
+        private RevoLayerDayYeltVectorised2 _dayYelt1;
         private YeltPartitionMapper _mapper;
 
         [GlobalSetup(Targets = new[] 
