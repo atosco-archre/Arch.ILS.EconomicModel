@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Arch.ILS.EconomicModel.Benchmark
 {
-    public unsafe class RevoLayerYeltUnmanagedSpan : IBenchmarkYelt
+    public unsafe class RevoLayerYeltUnmanagedSpan : IBenchmarkYelt, IDisposable
     {
         public const int YEAR_COUNT = 10000;
         public const int YEAR_BUFFER_SIZE = YEAR_COUNT + 1;
@@ -22,9 +22,11 @@ namespace Arch.ILS.EconomicModel.Benchmark
         private readonly int _lastBufferIndex;
         private int _lastYearBufferItemCount;
         private int _lastBufferItemCount;
+        private bool _disposed;
 
         public RevoLayerYeltUnmanagedSpan(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
         {
+            _disposed = false;
             LossAnalysisId = lossAnalysisId;
             LayerId = layerId;
             Span<nint> yearRefs = stackalloc nint[YEAR_BUFFER_SIZE];
@@ -175,33 +177,41 @@ namespace Arch.ILS.EconomicModel.Benchmark
 
         public void Dispose(bool disposing)
         {
-            for (int i = 0; i < _distinctYears.Length; i++)
+            if(!_disposed)
             {
-                if (i != _distinctYears.Length - 1)
+                if (disposing)
                 {
-                    ArrayPool<short>.Shared.Return(_distinctYears[i]);
-                    ArrayPool<int>.Shared.Return(_yearRepeatCount[i]);
+                    for (int i = 0; i < _distinctYears.Length; i++)
+                    {
+                        if (i != _distinctYears.Length - 1)
+                        {
+                            ArrayPool<short>.Shared.Return(_distinctYears[i]);
+                            ArrayPool<int>.Shared.Return(_yearRepeatCount[i]);
+                        }
+                        _distinctYears[i] = Array.Empty<short>();
+                        _yearRepeatCount[i] = Array.Empty<int>();
+                    }
+
+                    for (int i = 0; i < _eventIds.Length; i++)
+                    {
+                        if (i != _eventIds.Length - 1)
+                        {
+                            ArrayPool<int>.Shared.Return(_eventIds[i]);
+                            ArrayPool<short>.Shared.Return(_days[i]);
+                            ArrayPool<double>.Shared.Return(_lossPcts[i]);
+                            ArrayPool<double>.Shared.Return(_RPs[i]);
+                            ArrayPool<double>.Shared.Return(_RBs[i]);
+                        }
+                        _eventIds[i] = Array.Empty<int>();
+                        _days[i] = Array.Empty<short>();
+                        _lossPcts[i] = Array.Empty<double>();
+                        _RPs[i] = Array.Empty<double>();
+                        _RBs[i] = Array.Empty<double>();
+                    }
                 }
-                _distinctYears[i] = Array.Empty<short>();
-                _yearRepeatCount[i] = Array.Empty<int>();
             }
 
-            for (int i = 0; i < _eventIds.Length; i++)
-            {
-                if (i != _eventIds.Length - 1)
-                {
-                    ArrayPool<int>.Shared.Return(_eventIds[i]);
-                    ArrayPool<short>.Shared.Return(_days[i]);
-                    ArrayPool<double>.Shared.Return(_lossPcts[i]);
-                    ArrayPool<double>.Shared.Return(_RPs[i]);
-                    ArrayPool<double>.Shared.Return(_RBs[i]);
-                }
-                _eventIds[i] = Array.Empty<int>();
-                _days[i] = Array.Empty<short>();
-                _lossPcts[i] = Array.Empty<double>();
-                _RPs[i] = Array.Empty<double>();
-                _RBs[i] = Array.Empty<double>();
-            }
+            _disposed = true;
         }
 
         public void Dispose()

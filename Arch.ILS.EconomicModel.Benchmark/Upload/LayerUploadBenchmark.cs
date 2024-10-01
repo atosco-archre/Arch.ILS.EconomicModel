@@ -42,39 +42,39 @@ namespace Arch.ILS.EconomicModel.Benchmark
         }
 
         [Benchmark]
-        public void GetLayerYeltsFixedDictionary_Benchmark()
+        public async void GetLayerYeltsFixedDictionary_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltFixedDictionary();
+            await _revoLayerLossRepository.GetLayerYeltFixedDictionary();
         }
 
         [Benchmark]
-        public void GetLayerYeltYearArray_Benchmark()
+        public async void GetLayerYeltYearArray_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltYearArray();
+            using var yelt = await _revoLayerLossRepository.GetLayerYeltYearArray();
         }
 
         [Benchmark]
-        public void GetLayerYeltStandard_Benchmark()
+        public async void GetLayerYeltStandard_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltStandard();
+            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandard();
         }
 
         [Benchmark]
-        public void GetLayerYeltStandardUnmanaged_Benchmark()
+        public async void GetLayerYeltStandardUnmanaged_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltStandardUnmanaged();
+            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandardUnmanaged();
         }
 
         [Benchmark]
-        public void GetLayerYeltStandardUnsafe_Benchmark()
+        public async void GetLayerYeltStandardUnsafe_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltStandardUnsafe();
+            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandardUnsafe();
         }
 
         [Benchmark]
-        public void GetLayerYeltUnmanaged_Benchmark()
+        public async void GetLayerYeltUnmanaged_Benchmark()
         {
-            _revoLayerLossRepository.GetLayerYeltUnmanaged();
+            using var yelt = await _revoLayerLossRepository.GetLayerYeltUnmanaged();
         }
     }
 }

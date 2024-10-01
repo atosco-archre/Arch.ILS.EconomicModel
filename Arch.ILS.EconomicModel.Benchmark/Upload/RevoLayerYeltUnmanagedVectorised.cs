@@ -1,6 +1,4 @@
 ﻿
-using System.Buffers;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
@@ -8,7 +6,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Arch.ILS.EconomicModel.Benchmark
 {
-    public unsafe class RevoLayerYeltUnmanagedVectorised
+    public unsafe class RevoLayerYeltUnmanagedVectorised : IDisposable
     {
         public const int YEAR_COUNT = 10000;
         public const int YEAR_BUFFER_SIZE = YEAR_COUNT + 1;
@@ -26,9 +24,11 @@ namespace Arch.ILS.EconomicModel.Benchmark
         private readonly nint[] _RBs;
         private readonly int _lastBufferIndex;
         private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble, _lastBufferSizeLong;
+        private bool _disposed;
 
         public RevoLayerYeltUnmanagedVectorised(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
         {
+            _disposed = false;
             if (!Avx.IsSupported && !Avx2.IsSupported)
                 throw new Exception("AVX and AVX2 not supported on this machine. Please use the non vectorised version of this class.");
             LossAnalysisId = lossAnalysisId;
@@ -204,23 +204,34 @@ namespace Arch.ILS.EconomicModel.Benchmark
 
         public void Dispose(bool disposing)
         {
-            for (int i = 0; i < _yearDayEventIdKey.Length; i++)
+            if (!_disposed)
             {
-                Marshal.FreeHGlobal(_yearDayEventIdKey[i]);
-                Marshal.FreeHGlobal(_days[i]);
-                Marshal.FreeHGlobal(_lossPcts[i]);
-                Marshal.FreeHGlobal(_RPs[i]);
-                Marshal.FreeHGlobal(_RBs[i]);
-                _yearDayEventIdKey[i] = nint.Zero;
-                _days[i] = nint.Zero;
-                _lossPcts[i] = nint.Zero;
-                _RPs[i] = nint.Zero;
-                _RBs[i] = nint.Zero;
+                if (disposing)
+                {
+                }
+
+                for (int i = 0; i < _yearDayEventIdKey.Length; i++)
+                {
+                    Marshal.FreeHGlobal(_yearDayEventIdKey[i]);
+                    Marshal.FreeHGlobal(_days[i]);
+                    Marshal.FreeHGlobal(_lossPcts[i]);
+                    Marshal.FreeHGlobal(_RPs[i]);
+                    Marshal.FreeHGlobal(_RBs[i]);
+                    _yearDayEventIdKey[i] = nint.Zero;
+                    _days[i] = nint.Zero;
+                    _lossPcts[i] = nint.Zero;
+                    _RPs[i] = nint.Zero;
+                    _RBs[i] = nint.Zero;
+                }                
             }
+
+            _disposed = true;
         }
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿
-using System.Buffers;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Arch.ILS.EconomicModel.Benchmark
 {
-    public unsafe class RevoLayerYeltStandardUnsafe : IBenchmarkYelt
+    public unsafe class RevoLayerYeltStandardUnsafe : IBenchmarkYelt, IDisposable
     {
         public const int YEAR_COUNT = 10_000;
         public const int YEAR_BUFFER_SIZE = YEAR_COUNT + 1;
@@ -28,9 +25,11 @@ namespace Arch.ILS.EconomicModel.Benchmark
         private readonly int _lastBufferIndex;
         private int _lastYearBufferItemCount, _lastYearBufferSizeShort, _lastYearBufferSizeInt;
         private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble;
+        private bool _disposed;
 
         public RevoLayerYeltStandardUnsafe(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
-        { 
+        {
+            _disposed = false;
             LossAnalysisId = lossAnalysisId;
             LayerId = layerId;
             SortedSet<RevoLayerYeltEntry>[] yearLosses = new SortedSet<RevoLayerYeltEntry>[YEAR_BUFFER_SIZE];
@@ -189,31 +188,42 @@ namespace Arch.ILS.EconomicModel.Benchmark
 
         public void Dispose(bool disposing)
         {
-            for (int i = 0; i < _distinctYears.Length; i++)
+            if (!_disposed)
             {
-                Marshal.FreeHGlobal(_distinctYears[i]);
-                Marshal.FreeHGlobal(_yearRepeatCount[i]);
-                _distinctYears[i] = nint.Zero;
-                _yearRepeatCount[i] = nint.Zero;
+                if (disposing)
+                {
+                }
+                
+                for (int i = 0; i < _distinctYears.Length; i++)
+                {
+                    Marshal.FreeHGlobal(_distinctYears[i]);
+                    Marshal.FreeHGlobal(_yearRepeatCount[i]);
+                    _distinctYears[i] = nint.Zero;
+                    _yearRepeatCount[i] = nint.Zero;
+                }
+
+                for (int i = 0; i < _eventIds.Length; i++)
+                {
+                    Marshal.FreeHGlobal(_eventIds[i]);
+                    Marshal.FreeHGlobal(_days[i]);
+                    Marshal.FreeHGlobal(_lossPcts[i]);
+                    Marshal.FreeHGlobal(_RPs[i]);
+                    Marshal.FreeHGlobal(_RBs[i]);
+                    _eventIds[i] = nint.Zero;
+                    _days[i] = nint.Zero;
+                    _lossPcts[i] = nint.Zero;
+                    _RPs[i] = nint.Zero;
+                    _RBs[i] = nint.Zero;
+                }
             }
 
-            for (int i = 0; i < _eventIds.Length; i++)
-            {
-                Marshal.FreeHGlobal(_eventIds[i]);
-                Marshal.FreeHGlobal(_days[i]);
-                Marshal.FreeHGlobal(_lossPcts[i]);
-                Marshal.FreeHGlobal(_RPs[i]);
-                Marshal.FreeHGlobal(_RBs[i]);
-                _eventIds[i] = nint.Zero;
-                _days[i] = nint.Zero;
-                _lossPcts[i] = nint.Zero;
-                _RPs[i] = nint.Zero;
-                _RBs[i] = nint.Zero;
-            }
+            _disposed = true;
         }
 
         public void Dispose()
-        {           
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
