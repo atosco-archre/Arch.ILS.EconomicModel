@@ -42,39 +42,39 @@ namespace Arch.ILS.EconomicModel.Benchmark
         }
 
         [Benchmark]
-        public async void GetLayerYeltsFixedDictionary_Benchmark()
+        public void GetLayerYeltsFixedDictionary_Benchmark()
         {
-            await _revoLayerLossRepository.GetLayerYeltFixedDictionary();
+            _revoLayerLossRepository.GetLayerYeltFixedDictionary();
         }
 
         [Benchmark]
-        public async void GetLayerYeltYearArray_Benchmark()
+        public void GetLayerYeltYearArray_Benchmark()
         {
-            using var yelt = await _revoLayerLossRepository.GetLayerYeltYearArray();
+            using var yelt = _revoLayerLossRepository.GetLayerYeltYearArray().Result;
         }
 
         [Benchmark]
-        public async void GetLayerYeltStandard_Benchmark()
+        public void GetLayerYeltStandard_Benchmark()
         {
-            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandard();
+            using var yelt = _revoLayerLossRepository.GetLayerYeltStandard().Result;
         }
 
         [Benchmark]
-        public async void GetLayerYeltStandardUnmanaged_Benchmark()
+        public void GetLayerYeltStandardUnmanaged_Benchmark()
         {
-            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandardUnmanaged();
+            using var yelt = _revoLayerLossRepository.GetLayerYeltStandardUnmanaged().Result;
         }
 
         [Benchmark]
-        public async void GetLayerYeltStandardUnsafe_Benchmark()
+        public void GetLayerYeltStandardUnsafe_Benchmark()
         {
-            using var yelt = await _revoLayerLossRepository.GetLayerYeltStandardUnsafe();
+            using var yelt = _revoLayerLossRepository.GetLayerYeltStandardUnsafe().Result;
         }
 
         [Benchmark]
-        public async void GetLayerYeltUnmanaged_Benchmark()
+        public void GetLayerYeltUnmanaged_Benchmark()
         {
-            using var yelt = await _revoLayerLossRepository.GetLayerYeltUnmanaged();
+            using var yelt = _revoLayerLossRepository.GetLayerYeltUnmanaged().Result;
         }
     }
 }
