@@ -62,6 +62,11 @@ namespace Arch.ILS.EconomicModel
             return _portfolioLevelLayerRetroCessions[portfolioId][retroLevelId][portLayerId].Values;
         }
 
+        public IEnumerable<PortLayerPeriodCession> GetPortfolioLevelLayerCessions()
+        {
+            return _portfolioLevelLayerPeriodRetroCessions.Values.SelectMany(a => a.Values).SelectMany(b => b);
+        }
+
         private void SetNetCessions()
         {
             Stopwatch sw = Stopwatch.StartNew();

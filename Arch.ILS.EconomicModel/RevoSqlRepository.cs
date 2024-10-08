@@ -122,7 +122,7 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public void GetLayerView(int partitionCount = 8)
+        public PortfolioRetroCessions GetLayerView(int partitionCount = 8)
         {
             var portLayersTask = GetPortfolioLayers();
             var layersTask = GetLayers();
@@ -178,7 +178,7 @@ namespace Arch.ILS.EconomicModel
                 }, (i, partitionedPortLayerCessions[i]));
             Task.WaitAll(portLayerCessionsTasks);
 
-            PortfolioRetroCessions portfolioLevelRetroCessions = new(partitionedPortLayerCessions.SelectMany(cession => cession));
+            return new(partitionedPortLayerCessions.SelectMany(cession => cession));
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             static DateTime? GetPortfolioLayerInception(Portfolio portfolio, Layer layer)

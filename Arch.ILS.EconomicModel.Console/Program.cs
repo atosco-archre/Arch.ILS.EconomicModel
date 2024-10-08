@@ -27,8 +27,11 @@ namespace Arch.ILS.EconomicModel.Console
 
             /*Queries*/
             //var Layers2 = revoRepository.GetLayers().Result;
-            ////var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
-            ////var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
+            //var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
+            //var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
+            //var result = revoRepository.GetLayerView();
+            //var x = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218).ToArray();
+            //var xd = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218 && x.PortLayerId == 750703).ToArray();
             //var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
 
             RevoLayerLossSqlRepository revoLayerLossSqlRepository = new RevoLayerLossSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVOLAYERLOSS));
