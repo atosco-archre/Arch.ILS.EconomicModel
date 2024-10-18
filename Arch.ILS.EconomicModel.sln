@@ -21,6 +21,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.DependencyEngine",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Snowflake", "..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj", "{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.Historical", "Arch.ILS.EconomicModel.Historical\Arch.ILS.EconomicModel.Historical.csproj", "{BF31B702-01F8-4343-9C6C-C7053FC1B48A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arch.ILS.EconomicModel.Historical.Console", "Arch.ILS.EconomicModel.Historical.Console\Arch.ILS.EconomicModel.Historical.Console.csproj", "{5ECE153B-AFB1-4307-B33A-A77262CA561C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LargeLoss.LayeringService.Client", "..\LargeLoss.LayeringService.Client\LargeLoss.LayeringService.Client\LargeLoss.LayeringService.Client.csproj", "{7521256C-4B68-40C2-A42B-DF534CA273E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +69,18 @@ Global
 		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39CE8EA6-1587-41F8-BE97-9F89E5E596A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF31B702-01F8-4343-9C6C-C7053FC1B48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF31B702-01F8-4343-9C6C-C7053FC1B48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF31B702-01F8-4343-9C6C-C7053FC1B48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF31B702-01F8-4343-9C6C-C7053FC1B48A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ECE153B-AFB1-4307-B33A-A77262CA561C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ECE153B-AFB1-4307-B33A-A77262CA561C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ECE153B-AFB1-4307-B33A-A77262CA561C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ECE153B-AFB1-4307-B33A-A77262CA561C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7521256C-4B68-40C2-A42B-DF534CA273E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7521256C-4B68-40C2-A42B-DF534CA273E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7521256C-4B68-40C2-A42B-DF534CA273E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7521256C-4B68-40C2-A42B-DF534CA273E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

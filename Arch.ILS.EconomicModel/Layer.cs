@@ -9,5 +9,8 @@ namespace Arch.ILS.EconomicModel
         public int LayerId { get; set; }
         [Field(1)]
         public DateTime Inception { get; set; }
+        [Field(2)]
+        public DateTime Expiration { get; set; }
+
     }
 }

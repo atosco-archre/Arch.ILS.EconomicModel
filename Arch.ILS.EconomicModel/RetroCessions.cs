@@ -1,5 +1,4 @@
 ﻿#define TIMER
-
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -7,65 +6,47 @@ using System.Runtime.InteropServices;
 
 namespace Arch.ILS.EconomicModel
 {
-    public class PortfolioRetroCessions
+    public class RetroCessions
     {
-        /*Cessions By PortFolioId - RetroLevelType - RetroProgramId - PortLayerId*/
-        //private readonly Dictionary<int, Dictionary<byte, Dictionary<int, ReadOnlyDictionary<int, PortLayerCessionExtended>>>> _portfolioLevelRetroCessions;
+        /*Cessions By RetroLevelType - LayerId - RetroProgramId*/
+        private readonly Dictionary<byte, Dictionary<int, ReadOnlyDictionary<(int RetroProgramId, int RetroProgramResetId), RetroLayerCession>>> _levelLayerRetroCessions;
+        private Dictionary<byte, List<LayerPeriodCession>> _levelLayerPeriodRetroCessions;
 
-        /*Cessions By PortFolioId - RetroLevelType - PortLayerId - RetroProgramId*/
-        private readonly Dictionary<int, Dictionary<byte, Dictionary<int, ReadOnlyDictionary<int, PortLayerCessionExtended>>>> _portfolioLevelLayerRetroCessions;
-        private readonly Dictionary<int, Dictionary<byte, List<PortLayerPeriodCession>>> _portfolioLevelLayerPeriodRetroCessions;
-
-        public PortfolioRetroCessions(IEnumerable<PortLayerCessionExtended> portLayerCessions) 
+        public RetroCessions(IEnumerable<RetroLayerCession> portLayerCessions) 
         {
-            //_portfolioLevelRetroCessions = portLayerCessions
-            //    .GroupBy(portCessions => portCessions.PortfolioId)
-            //    .ToDictionary(portCessionPort => portCessionPort.Key, portCessionPortGroup => portCessionPortGroup
-            //        .GroupBy(portGroup => portGroup.RetroLevelType)
-            //        .ToDictionary(portRetroLevel => portRetroLevel.Key, portRetroLevelGroup => portRetroLevelGroup
-            //            .GroupBy(portRetroLevelProgram => portRetroLevelProgram.RetroProgramId)
-            //            .ToDictionary(retroCessions => retroCessions.Key, retroCessionsValue => new ReadOnlyDictionary<int, PortLayerCessionExtended>(retroCessionsValue
-            //                .ToDictionary(retroCessions => retroCessions.PortLayerId)))));
-            _portfolioLevelLayerRetroCessions = portLayerCessions
-                .GroupBy(portCessions => portCessions.PortfolioId)
-                .ToDictionary(portCessionPort => portCessionPort.Key, portCessionPortGroup => portCessionPortGroup
-                    .GroupBy(portGroup => portGroup.RetroLevelType)
-                    .ToDictionary(portRetroLevel => portRetroLevel.Key, portRetroLevelGroup => portRetroLevelGroup
-                        .GroupBy(portLayerCession => portLayerCession.PortLayerId)
-                        .ToDictionary(layerCession => layerCession.Key, layerCessionValue => new ReadOnlyDictionary<int, PortLayerCessionExtended>(layerCessionValue
-                            .ToDictionary(retroCessions => retroCessions.RetroProgramId)))));
-            _portfolioLevelLayerPeriodRetroCessions = new Dictionary<int, Dictionary<byte, List<PortLayerPeriodCession>>>();
+
+            _levelLayerRetroCessions = portLayerCessions
+                .GroupBy(portGroup => portGroup.RetroLevelType)
+                .ToDictionary(portRetroLevel => portRetroLevel.Key, portRetroLevelGroup => portRetroLevelGroup
+                    .GroupBy(portLayerCession => portLayerCession.LayerId)
+                    .ToDictionary(layerCession => layerCession.Key, layerCessionValue => new ReadOnlyDictionary<(int RetroProgramId, int RetroProgramResetId), RetroLayerCession>(layerCessionValue
+                        .ToDictionary(retroCessions => (retroCessions.RetroProgramId, retroCessions.RetroProgramResetId)))));
             SetNetCessions();
         }
 
-        public IEnumerable<int> GetPortfolioIds()
+        public IEnumerable<byte> GetLevels()
         {
-            return _portfolioLevelLayerRetroCessions.Keys;
+            return _levelLayerRetroCessions.Keys;
         }
 
-        public IEnumerable<byte> GetPortfolioLevels(in int portfolioId)
+        public IEnumerable<int> GetLevelLayers(in byte retroLevelId)
         {
-            return _portfolioLevelLayerRetroCessions[portfolioId].Keys;
+            return _levelLayerRetroCessions[retroLevelId].Keys;
         }
 
-        public IEnumerable<int> GetPortfolioLevelLayers(in int portfolioId, in byte retroLevelId)
+        public IEnumerable<int> GetLevelLayerRetroPrograms(in byte retroLevelId, in int layerId)
         {
-            return _portfolioLevelLayerRetroCessions[portfolioId][retroLevelId].Keys;
+            return _levelLayerRetroCessions[retroLevelId][layerId].Keys.Select(x => x.RetroProgramId).Distinct();
         }
 
-        public IEnumerable<int> GetPortfolioLevelLayerRetroPrograms(in int portfolioId, in byte retroLevelId, in int portLayerId)
+        public IEnumerable<RetroLayerCession> GetLevelLayerRetroCessions(in byte retroLevelId, in int layerId)
         {
-            return _portfolioLevelLayerRetroCessions[portfolioId][retroLevelId][portLayerId].Keys;
+            return _levelLayerRetroCessions[retroLevelId][layerId].Values;
         }
 
-        public IEnumerable<PortLayerCessionExtended> GetPortfolioLevelLayerRetroCessions(in int portfolioId, in byte retroLevelId, in int portLayerId)
+        public IEnumerable<LayerPeriodCession> GetLevelLayerCessions()
         {
-            return _portfolioLevelLayerRetroCessions[portfolioId][retroLevelId][portLayerId].Values;
-        }
-
-        public IEnumerable<PortLayerPeriodCession> GetPortfolioLevelLayerCessions()
-        {
-            return _portfolioLevelLayerPeriodRetroCessions.Values.SelectMany(a => a.Values).SelectMany(b => b);
+            return _levelLayerPeriodRetroCessions.SelectMany(a => a.Value);
         }
 
         private void SetNetCessions()
@@ -75,7 +56,7 @@ namespace Arch.ILS.EconomicModel
             sw.Start();
 #endif
 #if DEBUG
-            Parallel.ForEach(_portfolioLevelLayerRetroCessions.Keys, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (portfolioId) => { SetNetCessions(portfolioId);});
+            Parallel.ForEach(_levelLayerRetroCessions.Keys, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (portfolioId) => { SetNetCessions(portfolioId);});
 #else
             Parallel.ForEach(_portfolioLevelLayerRetroCessions.Keys, (portfolioId) => { SetNetCessions(portfolioId); });
 #endif
@@ -87,50 +68,50 @@ namespace Arch.ILS.EconomicModel
 
         private unsafe void SetNetCessions(in int portfolioId)
         {
-            var levels = GetPortfolioLevels(portfolioId).OrderBy(x => x).ToArray();
+            var levels = GetLevels().OrderBy(x => x).ToArray();
             Span<byte> sLevels = new Span<byte>(levels);
             Dictionary<int, List<PeriodCession>> cumulativeCessions = new Dictionary<int, List<PeriodCession>>();
-            Dictionary<byte, List<PortLayerPeriodCession>> levelPortLayerPeriodCessions = new Dictionary<byte, List<PortLayerPeriodCession>>();
+            Dictionary<byte, List<LayerPeriodCession>> levelLayerPeriodCessions = new Dictionary<byte, List<LayerPeriodCession>>();
             for(int l = 0; l < sLevels.Length; ++l)
             {
                 byte level = sLevels[l];
-                var layerRetroCessions = _portfolioLevelLayerRetroCessions[portfolioId][level];
-                List<PortLayerPeriodCession> currentLevelPeriodCessions = new List<PortLayerPeriodCession>();
+                var layerRetroCessions = _levelLayerRetroCessions[level];
+                List<LayerPeriodCession> currentLevelPeriodCessions = new List<LayerPeriodCession>();
                 foreach (var layerCessions in layerRetroCessions)
                 {
-                    int portLayerId = layerCessions.Key;                 
-                    List<PortLayerPeriodCession> currentLevelLayerPeriodCessions = new List<PortLayerPeriodCession>();
+                    int layerId = layerCessions.Key;                 
+                    List<LayerPeriodCession> currentLevelLayerPeriodCessions = new List<LayerPeriodCession>();
 
-                    if (!cumulativeCessions.TryGetValue(portLayerId, out List<PeriodCession> layerCumulativeCessions) || layerCumulativeCessions.Count == 0)
+                    if (!cumulativeCessions.TryGetValue(layerId, out List<PeriodCession> layerCumulativeCessions) || layerCumulativeCessions.Count == 0)
                         layerCumulativeCessions = null;
                         
-                    foreach (PortLayerCessionExtended retroCession in layerCessions.Value.Values)
+                    foreach (RetroLayerCession retroCession in layerCessions.Value.Values)
                     {
                         if(layerCumulativeCessions != null)
                         {
                             var periodCession = new PeriodCession(retroCession.OverlapStart, retroCession.OverlapEnd, retroCession.CessionGross);
                             var sLayerCumulativeCessions = CollectionsMarshal.AsSpan<PeriodCession>(layerCumulativeCessions);
-                            FindNetCessions(new PortLayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in portLayerId, ref periodCession), sLayerCumulativeCessions, ref currentLevelLayerPeriodCessions);
+                            FindNetCessions(new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, ref periodCession), sLayerCumulativeCessions, ref currentLevelLayerPeriodCessions);
                         }
                         else
                         {
                             PeriodCession periodCession = new PeriodCession(retroCession.OverlapStart, retroCession.OverlapEnd, retroCession.CessionGross);
-                            PortLayerPeriodCession cession = new PortLayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in portLayerId, ref periodCession);
+                            LayerPeriodCession cession = new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, ref periodCession);
                             currentLevelLayerPeriodCessions.Add(cession);
                         }
                     }
-                    if (cumulativeCessions.TryGetValue(portLayerId, out var layerPreviousLevelsCessions))
+                    if (cumulativeCessions.TryGetValue(layerId, out var layerPreviousLevelsCessions))
                         layerPreviousLevelsCessions.AddRange(currentLevelLayerPeriodCessions.Select(x => x.PeriodCession));
                     else
                         layerPreviousLevelsCessions = currentLevelLayerPeriodCessions.Select(x => x.PeriodCession).ToList();
-                    cumulativeCessions[portLayerId] = FindInuringCessions(layerPreviousLevelsCessions);
+                    cumulativeCessions[layerId] = FindInuringCessions(layerPreviousLevelsCessions);
 
                     currentLevelPeriodCessions.AddRange(currentLevelLayerPeriodCessions);
                 }
-                levelPortLayerPeriodCessions.Add(level, currentLevelPeriodCessions);
+                levelLayerPeriodCessions.Add(level, currentLevelPeriodCessions);
             }
 
-            _portfolioLevelLayerPeriodRetroCessions[portfolioId] = levelPortLayerPeriodCessions;
+            _levelLayerPeriodRetroCessions = levelLayerPeriodCessions;
         }
 
         private static List<PeriodCession> FindInuringCessions(List<PeriodCession> previousCessions)
@@ -201,7 +182,7 @@ namespace Arch.ILS.EconomicModel
             return periodCessions;
         }
 
-        private static void FindNetCessions(PortLayerPeriodCession currentLayerRetroCession, Span<PeriodCession> previousCumulativeCessions, ref List<PortLayerPeriodCession> output)
+        private static void FindNetCessions(LayerPeriodCession currentLayerRetroCession, Span<PeriodCession> previousCumulativeCessions, ref List<LayerPeriodCession> output)
         {
             if (previousCumulativeCessions.Length == 0)
             {
@@ -216,19 +197,19 @@ namespace Arch.ILS.EconomicModel
             if (rangeA.TryGetLeftNonOverlap(ref rangeB, out DateTimeRange leftNonOverlap))
             {
                 PeriodCession cession = new PeriodCession(leftNonOverlap.StartInclusive, leftNonOverlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession);
-                FindNetCessions(new PortLayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.PortLayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
             }
 
             if (rangeA.TryGetRightNonOverlap(ref rangeB, out DateTimeRange rightNonOverlap))
             {
                 PeriodCession cession = new PeriodCession(rightNonOverlap.StartInclusive, rightNonOverlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession);
-                FindNetCessions(new PortLayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.PortLayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
             }
 
             if (rangeA.TryGetOverlap(ref rangeB, out DateTimeRange overlap))
             {
                 PeriodCession cession = new PeriodCession(overlap.StartInclusive, overlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession * (1.0m - cessionB.NetCession));
-                FindNetCessions(new PortLayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.PortLayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
             }
         }
     }

@@ -9,43 +9,6 @@ namespace Arch.ILS.EconomicModel
 {
     public class RevoLayerLossSqlRepository : SqlRepository, IRevoLayerLossRepository
     {
-        #region Constants
-
-        private const string GET_MODELLED_LAYER_YELT_QUERY = @"SELECT [Year] 
-     , CAST([EventId] AS INT) EventId
-     , [Peril]
-     , [Day]
-     , [LossPct]
-     , [RP]
-     , [RB]
-  FROM [dbo].[LayerYelt]
- WHERE LossAnalysisId = {0}
-   AND LayerId  = {1}
-   AND LossType = 1";
-
-        private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RB = @"SELECT [Year] 
-     , CAST([EventId] AS INT) EventId
-     , [Peril]
-     , [Day]
-     , [LossPct]
-     , [RP]
-  FROM [dbo].[LayerYelt]
- WHERE LossAnalysisId = {0}
-   AND LayerId  = {1}
-   AND LossType = 1";
-
-        private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RP_NO_RB = @"SELECT [Year] 
-     , CAST([EventId] AS INT) EventId
-     , [Peril]
-     , [Day]
-     , [LossPct]
-  FROM [dbo].[LayerYelt]
- WHERE LossAnalysisId = {0}
-   AND LayerId  = {1}
-   AND LossType = 1";
-
-        #endregion Constants
-
         #region Constructor
 
         public RevoLayerLossSqlRepository(string connectionString) : base(connectionString)
@@ -222,5 +185,42 @@ namespace Arch.ILS.EconomicModel
 
 
         #endregion Methods
+
+        #region Constants
+
+        private const string GET_MODELLED_LAYER_YELT_QUERY = @"SELECT [Year] 
+     , CAST([EventId] AS INT) EventId
+     , [Peril]
+     , [Day]
+     , [LossPct]
+     , [RP]
+     , [RB]
+  FROM [dbo].[LayerYelt]
+ WHERE LossAnalysisId = {0}
+   AND LayerId  = {1}
+   AND LossType = 1";
+
+        private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RB = @"SELECT [Year] 
+     , CAST([EventId] AS INT) EventId
+     , [Peril]
+     , [Day]
+     , [LossPct]
+     , [RP]
+  FROM [dbo].[LayerYelt]
+ WHERE LossAnalysisId = {0}
+   AND LayerId  = {1}
+   AND LossType = 1";
+
+        private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RP_NO_RB = @"SELECT [Year] 
+     , CAST([EventId] AS INT) EventId
+     , [Peril]
+     , [Day]
+     , [LossPct]
+  FROM [dbo].[LayerYelt]
+ WHERE LossAnalysisId = {0}
+   AND LayerId  = {1}
+   AND LossType = 1";
+
+        #endregion Constants
     }
 }

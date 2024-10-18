@@ -11,28 +11,74 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            int bucket = 0;
-            nuint i = (uint)bucket - 1;
+            SetRetroCessions();
+            //SetPortfolioLayerCession();
+        }
+
+        public static void SetRetroCessions()
+        {
             /*Authentication*/
             ConnectionProtection connectionProtection =
                 new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
             //if (!connectionProtection.IsProtected())
             //    connectionProtection.EncryptFile();
             //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
-            //var layers = revoSnowflakeRepository.GetLayers().Result;
-            //var portLayersCessions = revoSnowflakeRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
+            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            //var retroPrograms = revoRepository.GetRetroPrograms().Result;
+            //var retroAllocations = revoRepository.GetRetroAllocations().Result;
+            //var spInsurers = revoRepository.GetSPInsurers().Result;
+            //var retroprograms = revoRepository.GetRetroPrograms().Result;
+            //var retroInvestorResets = revoRepository.GetRetroInvestorResets().Result.ToList();
+            //var retroProgramResets = revoRepository.GetRetroProgramResets().Result.ToList();
+
+            //var retroResetCessions = revoRepository.GetRetroResetCessions().Result.ToList();
+            //var retroInitialCessions = revoRepository.GetRetroInitialCessions().Result.ToList();
+            //var investorResetCessions = revoRepository.GetInvestorResetCessions().Result.ToList();
+            //var investorInitialCessions = revoRepository.GetInvestorInitialCessions().Result.ToList();
+            var retroAllocationView = revoRepository.GetRetroAllocationView();
+            var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
+
+            using(FileStream fs = new FileStream(@"C:\Data\RetroAllocations.csv", FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine($"RetroLevel,RetroProgramId,LayerId,StartInclusive,StartDayOfYear,EndInclusive,EndDayOfYear,NetCession");
+                foreach (var c in levelLayerCessions)
+                    sw.WriteLine($"{c.RetroLevel},{c.RetroProgramId},{c.LayerId},{c.PeriodCession.StartInclusive},{c.PeriodCession.StartInclusive.DayOfYear},{c.PeriodCession.EndInclusive},{c.PeriodCession.EndInclusive.DayOfYear},{c.PeriodCession.NetCession}");
+                sw.Flush();
+            }
+        }
+
+        public static void SetPortfolioLayerCession()
+        {
+            /*Authentication*/
+            ConnectionProtection connectionProtection =
+                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
+            //if (!connectionProtection.IsProtected())
+            //    connectionProtection.EncryptFile();
+            //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
+            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            /*Queries*/
+            var Layers2 = revoRepository.GetLayers().Result;
+            var portfolios = revoRepository.GetPortfolios().Result;
+            var portLayers = revoRepository.GetPortfolioLayers().Result;
+            var result = revoRepository.GetLayerView();
+            var x = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218).ToArray();
+            var xd = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218 && x.PortLayerId == 750703).ToArray();
+            var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
+        }
+
+        public unsafe static void ProcessLayerYelts()
+        {
+            int bucket = 0;
+            nuint i = (uint)bucket - 1;
+            /*Authentication*/
+            ConnectionProtection connectionProtection =
+                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
             RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
 
-
-            /*Queries*/
-            //var Layers2 = revoRepository.GetLayers().Result;
-            //var portfolios = revoRepository.GetPortfolios().Result.ToDictionary(x => x.PortfolioId);
-            //var portLayers = revoRepository.GetPortfolioLayers().Result.ToDictionary(x => x.PortLayerId);
-            //var result = revoRepository.GetLayerView();
-            //var x = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218).ToArray();
-            //var xd = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218 && x.PortLayerId == 750703).ToArray();
-            //var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
 
             RevoLayerLossSqlRepository revoLayerLossSqlRepository = new RevoLayerLossSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVOLAYERLOSS));
             var layerYelt = revoLayerLossSqlRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
@@ -43,7 +89,7 @@ namespace Arch.ILS.EconomicModel.Console
             YeltPartitionReader yeltPartitionLinkedListReader2 = YeltPartitionReader.Initialise(yeltPartitioner2);
 
             long[] sortedKeys = new long[yeltPartitionLinkedListReader.TotalLength + yeltPartitionLinkedListReader2.TotalLength];
-            fixed(long*keysPtr = sortedKeys)
+            fixed (long* keysPtr = sortedKeys)
             {
                 long* ptr = keysPtr;
                 int keyCount = YeltPartitionMerge.Merge_ScalarOptimised_2(yeltPartitionLinkedListReader.Head, yeltPartitionLinkedListReader2.Head, ptr);
@@ -61,7 +107,7 @@ namespace Arch.ILS.EconomicModel.Console
             }
             sw.Stop();
             System.Console.WriteLine(sw);
-            
+
             System.Console.ReadLine();
         }
     }
