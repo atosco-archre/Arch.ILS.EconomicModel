@@ -3,16 +3,13 @@ using Studio.Core;
 
 namespace Arch.ILS.EconomicModel
 {
-    public class LayerDetail : IRecord
+    public class LayerDetail
     {
-        [Field(0)]
         public int LayerId { get; set; }
-        [Field(1)]
         public int SubmissionId { get; set; }
         //public int LayerNum { get; set; }
         //public int SubLayerNum { get; set; }
         //public int ReinstCount { get; set; }
-        [Field(2)]
         public decimal Placement { get; set; }
         //public decimal OccLimit { get; set; }
         //public decimal OccRetention { get; set; }
@@ -25,11 +22,8 @@ namespace Arch.ILS.EconomicModel
         //public decimal Franchise { get; set; }
         //public decimal FranchiseReverse { get; set; }
         //public decimal RiskLimit { get; set; }
-        [Field(3)]
         public DateTime Inception { get; set; }
-        [Field(4)]
         public int UWYear { get; set; }
-        [Field(5)]
         public DateTime Expiration { get; set; }
         //public DateTime? ExpirationFinal { get; set; }
         //public string Facility { get; set; }
@@ -58,13 +52,11 @@ namespace Arch.ILS.EconomicModel
         //public decimal CatLoss1 { get; set; }
         //public decimal CatLoss2 { get; set; }
         //public decimal CatLoss3 { get; set; }
-        [Field(6)]
         public decimal EstimatedShare { get; set; }
-        [Field(7)]
         public decimal SignedShare { get; set; }
         //public decimal AuthShare { get; set; }
         //public decimal QuotedShare { get; set; }
-        //public int Status { get; set; }
+        public ContractStatus Status { get; set; }
         //public string LayerDesc { get; set; }
         //public string Notes { get; set; }
         //public string RegisMsg { get; set; }
@@ -113,7 +105,6 @@ namespace Arch.ILS.EconomicModel
         //public decimal ReinsurerExpenses { get; set; }
         //public int LayerCategory { get; set; }
         //public string LayerCatalog { get; set; }
-        [Field(8)]
         public decimal Premium { get; set; }
         //public decimal QuotePremium { get; set; }
         //public int? RiskZoneId { get; set; }
@@ -152,12 +143,11 @@ namespace Arch.ILS.EconomicModel
         //public decimal QuotedCorreShare { get; set; }
         //public decimal AuthCorreShare { get; set; }
         //public decimal FrontingFee { get; set; }
-        [Field(9)]
         public long RowVersion { get; set; }
         //public decimal? NonCatWeightPC { get; set; }
         //public decimal? NonCatWeightSS { get; set; }
-        //public decimal? BoundFXRate { get; set; }
-        //public DateTime? BoundFXDate { get; set; }
+        public decimal? BoundFXRate { get; set; }
+        public DateTime? BoundFXDate { get; set; }
         //public int RegisStatus { get; set; }
         //public bool IsDifferentialTerms { get; set; }
         //public decimal RolRpp { get; set; }

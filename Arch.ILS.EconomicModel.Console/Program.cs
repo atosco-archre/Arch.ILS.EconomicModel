@@ -12,7 +12,8 @@ namespace Arch.ILS.EconomicModel.Console
         public static unsafe void Main(string[] args)
         {
             //ExportRetroCessions();
-            ExportPremiumByRetroProfile(new DateTime(2024, 9, 30));
+            ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
+            ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
         }
 
@@ -50,7 +51,7 @@ namespace Arch.ILS.EconomicModel.Console
             }
         }
 
-        public static void ExportPremiumByRetroProfile(DateTime currentFxDate, bool useBoundFx = true, int previousYear = 2023, int currentYear = 2024, string baseCurrency = "USD")
+        public static void ExportPremiumByRetroProfile(string outputFilePath, DateTime currentFxDate, bool useBoundFx = true, int previousYear = 2023, int currentYear = 2024, string baseCurrency = "USD")
         {
             /*Authentication*/
             ConnectionProtection connectionProtection =
@@ -72,9 +73,15 @@ namespace Arch.ILS.EconomicModel.Console
             {
                 if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
                     continue;
-                if(!submissions.Result.TryGetValue(layerDetail.SubmissionId, out var submission))
+                /*if (layerDetail.Status != ContractStatus.Bound
+                    && layerDetail.Status != ContractStatus.Signed
+                    && layerDetail.Status != ContractStatus.SignReady
+                    // && layerDetail.Status != ContractStatus.Budget
+                    )
+                    continue;*/
+                if (!submissions.Result.TryGetValue(layerDetail.SubmissionId, out var submission))
                     continue;
-                var fxRate = fxRates.Result.GetRate(currentFxDate, baseCurrency, submission.Currency);
+                var fxRate = RevoHelper.GetFxRate(useBoundFx, currentFxDate, baseCurrency, submission, layerDetail, fxRates.Result);
                 var retroProgram = retroPrograms.Result[layerCession.RetroProgramId];
                 if(!retroProfiles.Result.TryGetValue(retroProgram.RetroProfileId, out var retroProfile))
                     continue;
@@ -98,7 +105,7 @@ namespace Arch.ILS.EconomicModel.Console
                     uwYearsPremiums[layerDetail.UWYear] = cededPremium;
             }
 
-            using (FileStream fs = new FileStream(@"C:\Data\RetroProfilePremiums.csv", FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter sw = new StreamWriter(fs))
             {
                 sw.WriteLine($"RetroProfileId,RetroProfileName,LossWeight2024,ExpectedWP2023,ExpectedWP2024");
