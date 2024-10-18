@@ -1,6 +1,5 @@
-﻿#define TIMER
+﻿
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -49,24 +48,7 @@ namespace Arch.ILS.EconomicModel
             return _levelLayerPeriodRetroCessions.SelectMany(a => a.Value);
         }
 
-        private void SetNetCessions()
-        {
-#if TIMER
-            Stopwatch sw = Stopwatch.StartNew();
-            sw.Start();
-#endif
-#if DEBUG
-            Parallel.ForEach(_levelLayerRetroCessions.Keys, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (portfolioId) => { SetNetCessions(portfolioId);});
-#else
-            Parallel.ForEach(_portfolioLevelLayerRetroCessions.Keys, (portfolioId) => { SetNetCessions(portfolioId); });
-#endif
-#if TIMER
-            sw.Stop();
-            Console.WriteLine($"Net Cession elapsed {sw.Elapsed}.");
-#endif
-        }
-
-        private unsafe void SetNetCessions(in int portfolioId)
+        private unsafe void SetNetCessions()
         {
             var levels = GetLevels().OrderBy(x => x).ToArray();
             Span<byte> sLevels = new Span<byte>(levels);
