@@ -25,6 +25,14 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
+        public Task<Dictionary<int, LayerDetail>> GetLayerDetails()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return ExecuteReaderSql(GET_LAYER_DETAILS).GetObjects<LayerDetail>().ToDictionary(x => x.LayerId);
+            });
+        }
+
         public Task<Dictionary<int, RetroProgram>> GetRetroPrograms()
         {
             return Task.Factory.StartNew(() =>
@@ -75,185 +83,191 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public PortfolioRetroCessions GetLayerView(int partitionCount = 8)
+        public Task<PortfolioRetroCessions> GetLayerView(int partitionCount = 8)
         {
-            var portLayersTask = GetPortfolioLayers();
-            var layersTask = GetLayers();
-            var portfoliosTask = GetPortfolios();
-            var retroProgramsTask = GetRetroPrograms();
-            Task.WaitAll(portLayersTask, layersTask, portfoliosTask, retroProgramsTask);
-            Dictionary<int, PortLayer> portLayers = portLayersTask.Result;
-            Dictionary<int, Layer> layers = layersTask.Result;
-            Dictionary<int, Portfolio> portfolios = portfoliosTask.Result;
-            Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
-            List<PortLayerCessionExtended>[] partitionedPortLayerCessions = new List<PortLayerCessionExtended>[partitionCount];
-
-            for (int i = 0; i < partitionedPortLayerCessions.Length; i++)
-                partitionedPortLayerCessions[i] = new();
-
-            Task[] portLayerCessionsTasks = new Task[partitionCount];
-            for (int i = 0; i < portLayerCessionsTasks.Length; i++)
-                portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
-                {
-                    var input = ((int index, List<PortLayerCessionExtended> layerCessionRepo))state!;
-                    
-                    foreach(var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, input.index, partitionCount)).GetObjects<PortLayerCessionExtended>())
-                    {
-                        if (!retroPrograms.TryGetValue(portLayerCession.RetroProgramId, out RetroProgram retroProgram))
-                            continue;
-
-                        PortLayer portLayer = portLayers[portLayerCession.PortLayerId];
-                        Portfolio portfolio = portfolios[portLayer.PortfolioId];
-                        Layer layer = layers[portLayer.LayerId];
-                        portLayerCession.PortfolioId = portfolio.PortfolioId;
-                        portLayerCession.LayerId = layer.LayerId;
-                        portLayerCession.RetroLevelType = retroProgram.RetroLevelType;
-                        DateTime? inception;
-                        if ((inception = GetPortfolioLayerInception(portfolio, layer)) == null)
-                            continue;
-                        DateTime portLayerInception = (DateTime)inception;
-                        DateTime portLayerExpiration = portLayerInception.AddYears(1).AddDays(-1);
-
-                        if (portLayerExpiration < retroProgram.Inception
-                            || portLayerInception > retroProgram.Expiration
-                            || (retroProgram.RetroProgramType != RetroProgramType.LOD /*1 = LOD*/ && portLayerInception < retroProgram.Inception))/*if RAD, discard ones where the layer started before the retro*/
-                            continue;
-
-                        portLayerCession.OverlapStart = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Inception > portLayerInception
-                            ? retroProgram.Inception
-                            : portLayerInception;
-                        portLayerCession.OverlapEnd = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Expiration < portLayerExpiration
-                            ? retroProgram.Expiration
-                            : portLayerExpiration;
-
-                        input.layerCessionRepo.Add(portLayerCession);
-                    }
-                }, (i, partitionedPortLayerCessions[i]));
-            Task.WaitAll(portLayerCessionsTasks);
-
-            return new(partitionedPortLayerCessions.SelectMany(cession => cession));
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            static DateTime? GetPortfolioLayerInception(Portfolio portfolio, Layer layer)
+            return Task.Factory.StartNew(() =>
             {
-                return portfolio.PortfolioType switch
+                var portLayersTask = GetPortfolioLayers();
+                var layersTask = GetLayers();
+                var portfoliosTask = GetPortfolios();
+                var retroProgramsTask = GetRetroPrograms();
+                Task.WaitAll(portLayersTask, layersTask, portfoliosTask, retroProgramsTask);
+                Dictionary<int, PortLayer> portLayers = portLayersTask.Result;
+                Dictionary<int, Layer> layers = layersTask.Result;
+                Dictionary<int, Portfolio> portfolios = portfoliosTask.Result;
+                Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
+                List<PortLayerCessionExtended>[] partitionedPortLayerCessions = new List<PortLayerCessionExtended>[partitionCount];
+
+                for (int i = 0; i < partitionedPortLayerCessions.Length; i++)
+                    partitionedPortLayerCessions[i] = new();
+
+                Task[] portLayerCessionsTasks = new Task[partitionCount];
+                for (int i = 0; i < portLayerCessionsTasks.Length; i++)
+                    portLayerCessionsTasks[i] = Task.Factory.StartNew(state =>
+                    {
+                        var input = ((int index, List<PortLayerCessionExtended> layerCessionRepo))state!;
+
+                        foreach (var portLayerCession in ExecuteReaderSql(string.Format(GET_PORTFOLIO_LAYER_CESSIONS_BY_PARTITION, input.index, partitionCount)).GetObjects<PortLayerCessionExtended>())
+                        {
+                            if (!retroPrograms.TryGetValue(portLayerCession.RetroProgramId, out RetroProgram retroProgram))
+                                continue;
+
+                            PortLayer portLayer = portLayers[portLayerCession.PortLayerId];
+                            Portfolio portfolio = portfolios[portLayer.PortfolioId];
+                            Layer layer = layers[portLayer.LayerId];
+                            portLayerCession.PortfolioId = portfolio.PortfolioId;
+                            portLayerCession.LayerId = layer.LayerId;
+                            portLayerCession.RetroLevelType = retroProgram.RetroLevelType;
+                            DateTime? inception;
+                            if ((inception = GetPortfolioLayerInception(portfolio, layer)) == null)
+                                continue;
+                            DateTime portLayerInception = (DateTime)inception;
+                            DateTime portLayerExpiration = portLayerInception.AddYears(1).AddDays(-1);
+
+                            if (portLayerExpiration < retroProgram.Inception
+                                || portLayerInception > retroProgram.Expiration
+                                || (retroProgram.RetroProgramType != RetroProgramType.LOD /*1 = LOD*/ && portLayerInception < retroProgram.Inception))/*if RAD, discard ones where the layer started before the retro*/
+                                continue;
+
+                            portLayerCession.OverlapStart = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Inception > portLayerInception
+                                ? retroProgram.Inception
+                                : portLayerInception;
+                            portLayerCession.OverlapEnd = retroProgram.RetroProgramType != RetroProgramType.RAD /*2 = RAD*/ && retroProgram.Expiration < portLayerExpiration
+                                ? retroProgram.Expiration
+                                : portLayerExpiration;
+
+                            input.layerCessionRepo.Add(portLayerCession);
+                        }
+                    }, (i, partitionedPortLayerCessions[i]));
+                Task.WaitAll(portLayerCessionsTasks);
+
+                return new PortfolioRetroCessions(partitionedPortLayerCessions.SelectMany(cession => cession));
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                static DateTime? GetPortfolioLayerInception(Portfolio portfolio, Layer layer)
                 {
-                    0 => layer.Inception,
-                    1 => layer.Inception.AddYears(1),
-                    _ when portfolio.PortfolioType == 2 && layer.Inception.Year == portfolio.AsOfDate.Year => layer.Inception,
-                    _ when portfolio.PortfolioType == 2 && layer.Inception.Year == portfolio.AsOfDate.Year - 1 => layer.Inception.AddYears(1),
-                    _ when portfolio.PortfolioType == 3 && layer.Inception.Year == portfolio.AsOfDate.Year => layer.Inception.AddYears(1),
-                    _ when portfolio.PortfolioType == 3 && layer.Inception.Year == portfolio.AsOfDate.Year - 1 => layer.Inception.AddYears(2),
-                    _ => null
-                };
-            }
+                    return portfolio.PortfolioType switch
+                    {
+                        0 => layer.Inception,
+                        1 => layer.Inception.AddYears(1),
+                        _ when portfolio.PortfolioType == 2 && layer.Inception.Year == portfolio.AsOfDate.Year => layer.Inception,
+                        _ when portfolio.PortfolioType == 2 && layer.Inception.Year == portfolio.AsOfDate.Year - 1 => layer.Inception.AddYears(1),
+                        _ when portfolio.PortfolioType == 3 && layer.Inception.Year == portfolio.AsOfDate.Year => layer.Inception.AddYears(1),
+                        _ when portfolio.PortfolioType == 3 && layer.Inception.Year == portfolio.AsOfDate.Year - 1 => layer.Inception.AddYears(2),
+                        _ => null
+                    };
+                }
+            });
         }
 
-        public RetroCessions GetRetroAllocationView()
+        public Task<RetroCessions> GetRetroAllocationView()
         {
-            var retroAllocationsTask = GetRetroAllocations();
-            var retroInvestorsTask = GetRetroInvestors();
-            var spInsurersTask = GetSPInsurers(); 
-            var layerRetroPlacementsTask = GetRetroPlacements();
-            var investorResetCessionsTask = GetInvestorResetCessions();
-            var investorInitialCessionsTask = GetInvestorInitialCessions();
-            var layersTask = GetLayers();
-            var retroProgramsTask = GetRetroPrograms();
-
-            Task.WaitAll(investorResetCessionsTask, investorInitialCessionsTask);
-            InvestorCession[] investorInitialCessions = investorInitialCessionsTask.Result.ToArray();
-            InvestorCession[] investorResetCessions = investorResetCessionsTask.Result.ToArray();
-            Dictionary<(int RetroProgramId, int RetroInvestorId), InvestorCession[]> investorRetroCessionPeriods = investorResetCessions.Union(investorInitialCessions.Except(investorResetCessions, new InvestorRetroProgramResetDateComparer()))
-                .GroupBy(g => (g.RetroProgramId, g.RetroInvestorId))
-                .ToDictionary(k => k.Key, v => v.OrderBy(o => o.StartDate).ToArray());//take investor cessions preferably from the RetroInvestorReset table rather than the RetroInvestor table. 
-
-            Task.WaitAll(retroAllocationsTask, retroInvestorsTask, spInsurersTask, layerRetroPlacementsTask);
-            IList<RetroAllocation> retroAllocations = retroAllocationsTask.Result;
-            IList<RetroInvestor> retroInvestors = retroInvestorsTask.Result;
-            Dictionary<int, SPInsurer> spInsurers = spInsurersTask.Result;
-            Dictionary<(int LayerId, int RetroProgramId), LayerRetroPlacement> layerRetroPlacements = layerRetroPlacementsTask.Result
-                .ToDictionary(x => (x.LayerId, x.RetroProgramId));
-
-            var retroInvestorPrograms = retroInvestors
-                .Join(spInsurers, ok => ok.SPInsurerId, ik => ik.Value.SPInsurerId, (o, i) => new { o, i.Value.RetroProgramId });
-            Dictionary<(int RetroProgramId, int LayerId), (decimal GrossCessionBeforePlacement, decimal CalculatedGrossCessionBeforePlacement, decimal Placement, decimal GrossCessionAfterPlacement, int[] RetroInvestors)> retroProgramsLayerGrossAllocation =
-                retroAllocations
-                .Join(retroInvestorPrograms, ok => ok.RetroInvestorId, ik => ik.o.RetroInvestorId, (o, i) => new { o, i.RetroProgramId })
-                .LeftOuterJoin(layerRetroPlacements, ok => (ok.o.LayerId, ok.RetroProgramId), ik => ik.Key, (o, i) => new { o, Placement = i.Value?.Placement ?? 1.0M })
-                .LeftOuterJoin(investorRetroCessionPeriods, ok => (ok.o.RetroProgramId, ok.o.o.RetroInvestorId), ik => ik.Key, (o, i) => new { o, i.Value[0].CessionBeforePlacement, i.Key.RetroInvestorId }) //to handle the case of RetroProgram 101 wih Retro Zone Placement = 0 but non zero layer retro cessions
-                .GroupBy(g => (g.o.o.RetroProgramId, g.o.o.o.LayerId))
-                .ToDictionary(k => k.Key
-                    , v => (v.Sum(x => x.CessionBeforePlacement)
-                    , v.Sum(x => x.o.Placement == decimal.Zero ? x.CessionBeforePlacement : x.o.o.o.CessionGross / x.o.Placement)
-                    , v.Max(x => x.o.Placement), v.Sum(x => x.o.o.o.CessionGross)
-                    , v.Select(x => x.RetroInvestorId).ToArray()));
-
-            Dictionary<int, (DateTime StartDate, int RetroProgramResetId)[]> retroProgramResetDates = investorRetroCessionPeriods
-                .GroupBy(x => x.Key.RetroProgramId, y => y.Value.Select(z => (z.StartDate, z.RetroProgramResetId)))
-                .ToDictionary(k => k.Key, v => v.SelectMany(s => s).Distinct().OrderBy(vv => vv.StartDate).ToArray());
-            Dictionary<int, Layer> layers = layersTask.Result;
-            Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
-            List<RetroLayerCession> retroLayerCessions = new();
-            /*TODO: Note that there are cases where the CalculatedGrossCessionBeforePlacement is different from GrossCessionBeforePlacement. In all the cases I could check, the CalculatedGrossCessionBeforePlacement was the correct one but keep in mind this mismatch*/
-            foreach (var retroGrossAllocation in retroProgramsLayerGrossAllocation.OrderByDescending(x => x.Key.RetroProgramId))
+            return Task.Factory.StartNew(() =>
             {
-                int retroProgramId = retroGrossAllocation.Key.RetroProgramId;
-                (DateTime StartDate, int RetroProgramResetId)[] resetDates = retroProgramResetDates[retroProgramId];
-                RetroProgram retroProgram = retroPrograms[retroGrossAllocation.Key.RetroProgramId];
+                var retroAllocationsTask = GetRetroAllocations();
+                var retroInvestorsTask = GetRetroInvestors();
+                var spInsurersTask = GetSPInsurers();
+                var layerRetroPlacementsTask = GetRetroPlacements();
+                var investorResetCessionsTask = GetInvestorResetCessions();
+                var investorInitialCessionsTask = GetInvestorInitialCessions();
+                var layersTask = GetLayers();
+                var retroProgramsTask = GetRetroPrograms();
 
-                if (!layers.TryGetValue(retroGrossAllocation.Key.LayerId, out Layer layer)
-                    || !TryGetLayerRetroIntersection(layer, retroProgram, out DateTime overlapStart, out DateTime overlapEnd))
-                    continue;
-                if (resetDates.Length == 1)
-                {
-                    var initialCession = resetDates[0];
-                    retroLayerCessions.Add(new RetroLayerCession
-                    {
-                        RetroProgramId = retroProgramId,
-                        LayerId = retroGrossAllocation.Key.LayerId,
-                        RetroProgramResetId = initialCession.RetroProgramResetId,
-                        CessionGross = retroGrossAllocation.Value.GrossCessionAfterPlacement,
-                        RetroLevelType = retroProgram.RetroLevelType,
-                        OverlapStart = overlapStart,
-                        OverlapEnd = overlapEnd
-                    });
-                }
-                else
-                {
-                    int[] retroInvestorIds = retroGrossAllocation.Value.RetroInvestors;
-                    InvestorCession[][] investorCessions = new InvestorCession[retroInvestorIds.Length][];
-                    for(int j = 0; j < retroInvestorIds.Length; ++j)
-                        investorCessions[j] = investorRetroCessionPeriods[(retroProgramId, retroInvestorIds[j])];
+                Task.WaitAll(investorResetCessionsTask, investorInitialCessionsTask);
+                InvestorCession[] investorInitialCessions = investorInitialCessionsTask.Result.ToArray();
+                InvestorCession[] investorResetCessions = investorResetCessionsTask.Result.ToArray();
+                Dictionary<(int RetroProgramId, int RetroInvestorId), InvestorCession[]> investorRetroCessionPeriods = investorResetCessions.Union(investorInitialCessions.Except(investorResetCessions, new InvestorRetroProgramResetDateComparer()))
+                    .GroupBy(g => (g.RetroProgramId, g.RetroInvestorId))
+                    .ToDictionary(k => k.Key, v => v.OrderBy(o => o.StartDate).ToArray());//take investor cessions preferably from the RetroInvestorReset table rather than the RetroInvestor table. 
 
-                    Dictionary<DateTime, decimal> resetDateGrossCessionAfterPlacement = investorCessions
-                        .SelectMany(x => x)
-                        .GroupBy(g => g.StartDate)
-                        .ToDictionary(k => k.Key, v => v.Sum(vv => vv.CessionBeforePlacement) * (retroGrossAllocation.Value.Placement == decimal.Zero ? retroGrossAllocation.Value.GrossCessionAfterPlacement / retroGrossAllocation.Value.CalculatedGrossCessionBeforePlacement : retroGrossAllocation.Value.Placement));
-                    for (int i = 0; i < resetDates.Length; i++)
+                Task.WaitAll(retroAllocationsTask, retroInvestorsTask, spInsurersTask, layerRetroPlacementsTask);
+                IList<RetroAllocation> retroAllocations = retroAllocationsTask.Result;
+                IList<RetroInvestor> retroInvestors = retroInvestorsTask.Result;
+                Dictionary<int, SPInsurer> spInsurers = spInsurersTask.Result;
+                Dictionary<(int LayerId, int RetroProgramId), LayerRetroPlacement> layerRetroPlacements = layerRetroPlacementsTask.Result
+                    .ToDictionary(x => (x.LayerId, x.RetroProgramId));
+
+                var retroInvestorPrograms = retroInvestors
+                    .Join(spInsurers, ok => ok.SPInsurerId, ik => ik.Value.SPInsurerId, (o, i) => new { o, i.Value.RetroProgramId });
+                Dictionary<(int RetroProgramId, int LayerId), (decimal GrossCessionBeforePlacement, decimal CalculatedGrossCessionBeforePlacement, decimal Placement, decimal GrossCessionAfterPlacement, int[] RetroInvestors)> retroProgramsLayerGrossAllocation =
+                    retroAllocations
+                    .Join(retroInvestorPrograms, ok => ok.RetroInvestorId, ik => ik.o.RetroInvestorId, (o, i) => new { o, i.RetroProgramId })
+                    .LeftOuterJoin(layerRetroPlacements, ok => (ok.o.LayerId, ok.RetroProgramId), ik => ik.Key, (o, i) => new { o, Placement = i.Value?.Placement ?? 1.0M })
+                    .LeftOuterJoin(investorRetroCessionPeriods, ok => (ok.o.RetroProgramId, ok.o.o.RetroInvestorId), ik => ik.Key, (o, i) => new { o, i.Value[0].CessionBeforePlacement, i.Key.RetroInvestorId }) //to handle the case of RetroProgram 101 wih Retro Zone Placement = 0 but non zero layer retro cessions
+                    .GroupBy(g => (g.o.o.RetroProgramId, g.o.o.o.LayerId))
+                    .ToDictionary(k => k.Key
+                        , v => (v.Sum(x => x.CessionBeforePlacement)
+                        , v.Sum(x => x.o.Placement == decimal.Zero ? x.CessionBeforePlacement : x.o.o.o.CessionGross / x.o.Placement)
+                        , v.Max(x => x.o.Placement), v.Sum(x => x.o.o.o.CessionGross)
+                        , v.Select(x => x.RetroInvestorId).ToArray()));
+
+                Dictionary<int, (DateTime StartDate, int RetroProgramResetId)[]> retroProgramResetDates = investorRetroCessionPeriods
+                    .GroupBy(x => x.Key.RetroProgramId, y => y.Value.Select(z => (z.StartDate, z.RetroProgramResetId)))
+                    .ToDictionary(k => k.Key, v => v.SelectMany(s => s).Distinct().OrderBy(vv => vv.StartDate).ToArray());
+                Dictionary<int, Layer> layers = layersTask.Result;
+                Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
+                List<RetroLayerCession> retroLayerCessions = new();
+                /*TODO: Note that there are cases where the CalculatedGrossCessionBeforePlacement is different from GrossCessionBeforePlacement. In all the cases I could check, the CalculatedGrossCessionBeforePlacement was the correct one but keep in mind this mismatch*/
+                foreach (var retroGrossAllocation in retroProgramsLayerGrossAllocation.OrderByDescending(x => x.Key.RetroProgramId))
+                {
+                    int retroProgramId = retroGrossAllocation.Key.RetroProgramId;
+                    (DateTime StartDate, int RetroProgramResetId)[] resetDates = retroProgramResetDates[retroProgramId];
+                    RetroProgram retroProgram = retroPrograms[retroGrossAllocation.Key.RetroProgramId];
+
+                    if (!layers.TryGetValue(retroGrossAllocation.Key.LayerId, out Layer layer)
+                        || !TryGetLayerRetroIntersection(layer, retroProgram, out DateTime overlapStart, out DateTime overlapEnd))
+                        continue;
+                    if (resetDates.Length == 1)
                     {
-                        var resetCession = resetDates[i];
-                        DateTime resetStart = resetDates[i].StartDate;
-                        if (i == 0 && resetStart != retroProgram.Inception)
-                            throw new InvalidDataException("Expected the initial cession date to match the retro inception date");
-                        DateTime resetEnd = i + 1 >= resetDates.Length ? retroProgram.Expiration : resetDates[i + 1].StartDate.AddDays(-1);
-                        if (!TryGetPeriodIntersection(resetStart, resetEnd, retroProgram.Inception, retroProgram.Expiration, out DateTime retroOverlapStart, out DateTime retroOverlapEnd)
-                         || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
-                            continue;
+                        var initialCession = resetDates[0];
                         retroLayerCessions.Add(new RetroLayerCession
                         {
                             RetroProgramId = retroProgramId,
                             LayerId = retroGrossAllocation.Key.LayerId,
-                            RetroProgramResetId = resetCession.RetroProgramResetId,
-                            CessionGross = resetDateGrossCessionAfterPlacement[resetStart],
+                            RetroProgramResetId = initialCession.RetroProgramResetId,
+                            CessionGross = retroGrossAllocation.Value.GrossCessionAfterPlacement,
                             RetroLevelType = retroProgram.RetroLevelType,
-                            OverlapStart = resetOverlapStart,
-                            OverlapEnd = resetOverlapEnd
+                            OverlapStart = overlapStart,
+                            OverlapEnd = overlapEnd
                         });
                     }
-                }
-            }
+                    else
+                    {
+                        int[] retroInvestorIds = retroGrossAllocation.Value.RetroInvestors;
+                        InvestorCession[][] investorCessions = new InvestorCession[retroInvestorIds.Length][];
+                        for (int j = 0; j < retroInvestorIds.Length; ++j)
+                            investorCessions[j] = investorRetroCessionPeriods[(retroProgramId, retroInvestorIds[j])];
 
-            return new RetroCessions(retroLayerCessions);
+                        Dictionary<DateTime, decimal> resetDateGrossCessionAfterPlacement = investorCessions
+                            .SelectMany(x => x)
+                            .GroupBy(g => g.StartDate)
+                            .ToDictionary(k => k.Key, v => v.Sum(vv => vv.CessionBeforePlacement) * (retroGrossAllocation.Value.Placement == decimal.Zero ? retroGrossAllocation.Value.GrossCessionAfterPlacement / retroGrossAllocation.Value.CalculatedGrossCessionBeforePlacement : retroGrossAllocation.Value.Placement));
+                        for (int i = 0; i < resetDates.Length; i++)
+                        {
+                            var resetCession = resetDates[i];
+                            DateTime resetStart = resetDates[i].StartDate;
+                            if (i == 0 && resetStart != retroProgram.Inception)
+                                throw new InvalidDataException("Expected the initial cession date to match the retro inception date");
+                            DateTime resetEnd = i + 1 >= resetDates.Length ? retroProgram.Expiration : resetDates[i + 1].StartDate.AddDays(-1);
+                            if (!TryGetPeriodIntersection(resetStart, resetEnd, retroProgram.Inception, retroProgram.Expiration, out DateTime retroOverlapStart, out DateTime retroOverlapEnd)
+                             || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
+                                continue;
+                            retroLayerCessions.Add(new RetroLayerCession
+                            {
+                                RetroProgramId = retroProgramId,
+                                LayerId = retroGrossAllocation.Key.LayerId,
+                                RetroProgramResetId = resetCession.RetroProgramResetId,
+                                CessionGross = resetDateGrossCessionAfterPlacement[resetStart],
+                                RetroLevelType = retroProgram.RetroLevelType,
+                                OverlapStart = resetOverlapStart,
+                                OverlapEnd = resetOverlapEnd
+                            });
+                        }
+                    }
+                }
+
+                return new RetroCessions(retroLayerCessions);
+            });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -597,6 +611,194 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
+        public Task<IDictionary<int, Submission>> GetSubmissions()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                IDictionary<int, Submission> submissions = new Dictionary<int, Submission>();
+                using (var reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_SUBMISSIONS)))
+                {
+                    while (reader.Read())
+                    {
+                        int index = 0;
+                        Submission submission = new()
+                        {
+                            SubmissionId = reader.GetInt32(index),
+                            ProgramId = reader.GetInt32(++index),
+                            RegisId = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            BaseCurrency = reader.GetString(++index),
+                            Currency = reader.GetString(++index),
+                            FXRate = reader.GetDecimal(++index),
+                            FXDate = reader.GetDateTime(++index),
+                            TranType = (TranType)(byte)reader.GetInt32(++index),
+                            InceptionDefault = reader.GetDateTime(++index),
+                            UWYearDefault = reader.GetInt32(++index),
+                            IsMultiyear = reader.GetBoolean(++index),
+                            IsCancellable = reader.GetBoolean(++index),
+                            //ExpirationDefault = reader.GetDateTime(++index),
+                            //QuoteDeadline = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //AuthDeadline = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //Arrived = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //BrokerId = reader.GetInt32(++index),
+                            //BrokerContactId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //UnderwriterId = reader.GetInt32(++index),
+                            //ActuaryId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //AnalystId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //ModelerId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //RiskZoneId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //Notes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //UWNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //Correspondence = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //StrategicNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RefId = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //Status = reader.GetInt32(++index),
+                            //IsRenewal = reader.GetBoolean(++index),
+                            //DocStatus = reader.GetInt32(++index),
+                            //ModelingStatus = reader.GetInt32(++index),
+                            //Priority = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ExpiringSubmissionId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //Surplus = reader.GetDecimal(++index),
+                            //ClientScore = reader.GetInt32(++index),
+                            //SubmissionWriteupId = reader.GetInt32(++index),
+                            //CreateDate = reader.GetDateTime(++index),
+                            //CreateUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ModifyDate = reader.GetDateTime(++index),
+                            //ModifyUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IsActive = reader.GetBoolean(++index),
+                            //IsDeleted = reader.GetBoolean(++index),
+                            //LegalTermsId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //PlacementYear = reader.GetInt32(++index),
+                            //ParentSubmissionId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //CedentAltName = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ModelingDeadline = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //ModelingNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //DataLinkNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //MdlStatusDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //ActuarialNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RelshipUnderwriterId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //MarketShare = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
+                            //CorreAuthDeadline = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //CorreStatus = reader.GetInt32(++index),
+                            //ActuarialStatus = reader.GetInt32(++index),
+                            //SubmissionDataLinkNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ActuarialDataLinkNotes = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ActuarialDeadline = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //Source = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IsCorreInterest = reader.GetBoolean(++index),
+                            //ActuarialPriority = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RegisSyncStatus = reader.GetInt32(++index),
+                            //LastRegisSyncByUserId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //LastRegisSyncDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //ModelingComplexity = reader.GetInt32(++index),
+                            //ActuarialDataCheck = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ActuarialRanking = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IsActuarialDataCheckRequested = reader.GetBoolean(++index),
+                            RowVersion = reader.GetInt64(++index),
+                            //ERCLossViewArch = reader.GetInt32(++index),
+                            //ERCLossViewAir = reader.GetInt32(++index),
+                            //ERCLossViewRMS = reader.GetInt32(++index),
+                            //FxRateSBFUSD = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
+                            //FxRateSBFGBP = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
+                            //FxDateSBF = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //IrisPolicyNumber = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RationaleQuote = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RationaleAuth = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //RationaleSigned = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IrisSLA = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                            //IsCollateralized = reader.GetBoolean(++index),
+                            //BrokerRating = reader.GetInt32(++index),
+                            //BrokerRationale = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //PNOCDays = reader.GetInt32(++index),
+                            //ClientAdvocacyRating = reader.GetInt32(++index),
+                            //ClientAdvocacyRationale = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //LMXIndicator = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ActuaryPeerReviewerId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //ClientAdvocacyLink = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //GroupBuyerId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //LocalBuyerId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                            //IsActuaryPeerReviewNotRequired = reader.GetBoolean(++index),
+                            //CedeCoverageSelectionType = reader.GetInt32(++index),
+                            //DataScoreRating = reader.GetInt32(++index),
+                        };
+
+                        submissions[submission.SubmissionId] = submission;
+                    }
+                }
+
+                return submissions;
+            });
+        }
+
+        public Task<IDictionary<int, RetroProfile>> GetRetroProfiles()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                IDictionary<int, RetroProfile> retroProfiles = new Dictionary<int, RetroProfile>();
+                using (var reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_RETRO_PROFILES)))
+                {
+                    while (reader.Read())
+                    {
+                        int index = 0;
+                        RetroProfile retroProfile = new()
+                        {
+                            RetroProfileId = reader.GetInt32(index),
+                            Name = reader.GetString(++index),
+                            RegisId = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            ManagerId = reader.GetInt32(++index),
+                            CompanyId = reader.GetInt32(++index),
+                            OfficeId = reader.GetInt32(++index),
+                            DeptId = reader.GetInt32(++index),
+                            //CreateDate = reader.GetDateTime(++index),
+                            //CreateUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ModifyDate = reader.GetDateTime(++index),
+                            //ModifyUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IsActive = reader.GetBoolean(++index),
+                            //IsDeleted = reader.GetBoolean(++index),
+                            RowVersion = reader.GetInt64(++index),
+                        };
+
+                        retroProfiles[retroProfile.RetroProfileId] = retroProfile;
+                    }
+                }
+
+                return retroProfiles;
+            });
+        }
+
+        public Task<FXTable> GetFXRates()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                FXTable fxTable = new FXTable();
+                using (var reader = (SqlDataReader)ExecuteReaderSql(string.Format(GET_FX_RATES)))
+                {
+                    while (reader.Read())
+                    {
+                        int index = 0;
+                        FXRate fxRate = new()
+                        {
+                            FXRateId = reader.GetInt32(index),
+                            BaseCurrency = reader.GetString(++index),
+                            Currency = reader.GetString(++index),
+                            FXDate = reader.GetDateTime(++index),
+                            Rate = reader.GetDecimal(++index),
+                            //CreateDate = reader.GetDateTime(++index),
+                            //CreateUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //ModifyDate = reader.GetDateTime(++index),
+                            //ModifyUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
+                            //IsActive = reader.GetBoolean(++index),
+                            //IsDeleted = reader.GetBoolean(++index),
+                            RowVersion = reader.GetInt64(++index),
+                        };
+
+                        fxTable.AddRate(fxRate);
+                    }
+                }
+
+                return fxTable;
+            });
+        }
+
         #region Types
 
         private class InvestorRetroProgramResetDateComparer : IEqualityComparer<InvestorCession>
@@ -624,6 +826,191 @@ namespace Arch.ILS.EconomicModel
  WHERE IsActive = 1
    AND IsDeleted = 0";
 
+        private const string GET_LAYER_DETAILS = @"SELECT LayerId
+      ,SubmissionId
+      --,LayerNum
+      --,SubLayerNum
+      --,ReinstCount
+      ,Placement
+      --,OccLimit
+      --,OccRetention
+      --,CascadeRetention
+      --,AAD
+      --,Var1Retention
+      --,Var2Retention
+      --,AggLimit
+      --,AggRetention
+      --,Franchise
+      --,FranchiseReverse
+      --,RiskLimit
+      ,Inception
+      ,UWYear
+      ,Expiration
+      --,ExpirationFinal
+      --,Facility
+      --,Segment
+      --,LOB
+      --,ContractType
+      --,LimitBasis
+      --,AttachBasis
+      --,LAETerm
+      --,LossTrigger
+      --,ROL
+      --,QuoteROL
+      --,ERC
+      --,ERCModel
+      --,ERCMid
+      --,ERCPareto
+      --,RegisId
+      --,RegisNbr
+      --,RegisMKey
+      --,RegisIdCt
+      --,RegisNbrCt
+      --,BurnReported
+      --,BurnTrended
+      --,YearPeriodSelected
+      --,YearPeriodLoss
+      --,CatLoss1
+      --,CatLoss2
+      --,CatLoss3
+      ,EstimatedShare
+      ,SignedShare
+      --,AuthShare
+      --,QuotedShare
+      --,Status
+      --,LayerDesc
+      --,Notes
+      --,RegisMsg
+      --,ExpiringLayerId
+      --,Commission
+      --,CommOverride
+      --,Brokerage
+      --,Tax
+      --,OtherExpenses
+      --,IsVarComm
+      --,VarCommHi
+      --,VarCommLow
+      --,IsGrossUpComm
+      --,GrossUpFactor
+      --,IsSlidingScale
+      --,SSCommProv
+      --,SSCommMax
+      --,SSCommMin
+      --,SSLossRatioProv
+      --,SSLossRatioMax
+      --,SSLossRatioMin
+      --,IsProfitComm
+      --,ProfitComm
+      --,CCFYears
+      --,DCFYears
+      --,DCFAmount
+      --,PCStartDate
+      --,ComAccountProtect
+      --,ProfitCommissionExpAllowance
+      --,Rate
+      --,PremiumFreq
+      --,AdjustmentBaseType
+      --,LayerType
+      --,FHCFBand
+      --,CreateDate
+      --,CreateUser
+      --,ModifyDate
+      --,ModifyUser
+      --,IsActive
+      --,IsDeleted
+      --,TopUpZoneId
+      --,ERCQuote
+      --,DeclineReason
+      --,InuringLimit
+      --,RiskRetention
+      --,ReinsurerExpenses
+      --,LayerCategory
+      --,LayerCatalog
+      ,Premium
+      --,QuotePremium
+      --,RiskZoneId
+      --,RelShare
+      --,TargetNetShare
+      --,RegisLayerCode
+      --,SnpLobId
+      --,InvestmentReturn
+      --,NonCatMarginAllowance
+      --,LossDuration
+      --,DiversificationFactor
+      --,EarningType
+      --,SourceId
+      --,OrderPct
+      --,BrokerRef
+      --,AcctBrokerId
+      --,IsAdditionalPremium
+      --,IsCommonAcct
+      --,EventNumber
+      --,IsStopLoss
+      --,StopLossLimitPct
+      --,StopLossAttachPct
+      --,IsLossCorridor
+      --,LossCorridorBeginPct
+      --,LossCorridorEndPct
+      --,LossCorridorCedePct
+      --,OccLimitInPct
+      --,OccRetnInPct
+      --,ExpiringCorreShare
+      --,CorreAuthMin
+      --,CorreAuthTarget
+      --,CorreAuthMax
+      --,CorreRenewalMin
+      --,SharedToCorre
+      --,SignedCorreShare
+      --,QuotedCorreShare
+      --,AuthCorreShare
+      --,FrontingFee
+      , CONVERT(BIGINT, RowVersion) AS RowVersion
+      --,NonCatWeightPC
+      --,NonCatWeightSS
+      --,BoundFXRate
+      --,BoundFXDate
+      --,RegisStatus
+      --,IsDifferentialTerms
+      --,RolRpp
+      --,WILResolution
+      --,IsParametric
+      --,PricingSource
+      --,IRISPolicySeqNumber
+      --,IRISStatus
+      --,IRISComments
+      --,IRISRefId
+      --,IRISClassCode
+      --,IRISBranchCode
+      --,IRISTradeCode
+      --,IRISPlacingCode
+      --,ExpectedGrossNetPremiumGBP
+      --,IRISProductCode
+      --,StopLossBufferPct
+      --,ERCActual
+      --,ERCActualSource
+      --,ELMarketShare
+      --,ELHistoricalBurn
+      --,ELBroker
+      --,MAOL
+      --,NCBR
+      --,IsTerrorismSubLimitAppl
+      --,TerrorismSubLimit
+      --,TerrorismSubLimitComments
+      --,LloydsCapital
+      --,LloydsROC
+      --,QuoteExpire
+      --,AuthExpire
+      --,MktROL
+      --,IsHidden
+      --,Cloud
+      --,Ransom
+      --,BudgetROL
+      --,BudgetPremium
+      --,BudgetShare
+  FROM dbo.Layer
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
+
         private const string GET_PORTFOLIOS = @"SELECT PortfolioId
      , PortfolioType
      , AsOfDate
@@ -639,6 +1026,7 @@ namespace Arch.ILS.EconomicModel
    AND IsDeleted = 0";
 
         private const string GET_RETRO_PROGRAM = @"SELECT RetroProgramId
+     , RetroProfileId
      , Inception
      , Expiration
      , CONVERT(TINYINT, RetroProgramType) AS RetroProgramType
@@ -839,6 +1227,140 @@ namespace Arch.ILS.EconomicModel
  WHERE IsActive = 1
    AND IsDeleted = 0
    AND TopUpZoneId IS NOT NULL";
+
+        private const string GET_SUBMISSIONS = @"SELECT SubmissionId
+      ,ProgramId
+      ,RegisId
+      ,BaseCurrency
+      ,Currency
+      ,FXRate
+      ,FXDate
+      ,TranType
+      ,InceptionDefault
+      ,UWYearDefault
+      ,IsMultiyear
+      ,IsCancellable
+      --,ExpirationDefault
+      --,QuoteDeadline
+      --,AuthDeadline
+      --,Arrived
+      --,BrokerId
+      --,BrokerContactId
+      --,UnderwriterId
+      --,ActuaryId
+      --,AnalystId
+      --,ModelerId
+      --,RiskZoneId
+      --,Notes
+      --,UWNotes
+      --,Correspondence
+      --,StrategicNotes
+      --,RefId
+      --,Status
+      --,IsRenewal
+      --,DocStatus
+      --,ModelingStatus
+      --,Priority
+      --,ExpiringSubmissionId
+      --,Surplus
+      --,ClientScore
+      --,SubmissionWriteupId
+      --,CreateDate
+      --,CreateUser
+      --,ModifyDate
+      --,ModifyUser
+      --,IsActive
+      --,IsDeleted
+      --,LegalTermsId
+      --,PlacementYear
+      --,ParentSubmissionId
+      --,CedentAltName
+      --,ModelingDeadline
+      --,ModelingNotes
+      --,DataLinkNotes
+      --,MdlStatusDate
+      --,ActuarialNotes
+      --,RelshipUnderwriterId
+      --,MarketShare
+      --,CorreAuthDeadline
+      --,CorreStatus
+      --,ActuarialStatus
+      --,SubmissionDataLinkNotes
+      --,ActuarialDataLinkNotes
+      --,ActuarialDeadline
+      --,Source
+      --,IsCorreInterest
+      --,ActuarialPriority
+      --,RegisSyncStatus
+      --,LastRegisSyncByUserId
+      --,LastRegisSyncDate
+      --,ModelingComplexity
+      --,ActuarialDataCheck
+      --,ActuarialRanking
+      --,IsActuarialDataCheckRequested
+      ,CONVERT(BIGINT, RowVersion) AS RowVersion
+      --,ERCLossViewArch
+      --,ERCLossViewAir
+      --,ERCLossViewRMS
+      --,FxRateSBFUSD
+      --,FxRateSBFGBP
+      --,FxDateSBF
+      --,IrisPolicyNumber
+      --,RationaleQuote
+      --,RationaleAuth
+      --,RationaleSigned
+      --,IrisSLA
+      --,IsCollateralized
+      --,BrokerRating
+      --,BrokerRationale
+      --,PNOCDays
+      --,ClientAdvocacyRating
+      --,ClientAdvocacyRationale
+      --,LMXIndicator
+      --,ActuaryPeerReviewerId
+      --,ClientAdvocacyLink
+      --,GroupBuyerId
+      --,LocalBuyerId
+      --,IsActuaryPeerReviewNotRequired
+      --,CedeCoverageSelectionType
+      --,DataScoreRating
+  FROM dbo.Submission
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
+
+        private const string GET_RETRO_PROFILES = @"SELECT RetroProfileId
+      ,Name
+      ,RegisId
+      ,ManagerId
+      ,CompanyId
+      ,OfficeId
+      ,DeptId
+      --,CreateDate
+      --,CreateUser
+      --,ModifyDate
+      --,ModifyUser
+      --,IsActive
+      --,IsDeleted
+      ,CONVERT(BIGINT, RowVersion) AS RowVersion
+  FROM dbo.RetroProfile
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
+
+        private const string GET_FX_RATES = @"SELECT FXRateId
+      ,BaseCurrency
+      ,Currency
+      ,FXDate
+      ,Rate
+      --,CreateDate
+      --,CreateUser
+      --,ModifyDate
+      --,ModifyUser
+      --,IsActive
+      --,IsDeleted
+      ,CONVERT(BIGINT, RowVersion) AS RowVersion
+  FROM dbo.FXRate
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
 
         #endregion Constants
     }

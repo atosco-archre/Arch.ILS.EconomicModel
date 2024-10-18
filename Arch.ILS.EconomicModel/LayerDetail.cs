@@ -1,0 +1,200 @@
+﻿
+using Studio.Core;
+
+namespace Arch.ILS.EconomicModel
+{
+    public class LayerDetail : IRecord
+    {
+        [Field(0)]
+        public int LayerId { get; set; }
+        [Field(1)]
+        public int SubmissionId { get; set; }
+        //public int LayerNum { get; set; }
+        //public int SubLayerNum { get; set; }
+        //public int ReinstCount { get; set; }
+        [Field(2)]
+        public decimal Placement { get; set; }
+        //public decimal OccLimit { get; set; }
+        //public decimal OccRetention { get; set; }
+        //public decimal CascadeRetention { get; set; }
+        //public decimal AAD { get; set; }
+        //public decimal Var1Retention { get; set; }
+        //public decimal Var2Retention { get; set; }
+        //public decimal AggLimit { get; set; }
+        //public decimal AggRetention { get; set; }
+        //public decimal Franchise { get; set; }
+        //public decimal FranchiseReverse { get; set; }
+        //public decimal RiskLimit { get; set; }
+        [Field(3)]
+        public DateTime Inception { get; set; }
+        [Field(4)]
+        public int UWYear { get; set; }
+        [Field(5)]
+        public DateTime Expiration { get; set; }
+        //public DateTime? ExpirationFinal { get; set; }
+        //public string Facility { get; set; }
+        //public string Segment { get; set; }
+        //public string LOB { get; set; }
+        //public int ContractType { get; set; }
+        //public int LimitBasis { get; set; }
+        //public int AttachBasis { get; set; }
+        //public int LAETerm { get; set; }
+        //public int LossTrigger { get; set; }
+        //public decimal ROL { get; set; }
+        //public decimal QuoteROL { get; set; }
+        //public decimal? ERC { get; set; }
+        //public decimal ERCModel { get; set; }
+        //public decimal ERCMid { get; set; }
+        //public decimal ERCPareto { get; set; }
+        //public string RegisId { get; set; }
+        //public string RegisNbr { get; set; }
+        //public string RegisMKey { get; set; }
+        //public string RegisIdCt { get; set; }
+        //public string RegisNbrCt { get; set; }
+        //public decimal BurnReported { get; set; }
+        //public decimal BurnTrended { get; set; }
+        //public int YearPeriodSelected { get; set; }
+        //public int YearPeriodLoss { get; set; }
+        //public decimal CatLoss1 { get; set; }
+        //public decimal CatLoss2 { get; set; }
+        //public decimal CatLoss3 { get; set; }
+        [Field(6)]
+        public decimal EstimatedShare { get; set; }
+        [Field(7)]
+        public decimal SignedShare { get; set; }
+        //public decimal AuthShare { get; set; }
+        //public decimal QuotedShare { get; set; }
+        //public int Status { get; set; }
+        //public string LayerDesc { get; set; }
+        //public string Notes { get; set; }
+        //public string RegisMsg { get; set; }
+        //public int? ExpiringLayerId { get; set; }
+        //public decimal Commission { get; set; }
+        //public decimal CommOverride { get; set; }
+        //public decimal Brokerage { get; set; }
+        //public decimal Tax { get; set; }
+        //public decimal OtherExpenses { get; set; }
+        //public bool IsVarComm { get; set; }
+        //public decimal VarCommHi { get; set; }
+        //public decimal VarCommLow { get; set; }
+        //public bool IsGrossUpComm { get; set; }
+        //public decimal GrossUpFactor { get; set; }
+        //public bool IsSlidingScale { get; set; }
+        //public decimal SSCommProv { get; set; }
+        //public decimal SSCommMax { get; set; }
+        //public decimal SSCommMin { get; set; }
+        //public decimal SSLossRatioProv { get; set; }
+        //public decimal SSLossRatioMax { get; set; }
+        //public decimal SSLossRatioMin { get; set; }
+        //public bool IsProfitComm { get; set; }
+        //public decimal ProfitComm { get; set; }
+        //public int CCFYears { get; set; }
+        //public int DCFYears { get; set; }
+        //public int DCFAmount { get; set; }
+        //public DateTime? PCStartDate { get; set; }
+        //public decimal ComAccountProtect { get; set; }
+        //public decimal ProfitCommissionExpAllowance { get; set; }
+        //public decimal Rate { get; set; }
+        //public int PremiumFreq { get; set; }
+        //public int AdjustmentBaseType { get; set; }
+        //public int LayerType { get; set; }
+        //public int FHCFBand { get; set; }
+        //public DateTime CreateDate { get; set; }
+        //public string CreateUser { get; set; }
+        //public DateTime ModifyDate { get; set; }
+        //public string ModifyUser { get; set; }
+        //public bool IsActive { get; set; }
+        //public bool IsDeleted { get; set; }
+        //public int? TopUpZoneId { get; set; }
+        //public decimal? ERCQuote { get; set; }
+        //public string DeclineReason { get; set; }
+        //public decimal InuringLimit { get; set; }
+        //public decimal RiskRetention { get; set; }
+        //public decimal ReinsurerExpenses { get; set; }
+        //public int LayerCategory { get; set; }
+        //public string LayerCatalog { get; set; }
+        [Field(8)]
+        public decimal Premium { get; set; }
+        //public decimal QuotePremium { get; set; }
+        //public int? RiskZoneId { get; set; }
+        //public decimal RelShare { get; set; }
+        //public decimal TargetNetShare { get; set; }
+        //public string RegisLayerCode { get; set; }
+        //public int? SnpLobId { get; set; }
+        //public decimal InvestmentReturn { get; set; }
+        //public decimal NonCatMarginAllowance { get; set; }
+        //public decimal LossDuration { get; set; }
+        //public decimal DiversificationFactor { get; set; }
+        //public int EarningType { get; set; }
+        //public string SourceId { get; set; }
+        //public decimal OrderPct { get; set; }
+        //public string BrokerRef { get; set; }
+        //public int? AcctBrokerId { get; set; }
+        //public bool IsAdditionalPremium { get; set; }
+        //public bool IsCommonAcct { get; set; }
+        //public string EventNumber { get; set; }
+        //public bool IsStopLoss { get; set; }
+        //public decimal StopLossLimitPct { get; set; }
+        //public decimal StopLossAttachPct { get; set; }
+        //public bool IsLossCorridor { get; set; }
+        //public decimal LossCorridorBeginPct { get; set; }
+        //public decimal LossCorridorEndPct { get; set; }
+        //public decimal LossCorridorCedePct { get; set; }
+        //public decimal? OccLimitInPct { get; set; }
+        //public decimal? OccRetnInPct { get; set; }
+        //public decimal ExpiringCorreShare { get; set; }
+        //public decimal CorreAuthMin { get; set; }
+        //public decimal CorreAuthTarget { get; set; }
+        //public decimal CorreAuthMax { get; set; }
+        //public decimal CorreRenewalMin { get; set; }
+        //public int SharedToCorre { get; set; }
+        //public decimal SignedCorreShare { get; set; }
+        //public decimal QuotedCorreShare { get; set; }
+        //public decimal AuthCorreShare { get; set; }
+        //public decimal FrontingFee { get; set; }
+        [Field(9)]
+        public long RowVersion { get; set; }
+        //public decimal? NonCatWeightPC { get; set; }
+        //public decimal? NonCatWeightSS { get; set; }
+        //public decimal? BoundFXRate { get; set; }
+        //public DateTime? BoundFXDate { get; set; }
+        //public int RegisStatus { get; set; }
+        //public bool IsDifferentialTerms { get; set; }
+        //public decimal RolRpp { get; set; }
+        //public int WILResolution { get; set; }
+        //public bool IsParametric { get; set; }
+        //public int PricingSource { get; set; }
+        //public string IRISPolicySeqNumber { get; set; }
+        //public int IRISStatus { get; set; }
+        //public string IRISComments { get; set; }
+        //public int IRISRefId { get; set; }
+        //public string IRISClassCode { get; set; }
+        //public string IRISBranchCode { get; set; }
+        //public string IRISTradeCode { get; set; }
+        //public string IRISPlacingCode { get; set; }
+        //public double ExpectedGrossNetPremiumGBP { get; set; }
+        //public string IRISProductCode { get; set; }
+        //public decimal StopLossBufferPct { get; set; }
+        //public decimal? ERCActual { get; set; }
+        //public string ERCActualSource { get; set; }
+        //public decimal? ELMarketShare { get; set; }
+        //public decimal? ELHistoricalBurn { get; set; }
+        //public decimal? ELBroker { get; set; }
+        //public int? MAOL { get; set; }
+        //public bool NCBR { get; set; }
+        //public bool IsTerrorismSubLimitAppl { get; set; }
+        //public decimal? TerrorismSubLimit { get; set; }
+        //public string TerrorismSubLimitComments { get; set; }
+        //public decimal? LloydsCapital { get; set; }
+        //public decimal? LloydsROC { get; set; }
+        //public DateTime? QuoteExpire { get; set; }
+        //public DateTime? AuthExpire { get; set; }
+        //public decimal MktROL { get; set; }
+        //public bool IsHidden { get; set; }
+        //public decimal? Cloud { get; set; }
+        //public decimal? Ransom { get; set; }
+        //public decimal BudgetROL { get; set; }
+        //public decimal BudgetPremium { get; set; }
+        //public decimal BudgetShare { get; set; }
+    }
+}

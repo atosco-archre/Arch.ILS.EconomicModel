@@ -13,6 +13,7 @@ namespace Arch.ILS.EconomicModel
 
         private const string GET_LAYERS = @"SELECT LayerId
      , Inception
+     , Expiration
   FROM dbo.Layer";
 
         private const string GET_PORTFOLIOS = @"SELECT PortfolioId
@@ -26,12 +27,13 @@ namespace Arch.ILS.EconomicModel
   FROM dbo.PortLayer";
 
         private const string GET_RETRO_PROGRAM = @"SELECT RetroProgramId
+     , RetroProfileId
      , Inception
      , Expiration
      , RetroProgramType
   FROM dbo.RetroProgram
- WHERE Status IN (22,10)/*remove projection retros*/
-   AND IsActive = 1
+ WHERE /*Status IN (22,10)/*remove projection retros*/
+   AND */IsActive = 1
    AND IsDeleted = 0";
 
         private const string GET_PORTFOLIO_LAYER_CESSIONS = @"SELECT PortLayerCessionId
