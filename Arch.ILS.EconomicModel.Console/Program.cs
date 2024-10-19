@@ -11,13 +11,13 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            //ExportRetroCessions();
-            ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
-            ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
+            ExportRetroCessions(@"C:\Data\RetroAllocations 2.csv");
+            //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
+            //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
         }
 
-        public static void ExportRetroCessions()
+        public static void ExportRetroCessions(string outputFilePath)
         {
             /*Authentication*/
             ConnectionProtection connectionProtection =
@@ -41,7 +41,7 @@ namespace Arch.ILS.EconomicModel.Console
             var retroAllocationView = revoRepository.GetRetroAllocationView().Result;
             var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
 
-            using(FileStream fs = new FileStream(@"C:\Data\RetroAllocations.csv", FileMode.Create, FileAccess.Write, FileShare.Read))
+            using(FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter sw = new StreamWriter(fs))
             {
                 sw.WriteLine($"RetroLevel,RetroProgramId,LayerId,StartInclusive,StartDayOfYear,EndInclusive,EndDayOfYear,NetCession");

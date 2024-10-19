@@ -379,6 +379,7 @@ namespace Arch.ILS.EconomicModel
                 IList<RetroAllocation> retroAllocations = retroAllocationsTask.Result;
                 IList<RetroInvestor> retroInvestors = retroInvestorsTask.Result;
                 Dictionary<int, SPInsurer> spInsurers = spInsurersTask.Result;
+                Dictionary<int, Layer> layers = layersTask.Result;
                 Dictionary<(int LayerId, int RetroProgramId), LayerRetroPlacement> layerRetroPlacements = layerRetroPlacementsTask.Result
                     .ToDictionary(x => (x.LayerId, x.RetroProgramId));
 
@@ -387,19 +388,19 @@ namespace Arch.ILS.EconomicModel
                 Dictionary<(int RetroProgramId, int LayerId), (decimal GrossCessionBeforePlacement, decimal CalculatedGrossCessionBeforePlacement, decimal Placement, decimal GrossCessionAfterPlacement, int[] RetroInvestors)> retroProgramsLayerGrossAllocation =
                     retroAllocations
                     .Join(retroInvestorPrograms, ok => ok.RetroInvestorId, ik => ik.o.RetroInvestorId, (o, i) => new { o, i.RetroProgramId })
-                    .LeftOuterJoin(layerRetroPlacements, ok => (ok.o.LayerId, ok.RetroProgramId), ik => ik.Key, (o, i) => new { o, Placement = i.Value?.Placement ?? 1.0M })
-                    .LeftOuterJoin(investorRetroCessionPeriods, ok => (ok.o.RetroProgramId, ok.o.o.RetroInvestorId), ik => ik.Key, (o, i) => new { o, i.Value[0].CessionBeforePlacement, i.Key.RetroInvestorId }) //to handle the case of RetroProgram 101 wih Retro Zone Placement = 0 but non zero layer retro cessions
-                    .GroupBy(g => (g.o.o.RetroProgramId, g.o.o.o.LayerId))
+                    .Join(layers, ok => ok.o.LayerId, ik => ik.Key, (o, i) => new { o, LayerInception = i.Value.Inception })
+                    .LeftOuterJoin(layerRetroPlacements, ok => (ok.o.o.LayerId, ok.o.RetroProgramId), ik => ik.Key, (o, i) => new { o, Placement = i.Value?.Placement ?? 1.0M })
+                    .LeftOuterJoin(investorRetroCessionPeriods, ok => (ok.o.o.RetroProgramId, ok.o.o.o.RetroInvestorId), ik => ik.Key, (o, i) => new { o, CessionBeforePlacement = i.Value.LastOrDefault(ii => ii.StartDate <= o.o.LayerInception)?.CessionBeforePlacement ?? i.Value[0].CessionBeforePlacement, i.Key.RetroInvestorId }) //to handle the case of RetroProgram 101 wih Retro Zone Placement = 0 but non zero layer retro cessions
+                    .GroupBy(g => (g.o.o.o.RetroProgramId, g.o.o.o.o.LayerId))
                     .ToDictionary(k => k.Key
                         , v => (v.Sum(x => x.CessionBeforePlacement)
-                        , v.Sum(x => x.o.Placement == decimal.Zero ? x.CessionBeforePlacement : x.o.o.o.CessionGross / x.o.Placement)
-                        , v.Max(x => x.o.Placement), v.Sum(x => x.o.o.o.CessionGross)
+                        , v.Sum(x => x.o.Placement == decimal.Zero ? x.CessionBeforePlacement : x.o.o.o.o.CessionGross / x.o.Placement)
+                        , v.Max(x => x.o.Placement), v.Sum(x => x.o.o.o.o.CessionGross)
                         , v.Select(x => x.RetroInvestorId).ToArray()));
 
                 Dictionary<int, (DateTime StartDate, int RetroProgramResetId)[]> retroProgramResetDates = investorRetroCessionPeriods
                     .GroupBy(x => x.Key.RetroProgramId, y => y.Value.Select(z => (z.StartDate, z.RetroProgramResetId)))
                     .ToDictionary(k => k.Key, v => v.SelectMany(s => s).Distinct().OrderBy(vv => vv.StartDate).ToArray());
-                Dictionary<int, Layer> layers = layersTask.Result;
                 Dictionary<int, RetroProgram> retroPrograms = retroProgramsTask.Result;
                 List<RetroLayerCession> retroLayerCessions = new();
                 /*TODO: Note that there are cases where the CalculatedGrossCessionBeforePlacement is different from GrossCessionBeforePlacement. In all the cases I could check, the CalculatedGrossCessionBeforePlacement was the correct one but keep in mind this mismatch*/
