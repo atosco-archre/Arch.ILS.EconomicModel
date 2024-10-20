@@ -1,6 +1,7 @@
 ﻿
 using Arch.ILS.Common;
 using LargeLoss.LayeringService.Client;
+using System.Collections.Concurrent;
 
 namespace Arch.ILS.EconomicModel.Historical.Console
 {
@@ -8,29 +9,40 @@ namespace Arch.ILS.EconomicModel.Historical.Console
     {
         public static void Main(string[] args)
         {
-            int scenarioYear = 2022;
+            DateTime scenarioStartPeriod = new DateTime(2020, 1, 1);
+            DateTime scenarioEndPeriod = new DateTime(2022, 10, 19);
             ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
             ScenarioSqlRepository scenarioRepository = new ScenarioSqlRepository(scenarioConnectionSettings.GetConnectionString(ScenarioConnectionStrings.ARG_DWVARLSQL01));
-            Dictionary<long, Scenario> scenarios = scenarioRepository.GetScenarios().Where(x => x.IsActive && !x.IsDeleted).ToDictionary(x => x.ScenarioId);
-            Dictionary<long, ScenarioLossEvent> scenarioLossEvents = scenarioRepository.GetScenarioLossEvents().Where(x => x.IsActive && !x.IsDeleted && x.EventDate.Year == scenarioYear).ToDictionary(x => x.ScenarioId);
+            Dictionary<long, Scenario> scenarios = scenarioRepository.GetScenarios().Result
+                .Where(x => x.IsActive && !x.IsDeleted)
+                .ToDictionary(x => x.ScenarioId);
+            Dictionary<long, ScenarioLossEvent> scenarioLossEvents = scenarioRepository.GetScenarioLossEvents().Result
+                .Where(x => x.IsActive && !x.IsDeleted && scenarioStartPeriod <= x.EventDate && x.EventDate <= scenarioEndPeriod)
+                .ToDictionary(x => x.ScenarioId);
+
+            //var allscenarioLayersTask = scenarioRepository.GetScenarioLayers();
+            //var allscenarioLayerLossesTask = scenarioRepository.GetScenarioLayerLosses();
+            //Task.WaitAll(allscenarioLayersTask, allscenarioLayerLossesTask);
+            //var allscenarioLayers = allscenarioLayersTask.Result.ToList();
+            //var allscenarioLayerLosses = allscenarioLayerLossesTask.Result.ToList();
 
             HashSet<long> layerIds = new HashSet<long>();
-            Dictionary<long, Dictionary<long, (ScenarioLayer, ScenarioLayerLoss)>> scenariosLayerLosses = new Dictionary<long, Dictionary<long, (ScenarioLayer, ScenarioLayerLoss)>>();
-
-            foreach(long scenarioId in scenarioLossEvents.Keys)
+            ConcurrentDictionary<long, Dictionary<int, (ScenarioLayer, ScenarioLayerLoss)>> scenariosLayerLosses = new ConcurrentDictionary<long, Dictionary<int, (ScenarioLayer, ScenarioLayerLoss)>>();
+            //foreach (long scenarioId in scenarioLossEvents.Keys)
+            Parallel.ForEach(scenarioLossEvents.Keys, (scenarioId) =>
             {
-                Dictionary<long, ScenarioLayer> scenarioLayers = scenarioRepository.GetScenarioLayersByScenarioId(scenarioId).Where(x => x.IsActive && !x.IsDeleted).ToDictionary(x => x.LayerId);
-                Dictionary<long, ScenarioLayerLoss> scenarioLayerLosses = scenarioRepository.GetScenarioLayerLossesByScenarioId(scenarioId).ToDictionary(x => x.LayerId);
-                var scenariolayersLosses = new Dictionary<long, (ScenarioLayer, ScenarioLayerLoss)>();
+                Dictionary<int, ScenarioLayer> scenarioLayers = scenarioRepository.GetScenarioLayers(scenarioId).Result.Where(x => x.IsActive && !x.IsDeleted).ToDictionary(x => x.LayerId);
+                Dictionary<int, ScenarioLayerLoss> scenarioLayerLosses = scenarioRepository.GetScenarioLayerLosses(scenarioId).Result.ToDictionary(x => x.LayerId);
+                var scenariolayersLosses = new Dictionary<int, (ScenarioLayer, ScenarioLayerLoss)>();
                 scenariosLayerLosses[scenarioId] = scenariolayersLosses;
-                foreach (long layerId in scenarioLayers.Keys)
+                foreach (int layerId in scenarioLayers.Keys)
                 {
                     layerIds.Add(layerId);
                     scenariolayersLosses.Add(layerId, (scenarioLayers[layerId], scenarioLayerLosses[layerId]));
                 }
-            }
+            });
 
-            IEnumerable<ScenarioLayerSection> dbSections = scenarioRepository.GetScenarioLayerSections().Where(x => scenarioLossEvents.ContainsKey(x.ScenarioId));
+            IEnumerable<ScenarioLayerSection> dbSections = scenarioRepository.GetScenarioLayerSections().Result.Where(x => scenarioLossEvents.ContainsKey(x.ScenarioId));
             DtoLayeringRequest layeringRequest = new DtoLayeringRequest { ApplyLossAggregation = true, Layers = new List<DtoLayeringInput>(), Sections = GetLayeringSection(dbSections).ToList() };
             LayeringServiceClient layeringClient = new LayeringServiceClient("https://localhost:44397/"/*"https://apps-dev.archre.com/actuarial/largeloss/api/layering/service/"*/, new HttpClient());//https://apps-dev.archre.com/actuarial/largeloss/api/layering/service/swagger/index.html
 
@@ -41,7 +53,7 @@ namespace Arch.ILS.EconomicModel.Historical.Console
 
                 foreach(var layerIdLosses in layerLossesByLayerId)
                 {
-                    long layerId = layerIdLosses.Key;
+                    int layerId = layerIdLosses.Key;
                     ScenarioLayer scenarioLayer = layerIdLosses.Value.Item1;
                     ScenarioLayerLoss scenarioLayerLoss = layerIdLosses.Value.Item2;
                     ScenarioLossEvent scenarioLossEvent = scenarioLossEvents[scenarioId];
@@ -53,8 +65,8 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             }
 
             var layeringResponse = layeringClient.ComputePartitionedLossesAsync(layeringRequest).Result;
-            ScenarioRetroCession[] scenarioRetroCessions = scenarioRepository.GetScenarioRetroCessions().ToArray();
-            ScenarioRetroCessionLoss[] scenarioRetroCessionLosses = scenarioRepository.GetScenarioRetroCessionLosses().ToArray();
+            ScenarioRetroCession[] scenarioRetroCessions = scenarioRepository.GetScenarioRetroCessions().Result.ToArray();
+            ScenarioRetroCessionLoss[] scenarioRetroCessionLosses = scenarioRepository.GetScenarioRetroCessionLosses().Result.ToArray();
         }
 
         public static bool TryMapEventDate(DateTime eventDate, DateTime layerInception, DateTime layerExpiration, out DateTime mappedEventDate)
@@ -84,6 +96,7 @@ namespace Arch.ILS.EconomicModel.Historical.Console
                 EventId = layerLoss.ScenarioId.ToString(),//largeLoss.EventKey
                 EventDate = eventDate,
                 InceptionDate = layer.Inception,
+                ExpirationDate = layer.Expiration,
                 LayerId = layer.LayerId,
                 GuLoss = (double)(layerLoss.GULoss ?? 0m),//Layer loss values are in loss currency while layer values are in layer currency 
                 OccLimit = (double)(layer.OccLimit / layerLoss.FXRateToLayerCurrency),
