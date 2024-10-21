@@ -1,12 +1,12 @@
-﻿using Studio.Core.Sql;
-using System;
-using System.Collections.Generic;
+﻿
 using System.Data;
 using System.Data.SqlClient;
 
+using Studio.Core.Sql;
+
 namespace Arch.ILS.EconomicModel.Historical
 {
-    public class ScenarioSqlRepository : SqlRepository
+    public partial class ScenarioSqlRepository : SqlRepository
     {
         #region Constants
 
@@ -244,9 +244,18 @@ namespace Arch.ILS.EconomicModel.Historical
 
         #endregion Constants
 
+        #region Constructor
+
         public ScenarioSqlRepository(string connectionString) : base(connectionString)
         {
+            Initialise();
         }
+
+        #endregion Constructor
+
+        #region Methods
+
+        partial void Initialise();
 
         public Task<IList<Scenario>> GetScenarios()
         {
@@ -702,5 +711,7 @@ namespace Arch.ILS.EconomicModel.Historical
                 };
             }
         }
+
+        #endregion Methods
     }
 }

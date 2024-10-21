@@ -9,8 +9,14 @@ namespace Arch.ILS.EconomicModel.Historical.Console
     {
         public static void Main(string[] args)
         {
-            DateTime scenarioStartPeriod = new DateTime(2020, 1, 1);
-            DateTime scenarioEndPeriod = new DateTime(2022, 10, 19);
+            //ExportRetroCessions("Retro Allocations Revo Bermuda As Of 2024-10-21");
+            DateTime scenarioStartPeriod = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);//20100101
+            DateTime scenarioEndPeriod = new DateTime(2022, 10, 19, 0, 0, 0, DateTimeKind.Utc);//20240906
+            GetScenarioLayerLossAggregates(scenarioStartPeriod, scenarioEndPeriod, "Test");
+        }
+
+        public static void GetScenarioLayerLossAggregates(DateTime scenarioStartPeriod, DateTime scenarioEndPeriod, string headerName)
+        {
             ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
             ScenarioSqlRepository scenarioRepository = new ScenarioSqlRepository(scenarioConnectionSettings.GetConnectionString(ScenarioConnectionStrings.ARG_DWVARLSQL01));
             Dictionary<long, Scenario> scenarios = scenarioRepository.GetScenarios().Result
@@ -46,45 +52,40 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             DtoLayeringRequest layeringRequest = new DtoLayeringRequest { ApplyLossAggregation = true, Layers = new List<DtoLayeringInput>(), Sections = GetLayeringSection(dbSections).ToList() };
             LayeringServiceClient layeringClient = new LayeringServiceClient("https://localhost:44397/"/*"https://apps-dev.archre.com/actuarial/largeloss/api/layering/service/"*/, new HttpClient());//https://apps-dev.archre.com/actuarial/largeloss/api/layering/service/swagger/index.html
 
-            foreach (long scenarioId in scenarioLossEvents.Keys) 
+            foreach (long scenarioId in scenarioLossEvents.Keys)
             {
                 if (!scenariosLayerLosses.TryGetValue(scenarioId, out var layerLossesByLayerId))
                     continue;
 
-                foreach(var layerIdLosses in layerLossesByLayerId)
+                foreach (var layerIdLosses in layerLossesByLayerId)
                 {
                     int layerId = layerIdLosses.Key;
                     ScenarioLayer scenarioLayer = layerIdLosses.Value.Item1;
                     ScenarioLayerLoss scenarioLayerLoss = layerIdLosses.Value.Item2;
                     ScenarioLossEvent scenarioLossEvent = scenarioLossEvents[scenarioId];
-                    //if (!TryMapEventDate(scenarioLossEvent.EventDate, scenarioLayer.Inception, scenarioLayer.Expiration, out DateTime mappedEventDate))
-                    //    continue;
                     DtoLayeringInput layeringInput = GetLayeringRequest(scenarioLossEvent.EventDate, scenarioLayer, scenarioLayerLoss);
-                    layeringRequest.Layers.Add(layeringInput); 
+                    layeringRequest.Layers.Add(layeringInput);
                 }
             }
 
             var layeringResponse = layeringClient.ComputePartitionedLossesAsync(layeringRequest).Result;
-            ScenarioRetroCession[] scenarioRetroCessions = scenarioRepository.GetScenarioRetroCessions().Result.ToArray();
-            ScenarioRetroCessionLoss[] scenarioRetroCessionLosses = scenarioRepository.GetScenarioRetroCessionLosses().Result.ToArray();
+            scenarioRepository.Save(new ScenarioLayerLossAggregateHeader(headerName, scenarioStartPeriod, scenarioEndPeriod, DateTime.Now), layeringResponse.Layers);
+            //ScenarioRetroCession[] scenarioRetroCessions = scenarioRepository.GetScenarioRetroCessions().Result.ToArray();
+            //ScenarioRetroCessionLoss[] scenarioRetroCessionLosses = scenarioRepository.GetScenarioRetroCessionLosses().Result.ToArray();
         }
 
-        public static bool TryMapEventDate(DateTime eventDate, DateTime layerInception, DateTime layerExpiration, out DateTime mappedEventDate)
+        public static void ExportRetroCessions(string exportName)
         {
-            DateTime candidateEventDate = new DateTime(layerInception.Year, eventDate.Month, eventDate.Day);
-            if (candidateEventDate >= layerInception && candidateEventDate <= layerExpiration)
-            {
-                mappedEventDate = candidateEventDate;
-                return true;
-            }
-            candidateEventDate = new DateTime(layerInception.Year + 1, eventDate.Month, eventDate.Day);
-            if (candidateEventDate >= layerInception && candidateEventDate <= layerExpiration)
-            {
-                mappedEventDate = candidateEventDate;
-                return true;
-            }
-            mappedEventDate = DateTime.MinValue;
-            return false;
+            /*Authentication*/
+            ConnectionProtection connectionProtection =
+                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
+            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            var retroAllocationView = revoRepository.GetRetroAllocationView().Result;
+            var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
+            ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
+            ScenarioSqlRepository scenarioRepository = new ScenarioSqlRepository(scenarioConnectionSettings.GetConnectionString(ScenarioConnectionStrings.ARG_DWVARLSQL01));
+            scenarioRepository.Save(new LayerPeriodCessionHeader(exportName, DateTime.Now), levelLayerCessions);
         }
 
         public static DtoLayeringInput GetLayeringRequest(DateTime eventDate, ScenarioLayer layer, ScenarioLayerLoss layerLoss)
