@@ -15,7 +15,7 @@ namespace Arch.ILS.EconomicModel.Historical
 
         private const string SCENARIO_LAYER_LOSS_AGGREGATE_HEADER = "dbo.ScenarioLayerLossAggregateHeader";
         private const string SCENARIO_LAYER_LOSS_AGGREGATE = "dbo.ScenarioLayerLossAggregate";
-        private const string ADD_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER_PROCEDURE = "dbo.AddScenarioLayerLossAggregateHeader";        
+        private const string ADD_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER_PROCEDURE = "dbo.AddScenarioLayerLossAggregateHeader";
 
         private const string CREATE_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER_TABLE = @"IF(OBJECT_ID('{0}') IS NULL)
 CREATE TABLE {0}

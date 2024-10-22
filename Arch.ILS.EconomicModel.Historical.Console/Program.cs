@@ -95,9 +95,9 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             return new DtoLayeringInput
             {
                 EventId = layerLoss.ScenarioId.ToString(),//largeLoss.EventKey
-                EventDate = eventDate,
-                InceptionDate = layer.Inception,
-                ExpirationDate = layer.Expiration,
+                EventDate = eventDate.ToUniversalTime().Date,
+                InceptionDate = layer.Inception.ToUniversalTime().Date,
+                ExpirationDate = layer.Expiration.ToUniversalTime().Date,
                 LayerId = layer.LayerId,
                 GuLoss = (double)(layerLoss.GULoss ?? 0m),//Layer loss values are in loss currency while layer values are in layer currency 
                 OccLimit = (double)(layer.OccLimit / layerLoss.FXRateToLayerCurrency),

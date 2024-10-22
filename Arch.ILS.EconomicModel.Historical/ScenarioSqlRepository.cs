@@ -246,7 +246,7 @@ namespace Arch.ILS.EconomicModel.Historical
 
         #region Constructor
 
-        public ScenarioSqlRepository(string connectionString) : base(connectionString)
+        public ScenarioSqlRepository(string connectionString, int timeOut = DefaultTimeout) : base(connectionString, timeOut)
         {
             Initialise();
         }
@@ -285,8 +285,8 @@ namespace Arch.ILS.EconomicModel.Historical
                     UseAdjustedMarketShare = reader.GetBoolean(++index),
                     UseTrendedLosses = reader.GetBoolean(++index),
                     Currency = reader.IsDBNull(++index) ? null : reader.GetString(index),
-                    InforceDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
-                    FXRatesDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
+                    InforceDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index).Date,
+                    FXRatesDate = reader.IsDBNull(++index) ? null : reader.GetDateTime(index).Date,
                     IsActive = reader.GetBoolean(++index),
                     IsDeleted = reader.GetBoolean(++index),
                     CreatedDate = reader.GetDateTime(++index),
@@ -326,7 +326,7 @@ namespace Arch.ILS.EconomicModel.Historical
                     EventKey = reader.GetString(++index),
                     Name = reader.GetString(++index),
                     AutoName = reader.IsDBNull(++index) ? null : reader.GetString(index),
-                    EventDate = reader.GetDateTime(++index),
+                    EventDate = reader.GetDateTime(++index).Date,
                     LossCurrency = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     TrendedLoss = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
                     UntrendedLoss = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
@@ -412,9 +412,9 @@ namespace Arch.ILS.EconomicModel.Historical
                     Franchise = reader.GetDecimal(++index),
                     FranchiseReverse = reader.GetDecimal(++index),
                     //RiskLimit = reader.GetDecimal(++index),
-                    Inception = reader.GetDateTime(++index),
+                    Inception = reader.GetDateTime(++index).Date,
                     //UWYear = reader.GetInt32(++index),
-                    Expiration = reader.GetDateTime(++index),
+                    Expiration = reader.GetDateTime(++index).Date,
                     //ExpirationFinal = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
                     //Facility = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     //Segment = reader.IsDBNull(++index) ? null : reader.GetString(index),
@@ -675,8 +675,8 @@ namespace Arch.ILS.EconomicModel.Historical
                     RetroProfileId = reader.GetInt64(++index),
                     RetroProfileName = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     RetroInvestorName = reader.IsDBNull(++index) ? null : reader.GetString(index),
-                    Expiration = reader.IsDBNull(++index) ? null : reader.GetDateTime(index),
-                    Inception = reader.IsDBNull(++index) ? null : reader.GetDateTime(index)
+                    Expiration = reader.IsDBNull(++index) ? null : reader.GetDateTime(index).Date,
+                    Inception = reader.IsDBNull(++index) ? null : reader.GetDateTime(index).Date
                 };
             }
         }

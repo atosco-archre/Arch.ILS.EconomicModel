@@ -4,15 +4,15 @@ namespace Arch.ILS.EconomicModel.Historical
 {
     public class ScenarioLayerLossAggregate
     {
-        public ScenarioLayerLossAggregate(DtoLayeringOutput dtoLayeringOutput) 
+        public ScenarioLayerLossAggregate(DtoLayeringOutput dtoLayeringOutput)
         {
             ScenarioId = long.Parse(dtoLayeringOutput.EventId);
-            EventDate = dtoLayeringOutput.EventDate.Value.DateTime.ToUniversalTime();
+            EventDate = dtoLayeringOutput.EventDate.Value.DateTime.ToUniversalTime().Date;
             LayerId = (int)dtoLayeringOutput.LayerId;
-            LayerInceptionDate = dtoLayeringOutput.InceptionDate.Value.DateTime.ToUniversalTime();
-            LayerExpirationDate = dtoLayeringOutput.ExpirationDate.Value.DateTime.ToUniversalTime();
-            SimulationInceptionDate = dtoLayeringOutput.SimulationInceptionDate.Value.DateTime.ToUniversalTime();
-            SimulationExpirationDate = dtoLayeringOutput.SimulationExpirationDate.Value.DateTime.ToUniversalTime();
+            LayerInceptionDate = dtoLayeringOutput.InceptionDate.Value.DateTime.ToUniversalTime().Date;
+            LayerExpirationDate = dtoLayeringOutput.ExpirationDate.Value.DateTime.ToUniversalTime().Date;
+            SimulationInceptionDate = dtoLayeringOutput.SimulationInceptionDate.Value.DateTime.ToUniversalTime().Date;
+            SimulationExpirationDate = dtoLayeringOutput.SimulationExpirationDate.Value.DateTime.ToUniversalTime().Date;
             SimulationUWYear = (int)dtoLayeringOutput.SimulationYear;
             IsFHCF = (bool)dtoLayeringOutput.IsFHCF;
             LAE = (decimal)dtoLayeringOutput.Lae.Value;
