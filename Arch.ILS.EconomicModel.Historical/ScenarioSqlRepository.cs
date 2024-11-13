@@ -452,7 +452,7 @@ namespace Arch.ILS.EconomicModel.Historical
                     RiskRetention = reader.GetDecimal(++index),
                     //LayerCategory = reader.GetInt32(++index),
                     //LayerCatalog = reader.IsDBNull(++index) ? null : reader.GetString(index),
-                    //Premium = reader.GetDecimal(++index),
+                    Premium = reader.GetDecimal(++index),
                     //QuotePremium = reader.GetDecimal(++index),
                     //RelShare = reader.GetDecimal(++index),
                     //TargetNetShare = reader.GetDecimal(++index),
