@@ -11,3 +11,4 @@ Release/
 */**/obj/Release
 /Arch.ILS.EconomicModel.Console/App.config
 /Arch.ILS.EconomicModel.Console/App.config.config
+/Arch.ILS.EconomicModel.Historical.Console/App.config

@@ -11,17 +11,17 @@ namespace Arch.ILS.EconomicModel
         //public int SubLayerNum { get; set; }
         //public int ReinstCount { get; set; }
         public decimal Placement { get; set; }
-        //public decimal OccLimit { get; set; }
+        public decimal OccLimit { get; set; }
         //public decimal OccRetention { get; set; }
         //public decimal CascadeRetention { get; set; }
         //public decimal AAD { get; set; }
         //public decimal Var1Retention { get; set; }
         //public decimal Var2Retention { get; set; }
-        //public decimal AggLimit { get; set; }
+        public decimal AggLimit { get; set; }
         //public decimal AggRetention { get; set; }
         //public decimal Franchise { get; set; }
         //public decimal FranchiseReverse { get; set; }
-        //public decimal RiskLimit { get; set; }
+        public decimal RiskLimit { get; set; }
         public DateTime Inception { get; set; }
         public int UWYear { get; set; }
         public DateTime Expiration { get; set; }
@@ -30,7 +30,7 @@ namespace Arch.ILS.EconomicModel
         //public string Segment { get; set; }
         //public string LOB { get; set; }
         //public int ContractType { get; set; }
-        //public int LimitBasis { get; set; }
+        public LimitBasis LimitBasis { get; set; }
         //public int AttachBasis { get; set; }
         //public int LAETerm { get; set; }
         //public int LossTrigger { get; set; }

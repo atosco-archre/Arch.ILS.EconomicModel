@@ -15,17 +15,25 @@ namespace Arch.ILS.EconomicModel.Historical
             SimulationExpirationDate = dtoLayeringOutput.SimulationExpirationDate.Value.DateTime.ToUniversalTime().Date;
             SimulationUWYear = (int)dtoLayeringOutput.SimulationYear;
             IsFHCF = (bool)dtoLayeringOutput.IsFHCF;
-            LAE = (decimal)dtoLayeringOutput.Lae.Value;
+            LAE = dtoLayeringOutput.Lae.Value;
             LossCurrency = dtoLayeringOutput.Currency;
-            GULoss = (decimal)dtoLayeringOutput.GuLoss.Value;
-            LayerLoss = (decimal)dtoLayeringOutput.LayerLoss.Value;
-            SectionsAdjustment = (decimal)dtoLayeringOutput.SectionsAdjustment.Value;
-            LastCumulativeOccLoss = (decimal)dtoLayeringOutput.LastCumulativeOccLoss.Value;
-            LastAggLoss = (decimal)dtoLayeringOutput.LastAggLoss.Value;
-            OccLoss = (decimal)dtoLayeringOutput.OccLoss.Value;
-            AggLoss = (decimal)dtoLayeringOutput.AggLoss.Value;
-            NewAggLimit = (decimal)dtoLayeringOutput.NewAggLimit.Value;
-            NewAggRetention = (decimal)dtoLayeringOutput.NewAggRetention.Value;
+            GULoss = dtoLayeringOutput.GuLoss.Value;
+            SectionsAdjustment = dtoLayeringOutput.SectionsAdjustment.Value;
+            OccLoss100Pct = dtoLayeringOutput.OccLoss100Pct.Value;
+            OccLoss = dtoLayeringOutput.OccLoss.Value;
+            LayerLoss100Pct = dtoLayeringOutput.LayerLoss100Pct.Value;
+            LayerLoss = dtoLayeringOutput.LayerLoss.Value;
+            AggLoss100Pct = dtoLayeringOutput.AggLoss100Pct.Value;
+            AggLoss = dtoLayeringOutput.AggLoss.Value;
+            LastCumulativeOccLoss100Pct = dtoLayeringOutput.LastCumulativeOccLoss100Pct.Value;
+            LastAggLoss100Pct = dtoLayeringOutput.LastAggLoss100Pct.Value;
+            NewAggLimit = dtoLayeringOutput.NewAggLimit.Value;
+            NewAggRetention = dtoLayeringOutput.NewAggRetention.Value;
+            ReinstatementPremium100Pct = dtoLayeringOutput.ReinstatementPremium100Pct ?? 0.0m;
+            ReinstatementPremium = dtoLayeringOutput.ReinstatementPremium ?? 0.0m;
+            ReinstatementBrokerage100Pct = dtoLayeringOutput.ReinstatementBrokerage100Pct ?? 0.0m;
+            ReinstatementBrokerage = dtoLayeringOutput.ReinstatementBrokerage ?? 0.0m;
+            Placement = dtoLayeringOutput.Placement.Value;
         }
 
         public int LossAggregateHeaderId { get; set; }
@@ -41,13 +49,21 @@ namespace Arch.ILS.EconomicModel.Historical
         public decimal LAE { get; }
         public string LossCurrency { get; }
         public decimal GULoss { get; }
+        public decimal LayerLoss100Pct { get; }
         public decimal LayerLoss { get; }
         public decimal SectionsAdjustment { get; }
-        public decimal LastCumulativeOccLoss { get; }
-        public decimal LastAggLoss { get; }
+        public decimal LastCumulativeOccLoss100Pct { get; }
+        public decimal LastAggLoss100Pct { get; }
+        public decimal OccLoss100Pct { get; }
         public decimal OccLoss { get; }
+        public decimal AggLoss100Pct { get; }
         public decimal AggLoss { get; }
         public decimal NewAggLimit { get; }
         public decimal NewAggRetention { get; }
+        public decimal ReinstatementPremium100Pct { get; }
+        public decimal ReinstatementPremium { get; }
+        public decimal ReinstatementBrokerage100Pct { get; }
+        public decimal ReinstatementBrokerage { get; }
+        public decimal Placement { get; }
     }
 }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Arch.ILS.Common;
 using Arch.ILS.EconomicModel;
+using Arch.ILS.Snowflake;
 using Google.Apis.Storage.v1.Data;
 
 namespace Arch.ILS.EconomicModel.Console
@@ -11,22 +12,23 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            ExportRetroCessions(@"C:\Data\RetroAllocations 2.csv");
+            ExportRetroLayerCessions(@"C:\Data\RetroAllocations 2.csv");
+            //ExportRetroCessionMetrics(@"C:\Data\RetroMetrics.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
         }
 
-        public static void ExportRetroCessions(string outputFilePath)
+        public static void ExportRetroLayerCessions(string outputFilePath)
         {
             /*Authentication*/
-            ConnectionProtection connectionProtection =
-                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
+            //ConnectionProtection connectionProtection =
+            //    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
             //if (!connectionProtection.IsProtected())
             //    connectionProtection.EncryptFile();
-            //RevoSnowflakeRepository revoSnowflakeRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
-            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
-            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            //RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            //RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            RevoSnowflakeRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
             //var retroPrograms = revoRepository.GetRetroPrograms().Result;
             //var retroAllocations = revoRepository.GetRetroAllocations().Result;
             //var spInsurers = revoRepository.GetSPInsurers().Result;
@@ -122,6 +124,84 @@ namespace Arch.ILS.EconomicModel.Console
             }
         }
 
+        public static void ExportRetroCessionMetrics(string outputFilePath, DateTime currentFxDate, bool useBoundFx = true, string baseCurrency = "USD")
+        {
+            /*Authentication*/
+            ConnectionProtection connectionProtection =
+                new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
+            RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
+            RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
+            var retroAllocationView = revoRepository.GetRetroAllocationView();
+            var retroPrograms = revoRepository.GetRetroPrograms();
+            var layerDetails = revoRepository.GetLayerDetails();
+            var submissions = revoRepository.GetSubmissions();
+            var fxRates = revoRepository.GetFXRates();
+
+            Task.WaitAll(retroAllocationView, retroPrograms, layerDetails, submissions, fxRates);
+            Dictionary<int, RetroMetrics> retroMetricsById = new();
+            var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
+
+            foreach (var layerCession in levelLayerCessions)
+            {
+                if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
+                    continue;
+                /*if (layerDetail.Status != ContractStatus.Bound
+                    && layerDetail.Status != ContractStatus.Signed
+                    && layerDetail.Status != ContractStatus.SignReady
+                    // && layerDetail.Status != ContractStatus.Budget
+                    )
+                    continue;*/
+                if (!submissions.Result.TryGetValue(layerDetail.SubmissionId, out var submission))
+                    continue;
+                var fxRate = RevoHelper.GetFxRate(useBoundFx, currentFxDate, baseCurrency, submission, layerDetail, fxRates.Result);
+                var retroProgram = retroPrograms.Result[layerCession.RetroProgramId];
+
+                if (!retroMetricsById.TryGetValue(retroProgram.RetroProgramId, out var retroMetrics))
+                {
+                    retroMetrics = new RetroMetrics(retroProgram.RetroProgramId);
+                    retroMetricsById[retroProgram.RetroProgramId] = retroMetrics;
+                }
+
+                decimal cededPremium = layerDetail.Premium
+                    * (layerDetail.Placement == decimal.Zero ? decimal.Zero : 1 / layerDetail.Placement)
+                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
+                    * fxRate
+                    * layerCession.PeriodCession.NetCession
+                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0))
+                    * (decimal)(((layerCession.PeriodCession.EndInclusive - layerCession.PeriodCession.StartInclusive).TotalDays + 1) / ((layerDetail.Expiration - layerDetail.Inception).TotalDays + 1));
+                retroMetrics.CededPremium += cededPremium;
+
+                decimal limit100Pct = GetLimit100Pct(layerDetail);
+                decimal cededLimit = limit100Pct
+                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
+                    * fxRate
+                    * layerCession.PeriodCession.NetCession
+                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0));
+
+                var currentDate = layerCession.PeriodCession.StartInclusive;
+                var dateCededLimits = retroMetrics.DateCededLimits;
+                while (currentDate <= layerCession.PeriodCession.EndInclusive)
+                {
+                    if (dateCededLimits.ContainsKey(currentDate))
+                        dateCededLimits[currentDate] += cededLimit;
+                    else
+                        dateCededLimits[currentDate] = cededLimit;
+                    currentDate.AddDays(1);
+                }
+            }
+
+            using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine($"RetroProgramId,CededPremium,CededLimit");
+                foreach (KeyValuePair<int, RetroMetrics> retroMetrics in retroMetricsById.OrderBy(x => x.Key))
+                {
+                    sw.WriteLine($"{retroMetrics.Key},{retroMetrics.Value.CededPremium},{retroMetrics.Value.DateCededLimits.Values.Max()}");
+                }
+                sw.Flush();
+            }
+        }
+
         public static void SetPortfolioLayerCession()
         {
             /*Authentication*/
@@ -183,6 +263,33 @@ namespace Arch.ILS.EconomicModel.Console
 
             System.Console.ReadLine();
         }
+
+        private static decimal GetLimit100Pct(LayerDetail layerDetail)
+        {
+            return layerDetail.LimitBasis == LimitBasis.Aggregate ?
+                layerDetail.AggLimit :
+                (layerDetail.LimitBasis == LimitBasis.PerRisk || layerDetail.LimitBasis == LimitBasis.NonCATQuotaShare ?
+                    layerDetail.RiskLimit :
+                    layerDetail.OccLimit);
+        }
+
+        #region Types
+
+        internal record class RetroMetrics
+        {
+            public RetroMetrics(int retroProgramid)
+            {
+                RetroProgramId = retroProgramid;
+                CededPremium = decimal.Zero;
+                DateCededLimits = new Dictionary<DateTime, decimal>();
+            }
+
+            public int RetroProgramId { get; }
+            public decimal CededPremium { get; set; } 
+            public Dictionary<DateTime, decimal> DateCededLimits { get; }
+        }
+
+        #endregion Types
     }
 }
 

@@ -19,7 +19,7 @@ namespace Arch.ILS.EconomicModel.Historical
         public decimal AggRetention { get; set; }
         public decimal Franchise { get; set; }
         public decimal FranchiseReverse { get; set; }
-        //public decimal RiskLimit { get; set; }
+        public decimal RiskLimit { get; set; }
         public DateTime Inception { get; set; }
         //public int UWYear { get; set; }
         public DateTime Expiration { get; set; }
@@ -28,7 +28,7 @@ namespace Arch.ILS.EconomicModel.Historical
         //public string Segment { get; set; }
         //public string LOB { get; set; }
         //public int ContractType { get; set; }
-        //public int LimitBasis { get; set; }
+        public int LimitBasis { get; set; }
         //public int AttachBasis { get; set; }
         //public int LAETerm { get; set; }
         //public decimal ROL { get; set; }
@@ -47,10 +47,10 @@ namespace Arch.ILS.EconomicModel.Historical
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         //public decimal InuringLimit { get; set; }
-        //public decimal RiskRetention { get; set; }
+        public decimal RiskRetention { get; set; }
         //public int LayerCategory { get; set; }
         //public string LayerCatalog { get; set; }
-        //public decimal Premium { get; set; }
+        public decimal Premium { get; set; }
         //public decimal QuotePremium { get; set; }
         //public decimal RelShare { get; set; }
         //public decimal TargetNetShare { get; set; }

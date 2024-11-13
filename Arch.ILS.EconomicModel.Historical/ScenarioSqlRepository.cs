@@ -1,7 +1,7 @@
 ﻿
 using System.Data;
 using System.Data.SqlClient;
-
+using Org.BouncyCastle.Tls.Crypto.Impl.BC;
 using Studio.Core.Sql;
 
 namespace Arch.ILS.EconomicModel.Historical
@@ -69,7 +69,7 @@ namespace Arch.ILS.EconomicModel.Historical
       ,AggRetention
       ,Franchise
       ,FranchiseReverse
-      --,RiskLimit
+      ,RiskLimit
       ,Inception
       --,UWYear
       ,Expiration
@@ -78,7 +78,7 @@ namespace Arch.ILS.EconomicModel.Historical
       --,Segment
       --,LOB
       --,ContractType
-      --,LimitBasis
+      ,LimitBasis
       --,AttachBasis
       --,LAETerm
       --,ROL
@@ -97,10 +97,10 @@ namespace Arch.ILS.EconomicModel.Historical
       ,IsActive
       ,IsDeleted
       --,InuringLimit
-      --,RiskRetention
+      ,RiskRetention
       --,LayerCategory
       --,LayerCatalog
-      --,Premium
+      ,Premium
       --,QuotePremium
       --,RelShare
       --,TargetNetShare
@@ -206,6 +206,16 @@ namespace Arch.ILS.EconomicModel.Historical
   FROM dbo.ScenarioLayerSection";
 
         private const string GET_SCENARIOLAYERSECTIONBYPARTITION = GET_SCENARIOLAYERSECTION + " WHERE (ScenarioId % {1}) = {0} ";
+
+        private const string GET_SCENARIOLAYERREINSTATEMENT = @"SELECT ScenarioId
+      ,LayerId
+      ,ReinstatementId
+      ,ReinstatementOrder
+      ,Quantity
+      ,PremiumShare
+      ,BrokeragePercentage
+      ,RowVersion AS RowVersion
+  FROM dbo.ScenarioLayerReinstatement";
 
         private const string GET_SCENARIORETROCESSION = @"SELECT ScenarioId
       ,RetroAllocationId
@@ -411,7 +421,7 @@ namespace Arch.ILS.EconomicModel.Historical
                     AggRetention = reader.GetDecimal(++index),
                     Franchise = reader.GetDecimal(++index),
                     FranchiseReverse = reader.GetDecimal(++index),
-                    //RiskLimit = reader.GetDecimal(++index),
+                    RiskLimit = reader.GetDecimal(++index),
                     Inception = reader.GetDateTime(++index).Date,
                     //UWYear = reader.GetInt32(++index),
                     Expiration = reader.GetDateTime(++index).Date,
@@ -420,7 +430,7 @@ namespace Arch.ILS.EconomicModel.Historical
                     //Segment = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     //LOB = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     //ContractType = reader.GetInt32(++index),
-                    //LimitBasis = reader.GetInt32(++index),
+                    LimitBasis = reader.GetInt32(++index),
                     //AttachBasis = reader.GetInt32(++index),
                     //LAETerm = reader.GetInt32(++index),
                     //ROL = reader.GetDecimal(++index),
@@ -439,7 +449,7 @@ namespace Arch.ILS.EconomicModel.Historical
                     IsActive = reader.GetBoolean(++index),
                     IsDeleted = reader.GetBoolean(++index),
                     //InuringLimit = reader.GetDecimal(++index),
-                    //RiskRetention = reader.GetDecimal(++index),
+                    RiskRetention = reader.GetDecimal(++index),
                     //LayerCategory = reader.GetInt32(++index),
                     //LayerCatalog = reader.IsDBNull(++index) ? null : reader.GetString(index),
                     //Premium = reader.GetDecimal(++index),
@@ -620,6 +630,38 @@ namespace Arch.ILS.EconomicModel.Historical
         //        }
         //    });
         //}
+
+        private IEnumerable<ScenarioLayerReinstatement> ReadScenarioLayerReinstatements(IDataReader reader)
+        {
+            while (reader.Read())
+            {
+                int index = 0;
+                byte[] rowVersionBuffer = new byte[8];
+                long rowVersionLength = reader.GetBytes(7, 0, rowVersionBuffer, 0, 8);
+                yield return new ScenarioLayerReinstatement
+                (
+                    ScenarioId: reader.GetInt64(index),
+                    LayerId: reader.GetInt64(++index),
+                    ReinstatementId: reader.GetInt32(++index),
+                    ReinstatementOrder: reader.GetInt32(++index),
+                    Quantity: reader.GetDouble(++index),
+                    PremiumShare: reader.GetDecimal(++index),
+                    BrokeragePercentage: reader.GetDecimal(++index),
+                    RowVersion: rowVersionBuffer
+                );
+            }
+        }
+
+        public Task<IList<ScenarioLayerReinstatement>> GetScenarioLayerReinstatements()
+        {
+            return Task.Factory.StartNew<IList<ScenarioLayerReinstatement>>(() =>
+            {
+                using (var reader = (SqlDataReader)ExecuteReaderSql(GET_SCENARIOLAYERREINSTATEMENT))
+                {
+                    return ReadScenarioLayerReinstatements(reader).ToList();
+                }
+            });
+        }
 
         private IEnumerable<ScenarioLayerSection> ReadScenarioLayerSections(IDataReader reader)
         {

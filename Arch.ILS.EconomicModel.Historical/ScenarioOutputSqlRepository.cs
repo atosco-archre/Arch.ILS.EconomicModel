@@ -1,6 +1,6 @@
 ﻿
 using System.Data;
-
+using System.Transactions;
 using LargeLoss.LayeringService.Client;
 using Studio.Core;
 using Studio.Core.Sql;
@@ -10,6 +10,27 @@ namespace Arch.ILS.EconomicModel.Historical
     public partial class ScenarioSqlRepository : SqlRepository
     {
         #region Constants
+
+        #region Scenario Layer Reinstatement
+
+        private const string SCENARIO_LAYER_REINSTATEMENT = "dbo.ScenarioLayerReinstatement";
+        private const string CREATE_SCENARIO_LAYER_REINSTATEMENT_TABLE = @"IF(OBJECT_ID('{0}') IS NULL)
+CREATE TABLE {0}
+(
+  ScenarioId BIGINT NOT NULL
+, LayerId BIGINT NOT NULL
+, ReinstatementId INT NOT NULL
+, ReinstatementOrder INT NOT NULL
+, Quantity FLOAT NOT NULL
+, PremiumShare DECIMAL(18, 10) NOT NULL
+, BrokeragePercentage DECIMAL(18, 10) NOT NULL
+, RowVersion BINARY(8) NOT NULL
+, CONSTRAINT pk_dbo_ScenarioLayerReinstatement PRIMARY KEY CLUSTERED(ScenarioId ASC, LayerId ASC, ReinstatementId ASC)
+, CONSTRAINT uk_dbo_ScenarioLayerReinstatement_ScenarioId_LayerId_ReinstatementOrder UNIQUE(ScenarioId ASC, LayerId ASC, ReinstatementOrder ASC)
+, CONSTRAINT fk_dbo_ScenarioLayerReinstatement_ScenarioId_LayerId_dbo_ScenarioLayer_ScenarioId_LayerId FOREIGN KEY (ScenarioId, LayerId) REFERENCES dbo.ScenarioLayer(ScenarioId, LayerId)
+);";
+
+        #endregion Scenario Layer Reinstatement
 
         #region Scenario Layer Loss Aggregate
 
@@ -44,14 +65,22 @@ CREATE TABLE {0}
 , LAE DECIMAL(18, 10) NOT NULL
 , LossCurrency VARCHAR(3) NOT NULL
 , GULoss DECIMAL(18, 2) NOT NULL
-, LayerLoss DECIMAL(18, 2) NOT NULL
 , SectionsAdjustment DECIMAL(18, 2) NOT NULL
-, LastCumulativeOccLoss DECIMAL(18, 2) NOT NULL
-, LastAggLoss DECIMAL(18, 2) NOT NULL
+, OccLoss100Pct DECIMAL(18, 2) NOT NULL
 , OccLoss DECIMAL(18, 2) NOT NULL
+, LayerLoss100Pct DECIMAL(18, 2) NOT NULL
+, LayerLoss DECIMAL(18, 2) NOT NULL
+, AggLoss100Pct DECIMAL(18, 2) NOT NULL
 , AggLoss DECIMAL(18, 2) NOT NULL
+, LastCumulativeOccLoss100Pct DECIMAL(18, 2) NOT NULL
+, LastAggLoss100Pct DECIMAL(18, 2) NOT NULL
 , NewAggLimit DECIMAL(18, 2) NOT NULL
 , NewAggRetention DECIMAL(18, 2) NOT NULL
+, ReinstatementPremium100Pct DECIMAL(18, 2) NOT NULL
+, ReinstatementPremium DECIMAL(18, 2) NOT NULL
+, ReinstatementBrokerage100Pct DECIMAL(18, 2) NOT NULL
+, ReinstatementBrokerage DECIMAL(18, 2) NOT NULL
+, Placement DECIMAL(18, 10) NOT NULL
 , CONSTRAINT pk_dbo_ScenarioLayerLossAggregate PRIMARY KEY CLUSTERED(LossAggregateHeaderId ASC, ScenarioId ASC, LayerId ASC, SimulationUWYear ASC)
 , CONSTRAINT fk_dbo_ScenarioLayerLossAggregate_LossAggregateHeaderId_dbo_ScenarioLayerLossAggregateHeader_LossAggregateHeaderId FOREIGN KEY (LossAggregateHeaderId) REFERENCES dbo.ScenarioLayerLossAggregateHeader(LossAggregateHeaderId)
 );";
@@ -140,10 +169,11 @@ END;";
 
         #region Variables
 
-        private static object layerLossAggregateHeaderCreationLock;
-        private static object layerLossAggregateCreationLock;
-        private static object layerPeriodCessionsHeaderCreationLock;
-        private static object layerPeriodCessionsCreationLock;
+        private static object _scenarioLayerReinstatementCreationLock;
+        private static object _layerLossAggregateHeaderCreationLock;
+        private static object _layerLossAggregateCreationLock;
+        private static object _layerPeriodCessionsHeaderCreationLock;
+        private static object _layerPeriodCessionsCreationLock;
 
         #endregion Variables
 
@@ -151,15 +181,36 @@ END;";
 
         partial void Initialise()
         {
-            layerLossAggregateHeaderCreationLock = new object();
-            layerLossAggregateCreationLock = new object();
-            layerPeriodCessionsHeaderCreationLock = new object();
-            layerPeriodCessionsCreationLock = new object();
+            _scenarioLayerReinstatementCreationLock = new object();
+            _layerLossAggregateHeaderCreationLock = new object();
+            _layerLossAggregateCreationLock = new object();
+            _layerPeriodCessionsHeaderCreationLock = new object();
+            _layerPeriodCessionsCreationLock = new object();
         }
 
-        public void AddScenarioLayerLossAggregateHeader(ScenarioLayerLossAggregateHeader header)
+        #region Scenario Layer Reinstatement
+
+        public void Save(IEnumerable<ScenarioLayerReinstatement> reinstatementEntries)
         {
-            lock (layerLossAggregateHeaderCreationLock)
+            //using (TransactionScope transactionScope = new TransactionScope(TransactionScopeOption.Required, TransactionManager.MaximumTimeout))
+            //{
+                lock (_scenarioLayerReinstatementCreationLock)
+                {
+                    ExecuteSql(string.Format(CREATE_SCENARIO_LAYER_REINSTATEMENT_TABLE, SCENARIO_LAYER_REINSTATEMENT));
+                }
+                var reader = reinstatementEntries.ToObjectDataReader<ScenarioLayerReinstatement>();
+                WriteToTable(reader, SCENARIO_LAYER_REINSTATEMENT);
+            //    transactionScope.Complete();
+            //}
+        }
+
+        #endregion Scenario Layer Reinstatement
+
+        #region Scenario Layer Loss Aggregate
+
+        private void AddScenarioLayerLossAggregateHeader(ScenarioLayerLossAggregateHeader header)
+        {
+            lock (_layerLossAggregateHeaderCreationLock)
             {
                 ExecuteSql(string.Format(CREATE_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER_TABLE, SCENARIO_LAYER_LOSS_AGGREGATE_HEADER));
                 ExecuteSql(string.Format(ADD_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER, ADD_SCENARIO_LAYER_LOSS_AGGREGATE_HEADER_PROCEDURE, SCENARIO_LAYER_LOSS_AGGREGATE_HEADER));
@@ -170,18 +221,26 @@ END;";
 
         public void Save(ScenarioLayerLossAggregateHeader header, IEnumerable<DtoLayeringOutput> exposureEntries)
         {
-            AddScenarioLayerLossAggregateHeader(header);
-            lock (layerLossAggregateCreationLock)
-            {
-                ExecuteSql(string.Format(CREATE_SCENARIO_LAYER_LOSS_AGGREGATE_TABLE, SCENARIO_LAYER_LOSS_AGGREGATE));
-            }
-            var reader = exposureEntries.Select(x => new ScenarioLayerLossAggregate(x) { LossAggregateHeaderId = header.LossAggregateHeaderId }).ToObjectDataReader<ScenarioLayerLossAggregate>();
-            WriteToTable(reader, SCENARIO_LAYER_LOSS_AGGREGATE);
+            //using (TransactionScope transactionScope = new TransactionScope(TransactionScopeOption.Required, TransactionManager.MaximumTimeout))
+            //{
+                AddScenarioLayerLossAggregateHeader(header);
+                lock (_layerLossAggregateCreationLock)
+                {
+                    ExecuteSql(string.Format(CREATE_SCENARIO_LAYER_LOSS_AGGREGATE_TABLE, SCENARIO_LAYER_LOSS_AGGREGATE));
+                }
+                var reader = exposureEntries.Select(x => new ScenarioLayerLossAggregate(x) { LossAggregateHeaderId = header.LossAggregateHeaderId }).ToObjectDataReader<ScenarioLayerLossAggregate>();
+                WriteToTable(reader, SCENARIO_LAYER_LOSS_AGGREGATE); 
+            //    transactionScope.Complete();
+            //}
         }
 
-        public void AddLayerPeriodCessionHeader(LayerPeriodCessionHeader header)
+        #endregion Scenario Layer Loss Aggregate
+
+        #region Layer Period Cession
+
+        private void AddLayerPeriodCessionHeader(LayerPeriodCessionHeader header)
         {
-            lock (layerPeriodCessionsHeaderCreationLock)
+            lock (_layerPeriodCessionsHeaderCreationLock)
             {
                 ExecuteSql(string.Format(CREATE_LAYER_PERIOD_CESSION_HEADER_TABLE, LAYER_PERIOD_CESSION_HEADER));
                 ExecuteSql(string.Format(ADD_LAYER_PERIOD_CESSION_HEADER, ADD_LAYER_PERIOD_CESSION_HEADER_PROCEDURE, LAYER_PERIOD_CESSION_HEADER));
@@ -192,14 +251,20 @@ END;";
 
         public void Save(LayerPeriodCessionHeader header, IEnumerable<LayerPeriodCession> layerPeriodCessions)
         {
-            AddLayerPeriodCessionHeader(header);
-            lock (layerLossAggregateCreationLock)
-            {
-                ExecuteSql(string.Format(CREATE_LAYER_PERIOD_CESSION_TABLE, LAYER_PERIOD_CESSION));
-            }
-            var reader = layerPeriodCessions.Select(x => new LayerPeriodCessionOutput(ref x) { LayerPeriodCessionHeaderId = header.LayerPeriodCessionHeaderId }).ToObjectDataReader<LayerPeriodCessionOutput>();
-            WriteToTable(reader, LAYER_PERIOD_CESSION);
+            //using (TransactionScope transactionScope = new TransactionScope(TransactionScopeOption.Required, TransactionManager.MaximumTimeout))
+            //{
+                AddLayerPeriodCessionHeader(header);
+                lock (_layerLossAggregateCreationLock)
+                {
+                    ExecuteSql(string.Format(CREATE_LAYER_PERIOD_CESSION_TABLE, LAYER_PERIOD_CESSION));
+                }
+                var reader = layerPeriodCessions.Select(x => new LayerPeriodCessionOutput(ref x) { LayerPeriodCessionHeaderId = header.LayerPeriodCessionHeaderId }).ToObjectDataReader<LayerPeriodCessionOutput>();
+                WriteToTable(reader, LAYER_PERIOD_CESSION);
+            //    transactionScope.Complete();
+            //}
         }
+
+        #endregion Layer Period Cession
 
         #endregion Methods
     }
