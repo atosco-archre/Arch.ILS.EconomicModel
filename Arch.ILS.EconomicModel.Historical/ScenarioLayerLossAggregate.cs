@@ -49,15 +49,15 @@ namespace Arch.ILS.EconomicModel.Historical
         public decimal LAE { get; }
         public string LossCurrency { get; }
         public decimal GULoss { get; }
-        public decimal LayerLoss100Pct { get; }
-        public decimal LayerLoss { get; }
         public decimal SectionsAdjustment { get; }
-        public decimal LastCumulativeOccLoss100Pct { get; }
-        public decimal LastAggLoss100Pct { get; }
         public decimal OccLoss100Pct { get; }
         public decimal OccLoss { get; }
+        public decimal LayerLoss100Pct { get; }
+        public decimal LayerLoss { get; }
         public decimal AggLoss100Pct { get; }
         public decimal AggLoss { get; }
+        public decimal LastCumulativeOccLoss100Pct { get; }
+        public decimal LastAggLoss100Pct { get; }
         public decimal NewAggLimit { get; }
         public decimal NewAggRetention { get; }
         public decimal ReinstatementPremium100Pct { get; }
