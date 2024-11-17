@@ -12,11 +12,13 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            ExportRetroLayerCessions(@"C:\Data\RetroAllocations 2.csv");
+            //ExportRetroLayerCessions(@"C:\Data\RetroAllocations 2.csv");
             //ExportRetroCessionMetrics(@"C:\Data\RetroMetrics.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
+
+            ProcessLayerYelts();
         }
 
         public static void ExportRetroLayerCessions(string outputFilePath)
@@ -28,7 +30,7 @@ namespace Arch.ILS.EconomicModel.Console
             //    connectionProtection.EncryptFile();
             //RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             //RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
-            RevoSnowflakeRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
+            RevoSnowflakeRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().RevoBermudaConnectionString);
             //var retroPrograms = revoRepository.GetRetroPrograms().Result;
             //var retroAllocations = revoRepository.GetRetroAllocations().Result;
             //var spInsurers = revoRepository.GetSPInsurers().Result;
@@ -233,7 +235,7 @@ namespace Arch.ILS.EconomicModel.Console
             RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
 
 
-            RevoLayerLossSqlRepository revoLayerLossSqlRepository = new RevoLayerLossSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVOLAYERLOSS));
+            RevoLayerLossRepository revoLayerLossSqlRepository = new RevoLayerLossSnowflakeRepository(new SnowflakeConnectionStrings().RevoLayerLossBermudaConnectionString);
             var layerYelt = revoLayerLossSqlRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
             YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
             YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);

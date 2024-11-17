@@ -90,7 +90,7 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             //    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
             //RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             //RevoRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
-            RevoRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
+            RevoRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().RevoBermudaConnectionString);
             var retroAllocationView = revoRepository.GetRetroAllocationView().Result;
             var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
             ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
@@ -105,7 +105,7 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             //    new ConnectionProtection(@"C:\Users\atosco\source\repos\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.Console\App.config.config");
             //RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             //RevoRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
-            RevoRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().ConnectionString);
+            RevoRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().RevoBermudaConnectionString);
             var layerReinstatements = revoRepository.GetLayerReinstatements().Result;
             ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
             ScenarioSqlRepository scenarioRepository = new ScenarioSqlRepository(scenarioConnectionSettings.GetConnectionString(ScenarioConnectionStrings.ARG_DWVARLSQL01));
