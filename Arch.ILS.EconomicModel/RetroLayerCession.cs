@@ -10,5 +10,6 @@ namespace Arch.ILS.EconomicModel
         public byte RetroLevelType { get; set; }
         public DateTime OverlapStart { get; set; }
         public DateTime OverlapEnd { get; set; }
+        public ResetType ResetType { get; set; }
     }
 }

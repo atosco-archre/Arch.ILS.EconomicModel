@@ -733,7 +733,7 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public Task<RetroCessions> GetRetroAllocationView()
+        public Task<RetroCessions> GetRetroAllocationView(ResetType resetType = ResetType.LOD)
         {
             return Task.Factory.StartNew(() =>
             {
@@ -791,40 +791,100 @@ namespace Arch.ILS.EconomicModel
                     if (!layers.TryGetValue(retroGrossAllocation.Key.LayerId, out Layer layer)
                         || !TryGetLayerRetroIntersection(layer, retroProgram, out DateTime overlapStart, out DateTime overlapEnd))
                         continue;
-                    if (resetDates.Length == 1)
-                    {
-                        var initialCession = resetDates[0];
-                        retroLayerCessions.Add(new RetroLayerCession
-                        {
-                            RetroProgramId = retroProgramId,
-                            LayerId = retroGrossAllocation.Key.LayerId,
-                            RetroProgramResetId = initialCession.RetroProgramResetId,
-                            CessionGross = retroGrossAllocation.Value.GrossCessionAfterPlacement,
-                            RetroLevelType = retroProgram.RetroLevelType,
-                            OverlapStart = overlapStart,
-                            OverlapEnd = overlapEnd
-                        });
-                    }
-                    else
-                    {
-                        int[] retroInvestorIds = retroGrossAllocation.Value.RetroInvestors;
-                        InvestorCession[][] investorCessions = new InvestorCession[retroInvestorIds.Length][];
-                        for (int j = 0; j < retroInvestorIds.Length; ++j)
-                            investorCessions[j] = investorRetroCessionPeriods[(retroProgramId, retroInvestorIds[j])];
 
-                        Dictionary<DateTime, decimal> resetDateGrossCessionAfterPlacement = investorCessions
-                            .SelectMany(x => x)
-                            .GroupBy(g => g.StartDate)
-                            .ToDictionary(k => k.Key, v => v.Sum(vv => vv.CessionBeforePlacement) * (retroGrossAllocation.Value.Placement == decimal.Zero ? retroGrossAllocation.Value.GrossCessionAfterPlacement / retroGrossAllocation.Value.CalculatedGrossCessionBeforePlacement : retroGrossAllocation.Value.Placement));
-                        for (int i = 0; i < resetDates.Length; i++)
+                    if (resetType == ResetType.LOD)
+                    {
+                        if (resetDates.Length == 1)
                         {
-                            var resetCession = resetDates[i];
-                            DateTime resetStart = resetDates[i].StartDate;
-                            if (i == 0 && resetStart != retroProgram.Inception)
-                                throw new InvalidDataException("Expected the initial cession date to match the retro inception date");
-                            DateTime resetEnd = i + 1 >= resetDates.Length ? retroProgram.Expiration : resetDates[i + 1].StartDate.AddDays(-1);
+                            var initialCession = resetDates[0];
+                            retroLayerCessions.Add(new RetroLayerCession
+                            {
+                                RetroProgramId = retroProgramId,
+                                LayerId = retroGrossAllocation.Key.LayerId,
+                                RetroProgramResetId = initialCession.RetroProgramResetId,
+                                CessionGross = retroGrossAllocation.Value.GrossCessionAfterPlacement,
+                                RetroLevelType = retroProgram.RetroLevelType,
+                                OverlapStart = overlapStart,
+                                OverlapEnd = overlapEnd,
+                                ResetType = ResetType.LOD
+                            });
+                        }
+                        else
+                        {
+                            int[] retroInvestorIds = retroGrossAllocation.Value.RetroInvestors;
+                            InvestorCession[][] investorCessions = new InvestorCession[retroInvestorIds.Length][];
+                            for (int j = 0; j < retroInvestorIds.Length; ++j)
+                                investorCessions[j] = investorRetroCessionPeriods[(retroProgramId, retroInvestorIds[j])];
+
+                            Dictionary<DateTime, decimal> resetDateGrossCessionAfterPlacement = investorCessions
+                                .SelectMany(x => x)
+                                .GroupBy(g => g.StartDate)
+                                .ToDictionary(k => k.Key, v => v.Sum(vv => vv.CessionBeforePlacement) * (retroGrossAllocation.Value.Placement == decimal.Zero ? retroGrossAllocation.Value.GrossCessionAfterPlacement / retroGrossAllocation.Value.CalculatedGrossCessionBeforePlacement : retroGrossAllocation.Value.Placement));
+                            for (int i = 0; i < resetDates.Length; i++)
+                            {
+                                var resetCession = resetDates[i];
+                                DateTime resetStart = resetDates[i].StartDate;
+                                if (i == 0 && resetStart != retroProgram.Inception)
+                                    throw new InvalidDataException("Expected the initial cession date to match the retro inception date");
+                                DateTime resetEnd = i + 1 >= resetDates.Length ? retroProgram.Expiration : resetDates[i + 1].StartDate.AddDays(-1);
+                                if (!TryGetPeriodIntersection(resetStart, resetEnd, retroProgram.Inception, retroProgram.Expiration, out DateTime retroOverlapStart, out DateTime retroOverlapEnd)
+                                 || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
+                                    continue;
+                                retroLayerCessions.Add(new RetroLayerCession
+                                {
+                                    RetroProgramId = retroProgramId,
+                                    LayerId = retroGrossAllocation.Key.LayerId,
+                                    RetroProgramResetId = resetCession.RetroProgramResetId,
+                                    CessionGross = resetDateGrossCessionAfterPlacement[resetStart],
+                                    RetroLevelType = retroProgram.RetroLevelType,
+                                    OverlapStart = resetOverlapStart,
+                                    OverlapEnd = resetOverlapEnd,
+                                    ResetType = ResetType.LOD
+                                });
+                            }
+                        }
+                    }
+                    else if (resetType == ResetType.RAD)
+                    {
+                        if (resetDates.Length == 1)
+                        {
+                            var initialCession = resetDates[0];
+                            if (initialCession.RetroProgramResetId != InvestorCession.DefaultRetroProgramResetId)
+                                throw new Exception($"Unexpected Retro Program Reset Id {initialCession.RetroProgramResetId}");
+                            retroLayerCessions.Add(new RetroLayerCession
+                            {
+                                RetroProgramId = retroProgramId,
+                                LayerId = retroGrossAllocation.Key.LayerId,
+                                RetroProgramResetId = initialCession.RetroProgramResetId,
+                                CessionGross = retroGrossAllocation.Value.GrossCessionAfterPlacement,
+                                RetroLevelType = retroProgram.RetroLevelType,
+                                OverlapStart = overlapStart,
+                                OverlapEnd = overlapEnd,
+                                ResetType = ResetType.RAD
+                            });
+                        }
+                        else
+                        {
+                            int[] retroInvestorIds = retroGrossAllocation.Value.RetroInvestors;
+                            InvestorCession[][] investorCessions = new InvestorCession[retroInvestorIds.Length][];
+                            for (int j = 0; j < retroInvestorIds.Length; ++j)
+                                investorCessions[j] = investorRetroCessionPeriods[(retroProgramId, retroInvestorIds[j])];
+
+                            Dictionary<DateTime, decimal> resetDateGrossCessionAfterPlacement = investorCessions
+                                .SelectMany(x => x)
+                                .GroupBy(g => g.StartDate)
+                                .ToDictionary(k => k.Key, v => v.Sum(vv => vv.CessionBeforePlacement) * (retroGrossAllocation.Value.Placement == decimal.Zero ? retroGrossAllocation.Value.GrossCessionAfterPlacement / retroGrossAllocation.Value.CalculatedGrossCessionBeforePlacement : retroGrossAllocation.Value.Placement));
+
+                            (DateTime StartDate, int RetroProgramResetId) resetCession = default;
+                            if (retroProgram.RetroProgramType == RetroProgramType.LOD && resetDates[0].StartDate > layer.Inception)
+                                resetCession = resetDates[0];
+                            else
+                                resetCession = resetDates.Last(x => x.StartDate <= layer.Inception);
+
+                            DateTime resetStart = resetCession.StartDate;                            
+                            DateTime resetEnd = retroProgram.Expiration;
                             if (!TryGetPeriodIntersection(resetStart, resetEnd, retroProgram.Inception, retroProgram.Expiration, out DateTime retroOverlapStart, out DateTime retroOverlapEnd)
-                             || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
+                                || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
                                 continue;
                             retroLayerCessions.Add(new RetroLayerCession
                             {
@@ -834,10 +894,13 @@ namespace Arch.ILS.EconomicModel
                                 CessionGross = resetDateGrossCessionAfterPlacement[resetStart],
                                 RetroLevelType = retroProgram.RetroLevelType,
                                 OverlapStart = resetOverlapStart,
-                                OverlapEnd = resetOverlapEnd
+                                OverlapEnd = resetOverlapEnd,
+                                ResetType = ResetType.RAD
                             });
+                            
                         }
                     }
+                    else throw new NotImplementedException($"RssetType {resetType} not implemented.");
                 }
 
                 return new RetroCessions(retroLayerCessions);
@@ -914,7 +977,7 @@ namespace Arch.ILS.EconomicModel
                 return retroInvestors
                     .Join(spInsurers, ri => ri.SPInsurerId, spi => spi.Key, (ri, spi) => new { spi.Value.RetroProgramId, ri })
                     .GroupBy(temp => (temp.RetroProgramId, temp.ri.RetroInvestorId))
-                    .Join(retroPrograms, ok => ok.Key.RetroProgramId, ik => ik.Key, (o, i) => new InvestorCession(o.Key.RetroInvestorId, -1, i.Value.RetroProgramId, i.Value.Inception, o.Sum(oo => oo.ri.InvestmentSignedAmt), o.Max(oo => oo.ri.TargetCollateral), o.Sum(oo => oo.ri.InvestmentSigned)))
+                    .Join(retroPrograms, ok => ok.Key.RetroProgramId, ik => ik.Key, (o, i) => new InvestorCession(o.Key.RetroInvestorId, InvestorCession.DefaultRetroProgramResetId, i.Value.RetroProgramId, i.Value.Inception, o.Sum(oo => oo.ri.InvestmentSignedAmt), o.Max(oo => oo.ri.TargetCollateral), o.Sum(oo => oo.ri.InvestmentSigned)))
                     //.Where(r => r.CessionBeforePlacement != 0)
                     ;
             });
