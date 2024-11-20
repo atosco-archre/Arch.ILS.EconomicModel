@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Amazon.S3.Model;
 using Arch.ILS.Common;
 using Arch.ILS.EconomicModel;
+using Arch.ILS.EconomicModel.Binary;
 using Arch.ILS.Snowflake;
 using Google.Apis.Storage.v1.Data;
 
@@ -274,7 +275,7 @@ namespace Arch.ILS.EconomicModel.Console
             var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
         }
 
-        public unsafe static void ProcessLayerYelts()
+        public unsafe static void ProcessLayerYelts() 
         {
             int bucket = 0;
             nuint i = (uint)bucket - 1;
@@ -284,6 +285,11 @@ namespace Arch.ILS.EconomicModel.Console
             //var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
             //YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
             var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(32877, 92012).Result;
+            string filePath = @$"C:\Data\Yelt_{layerYelt.LossAnalysisId}_{layerYelt.LayerId}.bin";
+            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
+            revoYeltBinaryWriter.WriteAll(filePath);
+            RevoYeltBinaryReader revoYeltBinaryReader = new RevoYeltBinaryReader(filePath);
+            var altLayerYelt = revoYeltBinaryReader.ReadAll();
             YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, layerYelt);
             YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
             var layerYelt2 = revoLayerLossRepository.GetLayerDayYeltVectorised(10620, 38252).Result;

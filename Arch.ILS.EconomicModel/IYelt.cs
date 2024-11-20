@@ -7,8 +7,11 @@ namespace Arch.ILS.EconomicModel
     {
         int LossAnalysisId { get; }
         int LayerId { get; }
+        long RowVersion { get; }
         int BufferCount { get; }
         int TotalEntryCount { get; }
+        bool HasRP { get; }
+        bool HasRB { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i);

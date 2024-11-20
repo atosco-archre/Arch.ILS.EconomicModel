@@ -1,5 +1,4 @@
 ﻿
-using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -130,8 +129,11 @@ namespace Arch.ILS.EconomicModel
         }
         public int LossAnalysisId { get; }
         public int LayerId { get; }
+        public long RowVersion { get; }
         public int BufferCount { get; }
         public int TotalEntryCount { get; }
+        public bool HasRP { get; }
+        public bool HasRB { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayPerilIdEventIdKeys[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);

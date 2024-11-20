@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
+using Arch.ILS.EconomicModel.Binary;
+
 namespace Arch.ILS.EconomicModel
 {
     public unsafe class RevoLayerDayYeltVectorised2 : IYelt, IDisposable
@@ -187,11 +189,130 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
+        public RevoLayerDayYeltVectorised2(in string filePath)
+        {
+            using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+            {
+                Span<byte> headerBuffer = new byte[RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH];
+                reader.Read(headerBuffer);
+
+                fixed (byte* headerPtr = headerBuffer)
+                {
+                    LossAnalysisId = *((int*)headerPtr + RevoYeltBinaryWriter.LOSSANALYSISID_INDEX);
+                    LayerId = *((int*)headerPtr + RevoYeltBinaryWriter.LAYERID_INDEX);
+                    RowVersion = *((long*)headerPtr + RevoYeltBinaryWriter.ROWVERSION_INDEX);
+                    TotalEntryCount = *((int*)headerPtr + RevoYeltBinaryWriter.TOTALENTRYCOUNT_INDEX);
+                    HasRP = *((bool*)headerPtr + RevoYeltBinaryWriter.HASRP_INDEX);
+                    HasRB = *((bool*)headerPtr + RevoYeltBinaryWriter.HASRB_INDEX);
+                }
+
+                _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT;
+                BufferCount = _lastBufferIndex + 1;
+                BufferCount = _lastBufferIndex + 1;
+                _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
+                _lastBufferSizeShort = _lastBufferItemCount << 1;
+                _lastBufferSizeInt = _lastBufferItemCount << 2;
+                _lastBufferSizeDouble = _lastBufferItemCount << 3;
+                _lastBufferSizeLong = _lastBufferSizeDouble;
+
+
+                nuint ptrSize = (nuint)(Unsafe.SizeOf<IntPtr>() * BufferCount);
+                _dayYearPerilIdEventIdKeys = (long**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+                _days = (short**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+                _lossPcts = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+                _RPs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+                _RBs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+
+                Span<long> currentYearDayPerilIdEventIdSpan = Span<long>.Empty;
+                int currentBufferIndex = 0;
+
+                while(currentBufferIndex < _lastBufferIndex)
+                {
+                    _dayYearPerilIdEventIdKeys[currentBufferIndex] = (long*)NativeMemory.AlignedAlloc(BUFFER_SIZE_LONG, sizeof(long));
+                    currentYearDayPerilIdEventIdSpan = new Span<long>(_dayYearPerilIdEventIdKeys[currentBufferIndex], BUFFER_SIZE_LONG);
+                    reader.Read(MemoryMarshal.Cast<long, byte>(currentYearDayPerilIdEventIdSpan));
+                    currentBufferIndex++;
+                }
+
+                _dayYearPerilIdEventIdKeys[currentBufferIndex] = (long*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeLong, sizeof(long));
+                currentYearDayPerilIdEventIdSpan = new Span<long>(_dayYearPerilIdEventIdKeys[currentBufferIndex], BUFFER_SIZE_LONG);
+                reader.Read(MemoryMarshal.Cast<long, byte>(currentYearDayPerilIdEventIdSpan));
+
+                Span<short> currentDayBufferSpan = Span<short>.Empty;
+                currentBufferIndex = 0;
+
+                while (currentBufferIndex < _lastBufferIndex)
+                {
+                    _days[currentBufferIndex] = (short*)NativeMemory.AlignedAlloc(BUFFER_SIZE_SHORT, sizeof(short));
+                    currentDayBufferSpan = new Span<short>(_days[currentBufferIndex], BUFFER_SIZE_SHORT);
+                    reader.Read(MemoryMarshal.Cast<short, byte>(currentDayBufferSpan));
+                    currentBufferIndex++;
+                }
+
+                _days[currentBufferIndex] = (short*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeLong, sizeof(short));
+                currentDayBufferSpan = new Span<short>(_days[currentBufferIndex], BUFFER_SIZE_SHORT);
+                reader.Read(MemoryMarshal.Cast<short, byte>(currentDayBufferSpan));
+                
+                Span<double> currentLossPctBufferSpan = Span<double>.Empty;
+                currentBufferIndex = 0;
+
+                while (currentBufferIndex < _lastBufferIndex)
+                {
+                    _lossPcts[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
+                    currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                    reader.Read(MemoryMarshal.Cast<double, byte>(currentLossPctBufferSpan));
+                    currentBufferIndex++;
+                }
+
+                _lossPcts[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
+                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                reader.Read(MemoryMarshal.Cast<double, byte>(currentLossPctBufferSpan));
+
+                if(HasRP)
+                {
+                    Span<double> currentRPBufferSpan = Span<double>.Empty;
+                    currentBufferIndex = 0;
+
+                    while (currentBufferIndex < _lastBufferIndex)
+                    {
+                        _RPs[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
+                        currentRPBufferSpan = new Span<double>(_RPs[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                        reader.Read(MemoryMarshal.Cast<double, byte>(currentRPBufferSpan));
+                        currentBufferIndex++;
+                    }
+
+                    _RPs[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
+                    currentRPBufferSpan = new Span<double>(_RPs[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                    reader.Read(MemoryMarshal.Cast<double, byte>(currentRPBufferSpan));
+                }
+
+                if(HasRB)
+                {
+                    Span<double> currentRBBufferSpan = Span<double>.Empty;
+                    currentBufferIndex = 0;
+
+                    while (currentBufferIndex < _lastBufferIndex)
+                    {
+                        _RBs[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
+                        currentRBBufferSpan = new Span<double>(_RBs[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                        reader.Read(MemoryMarshal.Cast<double, byte>(currentRBBufferSpan));
+                        currentBufferIndex++;
+                    }
+
+                    _RBs[currentBufferIndex] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
+                    currentRBBufferSpan = new Span<double>(_RBs[currentBufferIndex], BUFFER_SIZE_DOUBLE);
+                    reader.Read(MemoryMarshal.Cast<double, byte>(currentRBBufferSpan));
+                }
+            }
+        }
+
         public int LossAnalysisId { get; }
         public int LayerId { get; }
+        public long RowVersion { get; }
         public int BufferCount { get; }
-
         public int TotalEntryCount { get; }
+        public bool HasRP { get; }
+        public bool HasRB { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i) => new ReadOnlySpan<long>(_dayYearPerilIdEventIdKeys[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
