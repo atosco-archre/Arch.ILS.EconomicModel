@@ -793,7 +793,7 @@ namespace Arch.ILS.EconomicModel
                         continue;
 
                     if (resetType == ResetType.LOD)
-                    {
+                    {                        
                         if (resetDates.Length == 1)
                         {
                             var initialCession = resetDates[0];

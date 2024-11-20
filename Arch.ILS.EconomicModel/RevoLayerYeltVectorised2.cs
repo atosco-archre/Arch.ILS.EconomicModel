@@ -17,7 +17,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
-        private long** _yearDayEventIdKeys;
+        private long** _yearDayPerilIdEventIdKeys;
         private short** _days;
         private double** _lossPcts;
         private double** _RPs;
@@ -34,7 +34,7 @@ namespace Arch.ILS.EconomicModel
             LossAnalysisId = lossAnalysisId;
             LayerId = layerId;
             Span<nint> yearRefs = stackalloc nint[YEAR_BUFFER_SIZE];
-            var comparer = new RevoLayerEntryDayEventIdComparer();
+            var comparer = new RevoLayerEntryDayPerilIdEventIdComparer();
             int count = 0;
             foreach (var entry in yelt)
             {
@@ -72,16 +72,19 @@ namespace Arch.ILS.EconomicModel
             short* tempCurrentDay = tempDays;
             int* tempEventIds = (int*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 2), (nuint)Unsafe.SizeOf<int>());
             int* tempCurrentEventId = tempEventIds;
+            nint tempPerilIdAlloc = Marshal.AllocHGlobal(vectorLongCount);
+            byte* tempPerilIds = (byte*)tempPerilIdAlloc.ToPointer();
+            byte* tempCurrentPerilId = tempPerilIds;
 
             nuint ptrSize = (nuint)(Unsafe.SizeOf<IntPtr>() * BufferCount);
-            _yearDayEventIdKeys = (long**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
+            _yearDayPerilIdEventIdKeys = (long**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             _days = (short**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             _lossPcts = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             _RPs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             _RBs = (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>());
             ref nint spanStart = ref MemoryMarshal.GetReference(yearRefs);
             ref nint spanEnd = ref Unsafe.Add(ref spanStart, yearRefs.Length);
-            long* currentYearDayEventIdPtr = null;
+            long* currentYearDayPerilIdEventIdPtr = null;
             Span<short> currentDayBufferSpan = Span<short>.Empty;
             Span<double> currentLossPctBufferSpan = Span<double>.Empty;
             Span<double> currentRPBufferSpan = Span<double>.Empty;
@@ -98,13 +101,13 @@ namespace Arch.ILS.EconomicModel
                         {
                             if (++currentBuffer == _lastBufferIndex)
                             {
-                                _yearDayEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeLong, sizeof(long));
+                                _yearDayPerilIdEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeLong, sizeof(long));
                                 _days[currentBuffer] = (short*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeShort, sizeof(short));
                                 _lossPcts[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
                                 _RPs[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
                                 _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
 
-                                currentYearDayEventIdPtr = _yearDayEventIdKeys[currentBuffer];
+                                currentYearDayPerilIdEventIdPtr = _yearDayPerilIdEventIdKeys[currentBuffer];
                                 currentDayBufferSpan = new Span<short>(_days[currentBuffer], _lastBufferSizeShort);
                                 currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], _lastBufferSizeDouble);
                                 currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], _lastBufferSizeDouble);
@@ -112,13 +115,13 @@ namespace Arch.ILS.EconomicModel
                             }
                             else
                             {
-                                _yearDayEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc(BUFFER_SIZE_LONG, sizeof(long));
+                                _yearDayPerilIdEventIdKeys[currentBuffer] = (long*)NativeMemory.AlignedAlloc(BUFFER_SIZE_LONG, sizeof(long));
                                 _days[currentBuffer] = (short*)NativeMemory.AlignedAlloc(BUFFER_SIZE_SHORT, sizeof(short));
                                 _lossPcts[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
                                 _RPs[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
                                 _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
 
-                                currentYearDayEventIdPtr = _yearDayEventIdKeys[currentBuffer];
+                                currentYearDayPerilIdEventIdPtr = _yearDayPerilIdEventIdKeys[currentBuffer];
                                 currentDayBufferSpan = new Span<short>(_days[currentBuffer], BUFFER_SIZE_SHORT);
                                 currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], BUFFER_SIZE_DOUBLE);
                                 currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], BUFFER_SIZE_DOUBLE);
@@ -130,6 +133,7 @@ namespace Arch.ILS.EconomicModel
 
                         *tempCurrentYear++ = *entry.GetYear();
                         *tempCurrentDay++ = *entry.GetDay();
+                        *tempCurrentPerilId++ = *entry.GetPerilId();
                         *tempCurrentEventId++ = *entry.GetEventId();
                         currentDayBufferSpan[currentInBufferIndex] = *entry.GetDay();                        
                         currentLossPctBufferSpan[currentInBufferIndex] = *entry.GetLossPct();
@@ -140,21 +144,22 @@ namespace Arch.ILS.EconomicModel
                         {
                             tempCurrentYear = tempYears;
                             tempCurrentDay = tempDays;
+                            tempCurrentPerilId = tempPerilIds;
                             tempCurrentEventId = tempEventIds;
-                            //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365] and EventId in [1, Int32.MaxValue]. 
-                            // (((ulong)(ushort)(short)10000)<<48)|(((ulong)(ushort)(short)365)<<32)|((ulong)(uint)Int32.MaxValue) = (((long)(short)10000)<<48)|(((long)(short)365)<<32)|((long)Int32.MaxValue) = 2814751336917106687
+                            //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
+                            // (((ulong)(ushort)(short)10000)<<48)|(((ulong)(ushort)(short)365)<<33)|(((ulong)(byte)255)<<32)|((ulong)(uint)Int32.MaxValue) = (((long)(short)10000)<<48)|(((long)(short)365)<<33)|(((long)(byte)255)<<32)|((long)Int32.MaxValue) = 2814753063493959679
 
                             if (Avx2.IsSupported)
                             {
-                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 48) | ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 32) | Avx2.ConvertToVector256Int64(tempCurrentEventId);
-                                Avx2.Store(currentYearDayEventIdPtr, key);
-                                currentYearDayEventIdPtr += Vector256<long>.Count;
+                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 48) | ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 33) | ((Avx2.ConvertToVector256Int64(tempCurrentPerilId)) << 32) | Avx2.ConvertToVector256Int64(tempCurrentEventId);
+                                Avx2.Store(currentYearDayPerilIdEventIdPtr, key);
+                                currentYearDayPerilIdEventIdPtr += Vector256<long>.Count;
                             }
                             else if (Avx.IsSupported)
                             {
-                                var key = ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 48) | ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 32) | Avx.ConvertToVector128Int64(tempCurrentEventId);
-                                Avx.Store(currentYearDayEventIdPtr, key);
-                                currentYearDayEventIdPtr += Vector128<long>.Count;
+                                var key = ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 48) | ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 33) | ((Avx.ConvertToVector128Int64(tempCurrentPerilId)) << 32) | Avx.ConvertToVector128Int64(tempCurrentEventId);
+                                Avx.Store(currentYearDayPerilIdEventIdPtr, key);
+                                currentYearDayPerilIdEventIdPtr += Vector128<long>.Count;
                             }
                         }
 
@@ -170,11 +175,12 @@ namespace Arch.ILS.EconomicModel
                 tempLastYear = tempCurrentYear;
                 tempCurrentYear = tempYears;
                 tempCurrentDay = tempDays;
+                tempCurrentPerilId = tempPerilIds;
                 tempCurrentEventId = tempEventIds;
                 while(tempCurrentYear < tempLastYear)
                 {
-                    //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365] and EventId in [1, Int32.MaxValue]. 
-                    *currentYearDayEventIdPtr++ = (((long)*tempCurrentYear++) << 48) | (((long)*tempCurrentDay++) << 32) | *tempCurrentEventId++;
+                    //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
+                    *currentYearDayPerilIdEventIdPtr++ = (((long)*tempCurrentYear++) << 48) | (((long)*tempCurrentDay++) << 33) | (((long)*tempCurrentPerilId++) << 32) | *tempCurrentEventId++;
                 }
             }
         }
@@ -186,7 +192,7 @@ namespace Arch.ILS.EconomicModel
         public int TotalEntryCount { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<long> YearDayEventIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayEventIdKeys[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayPerilIdEventIdKeys[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<short> Days(in uint i) => new ReadOnlySpan<short>(_days[i], i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
@@ -210,24 +216,24 @@ namespace Arch.ILS.EconomicModel
 
                 for (int i = 0; i < BufferCount; i++)
                 {
-                    NativeMemory.AlignedFree(_yearDayEventIdKeys[i]);
+                    NativeMemory.AlignedFree(_yearDayPerilIdEventIdKeys[i]);
                     NativeMemory.AlignedFree(_days[i]);
                     NativeMemory.AlignedFree(_lossPcts[i]);
                     NativeMemory.AlignedFree(_RPs[i]);
                     NativeMemory.AlignedFree(_RBs[i]);
-                    _yearDayEventIdKeys[i] = null;
+                    _yearDayPerilIdEventIdKeys[i] = null;
                     _days[i] = null;
                     _lossPcts[i] = null;
                     _RPs[i] = null;
                     _RBs[i] = null;
                 }
 
-                NativeMemory.AlignedFree(_yearDayEventIdKeys);
+                NativeMemory.AlignedFree(_yearDayPerilIdEventIdKeys);
                 NativeMemory.AlignedFree(_days);
                 NativeMemory.AlignedFree(_lossPcts);
                 NativeMemory.AlignedFree(_RPs);
                 NativeMemory.AlignedFree(_RBs);
-                _yearDayEventIdKeys = null;
+                _yearDayPerilIdEventIdKeys = null;
                 _days = null;
                 _lossPcts = null;
                 _RPs = null;

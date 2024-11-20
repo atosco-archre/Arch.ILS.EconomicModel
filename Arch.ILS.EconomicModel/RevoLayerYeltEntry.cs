@@ -15,7 +15,7 @@ namespace Arch.ILS.EconomicModel
 
         public int EventId;
 
-        public string Peril = string.Empty;
+        public byte PerilId;
 
         public short Day;
 
@@ -36,6 +36,12 @@ namespace Arch.ILS.EconomicModel
         public unsafe int* GetEventId()
         {
             return (int*)Unsafe.AsPointer(ref EventId);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe byte* GetPerilId()
+        {
+            return (byte*)Unsafe.AsPointer(ref PerilId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

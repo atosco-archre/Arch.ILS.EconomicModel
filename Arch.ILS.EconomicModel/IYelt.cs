@@ -10,7 +10,8 @@ namespace Arch.ILS.EconomicModel
         int BufferCount { get; }
         int TotalEntryCount { get; }
 
-        ReadOnlySpan<long> YearDayEventIdKeys(in uint i);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         ReadOnlySpan<short> Days(in uint i);

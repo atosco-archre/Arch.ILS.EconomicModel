@@ -13,11 +13,11 @@ namespace Arch.ILS.EconomicModel
                 CurrentEndDay = CurrentStartDay + dayYearEventIdKeySpan.PartitionDays.Length - 1;
             }
 
-            fixed (long* keyPtr = dayYearEventIdKeySpan.PartitionYearDayEventIdKeys)
+            fixed (long* keyPtr = dayYearEventIdKeySpan.PartitionYearDayPerilIdEventIdKeys)
             {
                 CurrentStartKey = keyPtr;
-                CurrentEndKey = CurrentStartKey + dayYearEventIdKeySpan.PartitionYearDayEventIdKeys.Length - 1;
-                CurrentLength = dayYearEventIdKeySpan.PartitionYearDayEventIdKeys.Length;
+                CurrentEndKey = CurrentStartKey + dayYearEventIdKeySpan.PartitionYearDayPerilIdEventIdKeys.Length - 1;
+                CurrentLength = dayYearEventIdKeySpan.PartitionYearDayPerilIdEventIdKeys.Length;
             }
 
             fixed (double* lossPctPtr = dayYearEventIdKeySpan.PartitionLossPcts)

@@ -16,7 +16,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
-        private readonly nint[] _yearDayEventIdKeys;
+        private readonly nint[] _yearDayPerilIdEventIdKeys;
         private readonly nint[] _days;
         private readonly nint[] _lossPcts;
         private readonly nint[] _RPs;
@@ -31,7 +31,7 @@ namespace Arch.ILS.EconomicModel
             LossAnalysisId = lossAnalysisId;
             LayerId = layerId;
             Span<nint> yearRefs = stackalloc nint[YEAR_BUFFER_SIZE];
-            var comparer = new RevoLayerEntryDayEventIdComparer();
+            var comparer = new RevoLayerEntryDayPerilIdEventIdComparer();
             int count = 0;
             foreach (var entry in yelt)
             {
@@ -62,14 +62,14 @@ namespace Arch.ILS.EconomicModel
             int currentBuffer = -1;
             int currentInBufferIndex = 0;
 
-            _yearDayEventIdKeys = new nint[BufferCount];
+            _yearDayPerilIdEventIdKeys = new nint[BufferCount];
             _days = new nint[BufferCount];
             _lossPcts = new nint[BufferCount];
             _RPs = new nint[BufferCount];
             _RBs = new nint[BufferCount];
             ref nint spanStart = ref MemoryMarshal.GetReference(yearRefs);
             ref nint spanEnd = ref Unsafe.Add(ref spanStart, yearRefs.Length);
-            Span<long> currentYearDayEventIdBufferSpan = Span<long>.Empty;
+            Span<long> currentYearDayPerilIdEventIdBufferSpan = Span<long>.Empty;
             Span<short> currentDayBufferSpan = Span<short>.Empty;
             Span<double> currentLossPctBufferSpan = Span<double>.Empty;
             Span<double> currentRPBufferSpan = Span<double>.Empty;
@@ -86,13 +86,13 @@ namespace Arch.ILS.EconomicModel
                         {
                             if (++currentBuffer == _lastBufferIndex)
                             {
-                                _yearDayEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeLong);
+                                _yearDayPerilIdEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeLong);
                                 _days[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeShort);
                                 _lossPcts[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
                                 _RPs[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
                                 _RBs[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
 
-                                currentYearDayEventIdBufferSpan = new Span<long>(_yearDayEventIdKeys[currentBuffer].ToPointer(), _lastBufferSizeLong);
+                                currentYearDayPerilIdEventIdBufferSpan = new Span<long>(_yearDayPerilIdEventIdKeys[currentBuffer].ToPointer(), _lastBufferSizeLong);
                                 currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), _lastBufferSizeShort);
                                 currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), _lastBufferSizeDouble);
                                 currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), _lastBufferSizeDouble);
@@ -100,13 +100,13 @@ namespace Arch.ILS.EconomicModel
                             }
                             else
                             {
-                                _yearDayEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_LONG);
+                                _yearDayPerilIdEventIdKeys[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_LONG);
                                 _days[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_SHORT);
                                 _lossPcts[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
                                 _RPs[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
                                 _RBs[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
 
-                                currentYearDayEventIdBufferSpan = new Span<long>(_yearDayEventIdKeys[currentBuffer].ToPointer(), BUFFER_SIZE_LONG);
+                                currentYearDayPerilIdEventIdBufferSpan = new Span<long>(_yearDayPerilIdEventIdKeys[currentBuffer].ToPointer(), BUFFER_SIZE_LONG);
                                 currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), BUFFER_SIZE_SHORT);
                                 currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
                                 currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
@@ -117,7 +117,7 @@ namespace Arch.ILS.EconomicModel
                         }
 
                         currentDayBufferSpan[currentInBufferIndex] = *entry.GetDay();
-                        currentYearDayEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetYear())) << 48) | (((long)(*entry.GetDay())) << 32) | (*entry.GetEventId());
+                        currentYearDayPerilIdEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetYear())) << 48) | (((long)(*entry.GetDay())) << 33) | (((long)(*entry.GetPerilId())) << 32) | (*entry.GetEventId());
                         currentLossPctBufferSpan[currentInBufferIndex] = *entry.GetLossPct();
                         currentRPBufferSpan[currentInBufferIndex] = *entry.GetRP();
                         currentRBBufferSpan[currentInBufferIndex] = *entry.GetRB();
@@ -134,7 +134,7 @@ namespace Arch.ILS.EconomicModel
         public int TotalEntryCount { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<long> YearDayEventIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayEventIdKeys[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
+        public ReadOnlySpan<long> YearDayEventIdPerilIdKeys(in uint i) => new ReadOnlySpan<long>(_yearDayPerilIdEventIdKeys[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<short> Days(in uint i) => new ReadOnlySpan<short>(_days[i].ToPointer(), i == _lastBufferIndex ? _lastBufferItemCount : BUFFER_ITEM_COUNT);
@@ -150,14 +150,14 @@ namespace Arch.ILS.EconomicModel
 
         public void Dispose(bool disposing)
         {
-            for (int i = 0; i < _yearDayEventIdKeys.Length; i++)
+            for (int i = 0; i < _yearDayPerilIdEventIdKeys.Length; i++)
             {
-                Marshal.FreeHGlobal(_yearDayEventIdKeys[i]);
+                Marshal.FreeHGlobal(_yearDayPerilIdEventIdKeys[i]);
                 Marshal.FreeHGlobal(_days[i]);
                 Marshal.FreeHGlobal(_lossPcts[i]);
                 Marshal.FreeHGlobal(_RPs[i]);
                 Marshal.FreeHGlobal(_RBs[i]);
-                _yearDayEventIdKeys[i] = nint.Zero;
+                _yearDayPerilIdEventIdKeys[i] = nint.Zero;
                 _days[i] = nint.Zero;
                 _lossPcts[i] = nint.Zero;
                 _RPs[i] = nint.Zero;

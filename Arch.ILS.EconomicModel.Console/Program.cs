@@ -45,12 +45,12 @@ namespace Arch.ILS.EconomicModel.Console
             using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.WriteLine($"RetroLevel,RetroProgramId,RetroProgramType,RetroInception,RetroExpiration,LayerId,LayerInception,LayerExpiration,StartInclusive,StartDayOfYear,EndInclusive,EndDayOfYear,NetCession");
+                sw.WriteLine($"RetroLevel,RetroProgramId,RetroProgramType,RetroInception,RetroExpiration,LayerId,LayerInception,LayerExpiration,LayerStatus,StartInclusive,StartDayOfYear,EndInclusive,EndDayOfYear,NetCession");
                 foreach (var c in levelLayerCessions)
                 {
                     LayerDetail layerDetail = layerDetails[c.LayerId];
                     RetroProgram retro = retroPrograms[c.RetroProgramId];
-                    sw.WriteLine($"{c.RetroLevel},{c.RetroProgramId},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{c.LayerId},{layerDetail.Inception},{layerDetail.Expiration},{c.PeriodCession.StartInclusive},{c.PeriodCession.StartInclusive.DayOfYear},{c.PeriodCession.EndInclusive},{c.PeriodCession.EndInclusive.DayOfYear},{c.PeriodCession.NetCession}");
+                    sw.WriteLine($"{c.RetroLevel},{c.RetroProgramId},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{c.LayerId},{layerDetail.Inception},{layerDetail.Expiration},{layerDetail.Status.ToString()},{c.PeriodCession.StartInclusive},{c.PeriodCession.StartInclusive.DayOfYear},{c.PeriodCession.EndInclusive},{c.PeriodCession.EndInclusive.DayOfYear},{c.PeriodCession.NetCession}");
                 }
                 sw.Flush();
             }
@@ -254,7 +254,7 @@ namespace Arch.ILS.EconomicModel.Console
                 {
                     var retro = retroPrograms.Result[retroLayerMetric.RetroProgramid];
                     var layer = layerDetails.Result[retroLayerMetric.LayerId];
-                    sw.WriteLine($"{retro.RetroLevelType},{retroLayerMetric.RetroProgramid},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{retroLayerMetric.LayerId},{layer.Inception},{layer.Expiration},{retroLayerMetric.StartDateInclusive},{retroLayerMetric.EndDateInclusive},{retroLayerMetric.CededPremium},{retroLayerMetric.CededLimit}");
+                    sw.WriteLine($"{retro.RetroLevelType},{retroLayerMetric.RetroProgramid},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{retroLayerMetric.LayerId},{layer.Inception},{layer.Expiration},{layer.Status.ToString()},{retroLayerMetric.StartDateInclusive},{retroLayerMetric.EndDateInclusive},{retroLayerMetric.CededPremium},{retroLayerMetric.CededLimit}");
                 }
                 sw.Flush();
             }
@@ -281,8 +281,10 @@ namespace Arch.ILS.EconomicModel.Console
             /*Authentication*/
             RevoRepository revoRepository = GetRevoSnowflakeRepository();
             RevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
-            var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
-            YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
+            //var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
+            //YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
+            var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(32877, 92012).Result;
+            YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, layerYelt);
             YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
             var layerYelt2 = revoLayerLossRepository.GetLayerDayYeltVectorised(10620, 38252).Result;
             YeltPartitioner yeltPartitioner2 = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt2);
