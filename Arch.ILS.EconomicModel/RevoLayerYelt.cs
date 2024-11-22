@@ -39,12 +39,14 @@ namespace Arch.ILS.EconomicModel
                     var newEntry = new SortedSet<RevoLayerYeltEntry>(comparer);
                     GCHandle handle = GCHandle.Alloc(newEntry);
                     yearRefs[entry.Year] = GCHandle.ToIntPtr(GCHandle.Alloc(newEntry));
-                    ((SortedSet<RevoLayerYeltEntry>)handle.Target).Add(entry);
+                    if (!((SortedSet<RevoLayerYeltEntry>)handle.Target).Add(entry))
+                        throw new Exception("Expected unique Year, Day, Event Peril");
                 }
                 else
                 {
                     GCHandle handle = GCHandle.FromIntPtr(yearRefs[entry.Year]);
-                    ((SortedSet<RevoLayerYeltEntry>)handle.Target).Add(entry);
+                    if (!((SortedSet<RevoLayerYeltEntry>)handle.Target).Add(entry))
+                        throw new Exception("Expected unique Year, Day, Event Peril");
                 }
 
                 count++;

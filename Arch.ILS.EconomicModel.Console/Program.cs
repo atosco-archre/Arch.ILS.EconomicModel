@@ -284,7 +284,7 @@ namespace Arch.ILS.EconomicModel.Console
             RevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             //var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
             //YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
-            var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(32877, 92012).Result;
+            var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(37477, 104181).Result;
             string filePath = @$"C:\Data\Yelt_{layerYelt.LossAnalysisId}_{layerYelt.LayerId}.bin";
             RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
             revoYeltBinaryWriter.WriteAll(filePath);
@@ -292,7 +292,7 @@ namespace Arch.ILS.EconomicModel.Console
             var altLayerYelt = revoYeltBinaryReader.ReadAll();
             YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, layerYelt);
             YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
-            var layerYelt2 = revoLayerLossRepository.GetLayerDayYeltVectorised(10620, 38252).Result;
+            var layerYelt2 = revoLayerLossRepository.GetLayerDayYeltVectorised(48551, 140198).Result;
             YeltPartitioner yeltPartitioner2 = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt2);
             YeltPartitionReader yeltPartitionLinkedListReader2 = YeltPartitionReader.Initialise(yeltPartitioner2);
 

@@ -237,6 +237,22 @@ namespace Arch.ILS.EconomicModel
 
         #region Constants
 
+ //       private const string GET_MODELLED_LAYER_YELT_QUERY = @"SELECT Year 
+ //    , CAST(EventId AS INT) EventId
+ //    , Peril
+ //    , Day
+ //    , SUM(LossPct) AS LossPct
+ //    , SUM(RP) AS RP
+ //    , SUM(RB) AS RB
+ // FROM dbo.LayerYelt
+ //WHERE LossAnalysisId = {0}
+ //  AND LayerId  = {1}
+ //  AND LossType = 1
+ //GROUP BY Year 
+ //    , CAST(EventId AS INT)
+ //    , Peril
+ //    , Day";
+
         private const string GET_MODELLED_LAYER_YELT_QUERY = @"SELECT Year 
      , CAST(EventId AS INT) EventId
      , Peril
