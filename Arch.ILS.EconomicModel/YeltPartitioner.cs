@@ -46,8 +46,8 @@ namespace Arch.ILS.EconomicModel
                 ReadOnlySpan<short> days = _yelt.Days(_outBufferIndex)[_inBufferIndex..];
                 ReadOnlySpan<long> yearDayPerilIdEventIdKeys = _yelt.YearDayEventIdPerilIdKeys(_outBufferIndex)[_inBufferIndex..];
                 ReadOnlySpan<double> lossPcts = _yelt.LossPcts(_outBufferIndex)[_inBufferIndex..];
-                ReadOnlySpan<double> rps = _yelt.RPs(_outBufferIndex)[_inBufferIndex..];
-                ReadOnlySpan<double> rbs = _yelt.RBs(_outBufferIndex)[_inBufferIndex..];
+                ReadOnlySpan<double> rps = _yelt.HasRP ? _yelt.RPs(_outBufferIndex)[_inBufferIndex..] : ReadOnlySpan<double>.Empty;
+                ReadOnlySpan<double> rbs = _yelt.HasRB ? _yelt.RBs(_outBufferIndex)[_inBufferIndex..] : ReadOnlySpan<double>.Empty;
                 int startIndex = currentStartDay <= days[0] ? 0 : days.BinarySearch<short>(currentStartDay);
                 if (startIndex < 0)
                 {
@@ -109,7 +109,7 @@ namespace Arch.ILS.EconomicModel
                 }
 
                 days = days[..length];
-                yeltDayPartition = new YeltDayPartition(days, yearDayPerilIdEventIdKeys.Slice(startIndex, length), lossPcts.Slice(startIndex, length), rps.Slice(startIndex, length), rbs.Slice(startIndex, length));
+                yeltDayPartition = new YeltDayPartition(days, yearDayPerilIdEventIdKeys.Slice(startIndex, length), lossPcts.Slice(startIndex, length), _yelt.HasRP ? rps.Slice(startIndex, length) : ReadOnlySpan<double>.Empty, _yelt.HasRB ? rbs.Slice(startIndex, length) : ReadOnlySpan<double>.Empty);
                 return true;
             }
 

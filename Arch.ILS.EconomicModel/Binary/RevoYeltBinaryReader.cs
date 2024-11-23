@@ -12,7 +12,7 @@ namespace Arch.ILS.EconomicModel.Binary
 
         public IYelt ReadAll()
         {
-            return new RevoLayerDayYeltVectorised2(FilePath);
+            return new RevoLayerDayYeltVectorised2(FilePath, true);
         }
     }
 }

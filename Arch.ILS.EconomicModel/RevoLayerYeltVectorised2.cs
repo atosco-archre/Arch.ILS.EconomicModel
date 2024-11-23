@@ -110,10 +110,10 @@ namespace Arch.ILS.EconomicModel
                                 _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc((nuint)_lastBufferSizeDouble, sizeof(double));
 
                                 currentYearDayPerilIdEventIdPtr = _yearDayPerilIdEventIdKeys[currentBuffer];
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], _lastBufferSizeShort);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], _lastBufferSizeDouble);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], _lastBufferSizeDouble);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], _lastBufferSizeDouble);
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], _lastBufferItemCount);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], _lastBufferItemCount);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], _lastBufferItemCount);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], _lastBufferItemCount);
                             }
                             else
                             {
@@ -124,10 +124,10 @@ namespace Arch.ILS.EconomicModel
                                 _RBs[currentBuffer] = (double*)NativeMemory.AlignedAlloc(BUFFER_SIZE_DOUBLE, sizeof(double));
 
                                 currentYearDayPerilIdEventIdPtr = _yearDayPerilIdEventIdKeys[currentBuffer];
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], BUFFER_SIZE_SHORT);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], BUFFER_SIZE_DOUBLE);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], BUFFER_SIZE_DOUBLE);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], BUFFER_SIZE_DOUBLE);
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer], BUFFER_ITEM_COUNT);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer], BUFFER_ITEM_COUNT);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer], BUFFER_ITEM_COUNT);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer], BUFFER_ITEM_COUNT);
                             }
 
                             currentInBufferIndex = 0;

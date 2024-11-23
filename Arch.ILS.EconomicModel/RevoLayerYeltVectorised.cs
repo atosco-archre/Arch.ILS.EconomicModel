@@ -112,10 +112,10 @@ namespace Arch.ILS.EconomicModel
                                 _RBs[currentBuffer] = Marshal.AllocHGlobal(_lastBufferSizeDouble);
 
                                 currentYearDayPerilIdEventIdPtr = (long*)_yearDayPerilIdEventIdKeys[currentBuffer].ToPointer();
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), _lastBufferSizeShort);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), _lastBufferSizeDouble);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), _lastBufferSizeDouble);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), _lastBufferSizeDouble);
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), _lastBufferItemCount);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), _lastBufferItemCount);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), _lastBufferItemCount);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), _lastBufferItemCount);
                             }
                             else
                             {
@@ -126,10 +126,10 @@ namespace Arch.ILS.EconomicModel
                                 _RBs[currentBuffer] = Marshal.AllocHGlobal(BUFFER_SIZE_DOUBLE);
 
                                 currentYearDayPerilIdEventIdPtr = (long*)_yearDayPerilIdEventIdKeys[currentBuffer].ToPointer();
-                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), BUFFER_SIZE_SHORT);
-                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
-                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
-                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), BUFFER_SIZE_DOUBLE);
+                                currentDayBufferSpan = new Span<short>(_days[currentBuffer].ToPointer(), BUFFER_ITEM_COUNT);
+                                currentLossPctBufferSpan = new Span<double>(_lossPcts[currentBuffer].ToPointer(), BUFFER_ITEM_COUNT);
+                                currentRPBufferSpan = new Span<double>(_RPs[currentBuffer].ToPointer(), BUFFER_ITEM_COUNT);
+                                currentRBBufferSpan = new Span<double>(_RBs[currentBuffer].ToPointer(), BUFFER_ITEM_COUNT);
                             }
 
                             currentInBufferIndex = 0;

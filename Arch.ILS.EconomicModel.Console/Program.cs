@@ -67,7 +67,7 @@ namespace Arch.ILS.EconomicModel.Console
             var layerDetails = revoRepository.GetLayerDetails();
             var submissions = revoRepository.GetSubmissions();
             var fxRates = revoRepository.GetFXRates();
-
+             
             Task.WaitAll(retroAllocationView, retroProfiles, retroPrograms, layerDetails, submissions, fxRates);
             Dictionary<int, Dictionary<int, decimal>> retroProfileUwYearPremium = new Dictionary<int, Dictionary<int, decimal>>();
             var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
@@ -284,13 +284,23 @@ namespace Arch.ILS.EconomicModel.Console
             RevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             //var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(10619, 38252).Result;
             //YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt);
+            Stopwatch sx2 = Stopwatch.StartNew();
             var layerYelt = revoLayerLossRepository.GetLayerDayYeltVectorised(37477, 104181).Result;
             string filePath = @$"C:\Data\Yelt_{layerYelt.LossAnalysisId}_{layerYelt.LayerId}.bin";
-            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
+            sx2.Stop();
+            System.Console.WriteLine(sx2.Elapsed);
+            sx2.Restart();
+            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);    
             revoYeltBinaryWriter.WriteAll(filePath);
+            sx2.Stop();
+            System.Console.WriteLine(sx2.Elapsed);
+            sx2.Restart();
             RevoYeltBinaryReader revoYeltBinaryReader = new RevoYeltBinaryReader(filePath);
             var altLayerYelt = revoYeltBinaryReader.ReadAll();
-            YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, layerYelt);
+            sx2.Stop();
+            System.Console.WriteLine(sx2.Elapsed);
+            sx2.Restart();
+            YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, altLayerYelt);
             YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
             var layerYelt2 = revoLayerLossRepository.GetLayerDayYeltVectorised(48551, 140198).Result;
             YeltPartitioner yeltPartitioner2 = new YeltPartitioner(new Range[] { new Range(2, 50) }, layerYelt2);
