@@ -1,12 +1,7 @@
-﻿using Arch.ILS.Core;
-using Studio.Core;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
+﻿
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+
+using Studio.Core;
 
 namespace Arch.ILS.EconomicModel
 {
@@ -74,6 +69,8 @@ namespace Arch.ILS.EconomicModel
                         RB = reader.GetDouble(6),
                     };
                 }
+
+                reader.Close();
             }
         }
 
@@ -95,6 +92,8 @@ namespace Arch.ILS.EconomicModel
                         RB = reader.GetDouble(6),
                     };
                 }
+
+                reader.Close();
             }
         }
 

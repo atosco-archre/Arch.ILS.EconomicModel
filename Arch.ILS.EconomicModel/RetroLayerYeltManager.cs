@@ -44,7 +44,7 @@ namespace Arch.ILS.EconomicModel
 #if DEBUG
             foreach(RetroLayer retroLayer in _retroLayers.Values.SelectMany(x => x.Values))
 #else
-            Parallel.ForEach(_retroLayers.Values.SelectMany(x => x.Values), retroLayer =>
+            Parallel.ForEach(_retroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, retroLayer =>
             {
 #endif
                 UpdateStorage(in retroLayer);
