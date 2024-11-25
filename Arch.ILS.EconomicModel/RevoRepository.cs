@@ -551,6 +551,26 @@ namespace Arch.ILS.EconomicModel
 
         #endregion Retro Info
 
+        #region Retro Layers
+
+        public Task<IEnumerable<RetroLayer>> GetRetroLayers()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(GET_RETRO_LAYERS)).GetObjects<RetroLayer>();
+            });
+        }
+
+        public Task<IEnumerable<RetroLayer>> GetRetroLayers(long afterRowVersion)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(string.Format(GET_RETRO_LAYERS_INCREMENTAL, afterRowVersion))).GetObjects<RetroLayer>();
+            });
+        }
+
+        #endregion Retro Layers
+
         #region Portfolio Info
 
         public Task<Dictionary<int, Portfolio>> GetPortfolios()
@@ -1099,6 +1119,26 @@ namespace Arch.ILS.EconomicModel
         }
 
         #endregion FX Rates
+
+        #region Layer Loss Analyses
+
+        public Task<IEnumerable<LayerLossAnalysis>> GetLayerLossAnalyses()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(GET_LAYER_LOSS_ANALYSES)).GetObjects<LayerLossAnalysis>();
+            });
+        }
+
+        public Task<IEnumerable<LayerLossAnalysis>> GetLayerLossAnalyses(long afterRowVersion)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(string.Format(GET_LAYER_LOSS_ANALYSES_INCREMENTAL, afterRowVersion))).GetObjects<LayerLossAnalysis>();
+            });
+        }
+
+        #endregion Layer Loss Analyses
 
         #region Query Conversion
 
@@ -1682,6 +1722,38 @@ namespace Arch.ILS.EconomicModel
   FROM dbo.FXRate
  WHERE IsActive = 1
    AND IsDeleted = 0";
+
+        private const string GET_LAYER_LOSS_ANALYSES = @"SELECT A.LossAnalysisId
+     , A.LayerId
+     , L.LossView
+     , CONVERT(BIGINT, A.RowVersion) AS RowVersion
+  FROM dbo.LayerLossAnalysis A
+ INNER JOIN dbo.LossAnalysis L
+    ON L.LossAnalysisId = A.LossAnalysisId
+ WHERE A.IsActive = 1
+   AND A.IsDeleted = 0
+   AND L.IsActive = 1
+   AND L.IsDeleted = 0
+   AND L.LossView IN (1, 10, 3, 30, 4)";
+
+        private const string GET_LAYER_LOSS_ANALYSES_INCREMENTAL = GET_LAYER_LOSS_ANALYSES + " AND CONVERT(BIGINT, RowVersion) > {0}";
+
+        private const string GET_RETRO_LAYERS = @"SELECT A.LayerId, SI.RetroProgramId, MAX(CONVERT(BIGINT, A.RowVersion)) AS RowVersion 
+  FROM dbo.retroallocation A
+ INNER JOIN dbo.RetroInvestor I
+    ON I.RetroInvestorId = A.RetroInvestorId
+ INNER JOIN dbo.SpInsurer SI
+    ON SI.SpInsurerId = I.SpInsurerId   
+ WHERE CessionGross > 0
+   AND A.IsActive = 1
+   AND A.IsDeleted = 0
+   AND I.IsActive = 1
+   AND I.IsDeleted = 0   
+   AND SI.IsActive = 1
+   AND SI.IsDeleted = 0
+ GROUP BY A.LayerId, SI.RetroProgramId";
+
+        private const string GET_RETRO_LAYERS_INCREMENTAL = GET_RETRO_LAYERS + " HAVING MAX(CONVERT(BIGINT, A.RowVersion)) > {0}";
 
         #endregion Constants
     }

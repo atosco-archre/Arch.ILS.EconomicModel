@@ -29,132 +29,7 @@ namespace Arch.ILS.EconomicModel
 
         #region Methods
 
-        //public Task<RevoLayerYeltFixedDictionary> GetLayerYeltFixedDictionary(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltFixedDictionary>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
-
-        //public Task<IEnumerable<RevoLayerYeltFixedDictionary>> GetLayerYeltsFixedDictionary(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltFixedDictionary>[] tasks = new Task<RevoLayerYeltFixedDictionary>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltFixedDictionary(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
-
-        //public Task<RevoLayerYeltYearArray> GetLayerYeltYearArray(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltYearArray>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
-
-        //public Task<IEnumerable<RevoLayerYeltYearArray>> GetLayerYeltsYearArray(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltYearArray>[] tasks = new Task<RevoLayerYeltYearArray>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltYearArray(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
-
-        //public Task<RevoLayerYeltStandard> GetLayerYeltStandard(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltStandard>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
-
-        //public Task<IEnumerable<RevoLayerYeltStandard>> GetLayerYeltsStandard(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltStandard>[] tasks = new Task<RevoLayerYeltStandard>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltStandard(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
-
-        //public Task<RevoLayerYeltStandardUnmanaged> GetLayerYeltStandardUnmanaged(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltStandardUnmanaged>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
-
-        //public Task<IEnumerable<RevoLayerYeltStandardUnmanaged>> GetLayerYeltsStandardUnmanaged(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltStandardUnmanaged>[] tasks = new Task<RevoLayerYeltStandardUnmanaged>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltStandardUnmanaged(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
-
-        //public Task<RevoLayerYeltStandardUnsafe> GetLayerYeltStandardUnsafe(in int lossAnalysisId, in int layerId)
-        //{
-        //    return Task.Factory.StartNew<RevoLayerYeltStandardUnsafe>((ids) =>
-        //    {
-        //        (int analysisId, int layerId) = ((int, int))ids!;
-        //        return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
-        //    }, (lossAnalysisId, layerId));
-        //}
-
-        //public Task<IEnumerable<RevoLayerYeltStandardUnsafe>> GetLayerYeltsStandardUnsafe(IList<(int, int)> lossAnalysisIdLayerIds)
-        //{
-        //    ArgumentNullException.ThrowIfNull(lossAnalysisIdLayerIds);
-        //    return Task.Factory.StartNew((input) =>
-        //    {
-        //        IList<(int, int)> ids = (IList<(int, int)>)input!;
-        //        Task<RevoLayerYeltStandardUnsafe>[] tasks = new Task<RevoLayerYeltStandardUnsafe>[ids.Count];
-        //        for (int i = 0; i < tasks.Length; ++i)
-        //        {
-        //            tasks[i] = GetLayerYeltStandardUnsafe(ids[i].Item1, ids[i].Item2);
-        //        }
-        //        Task.WaitAll(tasks);
-        //        return tasks.Select(x => x.Result);
-        //    }, lossAnalysisIdLayerIds);
-        //}
-
-        public Task<RevoLayerDayYeltVectorised2> GetLayerYelVectorised(in int lossAnalysisId, in int layerId)
+        public Task<RevoLayerDayYeltVectorised2> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId)
         {
             return Task.Factory.StartNew<RevoLayerDayYeltVectorised2>((ids) =>
             {
@@ -163,12 +38,21 @@ namespace Arch.ILS.EconomicModel
             }, (lossAnalysisId, layerId));
         }
 
-        public Task<RevoLayerDayYeltVectorised2> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId)
+        public Task<RevoLayerDayYeltVectorised2> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId, int partitionCount)
         {
             return Task.Factory.StartNew<RevoLayerDayYeltVectorised2>((ids) =>
             {
                 (int analysisId, int layerId) = ((int, int))ids!;
-                return new(analysisId, layerId, GetRevoLayerYeltEntries(analysisId, layerId));
+                Task[] yeltPartitionsTasks = new Task[partitionCount];
+                IEnumerable<RevoLayerYeltEntry>[] partitionEntries = new IEnumerable<RevoLayerYeltEntry>[partitionCount];
+                for (int i = 0; i < yeltPartitionsTasks.Length; i++)
+                    yeltPartitionsTasks[i] = Task.Factory.StartNew(state => 
+                    {
+                        (int partitionAnalysisId, int partitionLayerId, int partitionId, int partitionsCount) = ((int partitionAnalysisId, int partitionLayerId, int partitionId, int partitionsCount)) state!;
+                        partitionEntries[partitionId] = GetRevoLayerYeltEntries(partitionAnalysisId, partitionLayerId, partitionId, partitionsCount);
+                    }, (analysisId, layerId, i, partitionCount));
+                Task.WaitAll(yeltPartitionsTasks);
+                return new(analysisId, layerId, partitionEntries.SelectMany(x => x));
             }, (lossAnalysisId, layerId));
         }
 
@@ -191,24 +75,6 @@ namespace Arch.ILS.EconomicModel
                     };
                 }
             }
-        }
-
-        public Task<RevoLayerDayYeltVectorised2> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId, int partitionCount)
-        {
-            return Task.Factory.StartNew<RevoLayerDayYeltVectorised2>((ids) =>
-            {
-                (int analysisId, int layerId) = ((int, int))ids!;
-                Task[] yeltPartitionsTasks = new Task[partitionCount];
-                IEnumerable<RevoLayerYeltEntry>[] partitionEntries = new IEnumerable<RevoLayerYeltEntry>[partitionCount];
-                for (int i = 0; i < yeltPartitionsTasks.Length; i++)
-                    yeltPartitionsTasks[i] = Task.Factory.StartNew(state => 
-                    {
-                        (int partitionAnalysisId, int partitionLayerId, int partitionId, int partitionsCount) = ((int partitionAnalysisId, int partitionLayerId, int partitionId, int partitionsCount)) state!;
-                        partitionEntries[partitionId] = GetRevoLayerYeltEntries(partitionAnalysisId, partitionLayerId, partitionId, partitionsCount);
-                    }, (analysisId, layerId, i, partitionCount));
-                Task.WaitAll(yeltPartitionsTasks);
-                return new(analysisId, layerId, partitionEntries.SelectMany(x => x));
-            }, (lossAnalysisId, layerId));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

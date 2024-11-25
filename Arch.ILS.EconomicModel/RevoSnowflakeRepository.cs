@@ -18,8 +18,8 @@ namespace Arch.ILS.EconomicModel
 
         static RevoSnowflakeRepository()
         {
-            _convertRegex = new Regex("CONVERT\\s*\\((?<Type>[^,]+)\\s*,\\s*(?<Column>[^,]+)\\s*\\)", RegexOptions.IgnoreCase);
-            _rowVersionToBigIntRegex = new Regex("CAST\\s*\\(\\s*ROWVERSION\\s* AS \\s*BIGINT\\s*\\)", RegexOptions.IgnoreCase);
+            _convertRegex = new Regex("CONVERT\\s*\\((?<Type>[^,]+)\\s*,\\s*(?<Column>[^,)]+)\\s*\\)", RegexOptions.IgnoreCase);
+            _rowVersionToBigIntRegex = new Regex("CAST\\s*\\(\\s*(?<Alias>[^\\s]+\\.)*ROWVERSION\\s* AS \\s*BIGINT\\s*\\)", RegexOptions.IgnoreCase);
             _quotedColumnRegex = new Regex("\\[(?<Column>[^\\]]+)\\]", RegexOptions.IgnoreCase);
         }
 
@@ -37,7 +37,7 @@ namespace Arch.ILS.EconomicModel
         protected override string Translate(in string sqlQuery)
         {
             string newQuery = _convertRegex.Replace(sqlQuery, new MatchEvaluator((match) => $"CAST({match.Groups["Column"]} AS {match.Groups["Type"]})"));
-            newQuery = _rowVersionToBigIntRegex.Replace(newQuery, "TO_NUMBER(CAST(ROWVERSION AS VARCHAR), 'XXXXXXXXXXXXXXXX')");
+            newQuery = _rowVersionToBigIntRegex.Replace(newQuery, new MatchEvaluator((match) => $"TO_NUMBER(CAST({match.Groups["Alias"]}ROWVERSION AS VARCHAR), 'XXXXXXXXXXXXXXXX')"));
             newQuery = _quotedColumnRegex.Replace(newQuery, new MatchEvaluator((match) => $@"""{match.Groups["Column"].Value.ToUpperInvariant()}"""));
             return newQuery;
         }
