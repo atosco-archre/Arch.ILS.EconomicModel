@@ -1736,7 +1736,7 @@ namespace Arch.ILS.EconomicModel
    AND L.IsDeleted = 0
    AND L.LossView IN (1, 10, 3, 30, 4)";
 
-        private const string GET_LAYER_LOSS_ANALYSES_INCREMENTAL = GET_LAYER_LOSS_ANALYSES + " AND CONVERT(BIGINT, RowVersion) > {0}";
+        private const string GET_LAYER_LOSS_ANALYSES_INCREMENTAL = GET_LAYER_LOSS_ANALYSES + " AND CONVERT(BIGINT, A.RowVersion) > {0}";
 
         private const string GET_RETRO_LAYERS = @"SELECT A.LayerId, SI.RetroProgramId, MAX(CONVERT(BIGINT, A.RowVersion)) AS RowVersion 
   FROM dbo.retroallocation A
