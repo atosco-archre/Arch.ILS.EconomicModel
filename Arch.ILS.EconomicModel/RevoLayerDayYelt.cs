@@ -13,7 +13,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_ITEM_COUNT = 1024;
         public const int BUFFER_SIZE_BYTE = BUFFER_ITEM_COUNT;
         public const int BUFFER_SIZE_SHORT = BUFFER_ITEM_COUNT << 1;
-        public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
+        //public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
@@ -61,7 +61,7 @@ namespace Arch.ILS.EconomicModel
                 count++;
             }
 
-            HasRP = anyRP;
+            HasRP = anyRP || anyRB;
             HasRB = anyRB;
             TotalEntryCount = count;
             dayRefs = dayRefs[1..];
@@ -69,7 +69,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (count % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
             int currentBuffer = -1;
@@ -134,7 +134,7 @@ namespace Arch.ILS.EconomicModel
                         }
 
                         currentDayBufferSpan[currentInBufferIndex] = *entry.GetDay();
-                        currentYearDayPerilIdEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetDay())) << 49) | (((long)(*entry.GetYear())) << 33) | (((long)(*entry.GetPerilId())) << 32) | (*entry.GetEventId());
+                        currentYearDayPerilIdEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetDay())) << 54) | (((long)(*entry.GetYear())) << 39) | (((long)(*entry.GetPerilId())) << 33) | (*entry.GetEventId());
                         currentLossPctBufferSpan[currentInBufferIndex] = *entry.GetLossPct();
                         if (HasRP)
                             currentRPBufferSpan[currentInBufferIndex] = *entry.GetRP();
@@ -200,7 +200,7 @@ namespace Arch.ILS.EconomicModel
                 BufferCount = _lastBufferIndex + 1;
                 _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
                 _lastBufferSizeShort = _lastBufferItemCount << 1;
-                _lastBufferSizeInt = _lastBufferItemCount << 2;
+                //_lastBufferSizeInt = _lastBufferItemCount << 2;
                 _lastBufferSizeDouble = _lastBufferItemCount << 3;
                 _lastBufferSizeLong = _lastBufferSizeDouble;
 
@@ -315,7 +315,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
 

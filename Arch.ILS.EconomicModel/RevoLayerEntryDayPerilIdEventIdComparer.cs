@@ -8,24 +8,24 @@ namespace Arch.ILS.EconomicModel
             return GetDayPerilIdEventIdKey(x.Day, x.EventId, x.PerilId).CompareTo(GetDayPerilIdEventIdKey(y.Day, y.EventId, y.PerilId));//not expecting ties on year, day, eventId and peril from Revo.
         }
 
-        public static ulong GetDayPerilIdEventIdKey(in short day, in int eventId, in byte perilId)
+        public static ulong GetDayPerilIdEventIdKey(in short day, in long eventId, in byte perilId)
         {
-            return (((ulong)day) << 33) | (((ulong)perilId) << 32) | (uint)eventId;
+            return (((ulong)day) << 39) | (((ulong)perilId) << 33) | (ulong)eventId;
         }
 
         public static short GetDay(in ulong dayPerilIdEventIdKey)
         {
-            return (short)(dayPerilIdEventIdKey >> 33);
-        }
-
-        public static int GetEventId(in ulong dayPerilIdEventIdKey)
-        {
-            return (int)dayPerilIdEventIdKey;
+            return (short)(dayPerilIdEventIdKey >> 39);
         }
 
         public static byte GetPerilId(in ulong dayPerilIdEventIdKey)
         {
-            return (byte)(dayPerilIdEventIdKey >> 32);
+            return (byte)((dayPerilIdEventIdKey >> 33) & 0x3F);
+        }
+
+        public static long GetEventId(in ulong dayPerilIdEventIdKey)
+        {
+            return (long)(dayPerilIdEventIdKey & 0x1FFFFFFFF);
         }
     }
 }

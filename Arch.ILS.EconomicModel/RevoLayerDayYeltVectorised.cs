@@ -14,7 +14,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_ITEM_COUNT = 1024;
         public const int BUFFER_SIZE_BYTE = BUFFER_ITEM_COUNT;
         public const int BUFFER_SIZE_SHORT = BUFFER_ITEM_COUNT << 1;
-        public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
+        //public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
@@ -63,7 +63,7 @@ namespace Arch.ILS.EconomicModel
                 count++;
             }
 
-            HasRP = anyRP;
+            HasRP = anyRP || anyRB;
             HasRB = anyRB;
             TotalEntryCount = count;
             dayRefs = dayRefs[1..];
@@ -71,7 +71,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (count % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
             int currentBuffer = -1;
@@ -85,9 +85,9 @@ namespace Arch.ILS.EconomicModel
             nint tempDayAlloc = Marshal.AllocHGlobal(vectorLongCount << 1);
             short* tempDays = (short*)tempDayAlloc.ToPointer();
             short* tempCurrentDay = tempDays;
-            nint tempEventIdAlloc = Marshal.AllocHGlobal(vectorLongCount << 2);
-            int* tempEventIds = (int*)tempEventIdAlloc.ToPointer();
-            int* tempCurrentEventId = tempEventIds;
+            nint tempEventIdAlloc = Marshal.AllocHGlobal(vectorLongCount << 3);
+            long* tempEventIds = (long*)tempEventIdAlloc.ToPointer();
+            long* tempCurrentEventId = tempEventIds;
             nint tempPerilIdAlloc = Marshal.AllocHGlobal(vectorLongCount);
             byte* tempPerilIds = (byte*)tempPerilIdAlloc.ToPointer();
             byte* tempCurrentPerilId = tempPerilIds;
@@ -167,18 +167,18 @@ namespace Arch.ILS.EconomicModel
                             tempCurrentDay = tempDays;
                             tempCurrentPerilId = tempPerilIds;
                             tempCurrentEventId = tempEventIds;
-                            //the key is identical using long instead of ulong for day in [1, 365], year in [0, 10000], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
-                            //(((ulong)(ushort)(short)365)<<49)|(((ulong)(ushort)(short)10000)<<33)| (((ulong)(byte)255) << 32)| ((ulong)(uint)Int32.MaxValue) = (((long)(short)365)<<49)|(((long)(short)10000)<<33) | (((long)(byte)255) << 32) | ((long)Int32.MaxValue) = 205563592269889535
+                            //the key is identical using long instead of ulong for day in [1, 365], year in [1, 10000], perilId in [0, 63] and EventId in [1, 8589934591]. 
+                            //(((ulong)(ushort)(short)365)<<54)|(((ulong)(ushort)(short)10000)<<39)| (((ulong)(byte)63) << 33)| ((ulong)(uint)Int32.MaxValue) = (((long)(short)365)<<54)|(((long)(short)10000)<<39) | (((long)(byte)63) << 33) | ((long)Int32.MaxValue) = 6580753557413167103
 
                             if (Avx2.IsSupported)
                             {
-                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 49) | ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 33) | ((Avx2.ConvertToVector256Int64(tempCurrentPerilId)) << 32) | Avx2.ConvertToVector256Int64(tempCurrentEventId);
+                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 54) | ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 39) | ((Avx2.ConvertToVector256Int64(tempCurrentPerilId)) << 33) | Avx2.LoadVector256(tempCurrentEventId);
                                 Avx2.Store(currentYearDayPerilIdEventIdPtr, key);
                                 currentYearDayPerilIdEventIdPtr += Vector256<long>.Count;
                             }
                             else if (Avx.IsSupported)
                             {
-                                var key = ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 49) | ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 33) | ((Avx.ConvertToVector128Int64(tempCurrentPerilId)) << 32) | Avx.ConvertToVector128Int64(tempCurrentEventId);
+                                var key = ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 54) | ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 39) | ((Avx.ConvertToVector128Int64(tempCurrentPerilId)) << 33) | Avx.LoadVector128(tempCurrentEventId);
                                 Avx.Store(currentYearDayPerilIdEventIdPtr, key);
                                 currentYearDayPerilIdEventIdPtr += Vector128<long>.Count;
                             }
@@ -200,8 +200,8 @@ namespace Arch.ILS.EconomicModel
                 tempCurrentPerilId = tempPerilIds;
                 while(tempCurrentYear < tempLastYear)
                 {
-                    //the key is identical using long instead of ulong for day in [1, 365], year in [0, 10000], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
-                    *currentYearDayPerilIdEventIdPtr++ = (((long)*tempCurrentDay++) << 49) | (((long)*tempCurrentYear++) << 33) | (((long)*tempCurrentPerilId++) << 32) | *tempCurrentEventId++;
+                    //the key is identical using long instead of ulong for day in [1, 365], year in [1, 10000], perilId in [0, 63] and EventId in [1, 8589934591]. 
+                    *currentYearDayPerilIdEventIdPtr++ = (((long)*tempCurrentDay++) << 54) | (((long)*tempCurrentYear++) << 39) | (((long)*tempCurrentPerilId++) << 33) | *tempCurrentEventId++;
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace Arch.ILS.EconomicModel
                 BufferCount = _lastBufferIndex + 1;
                 _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
                 _lastBufferSizeShort = _lastBufferItemCount << 1;
-                _lastBufferSizeInt = _lastBufferItemCount << 2;
+                //_lastBufferSizeInt = _lastBufferItemCount << 2;
                 _lastBufferSizeDouble = _lastBufferItemCount << 3;
                 _lastBufferSizeLong = _lastBufferSizeDouble;
 
@@ -373,7 +373,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
 

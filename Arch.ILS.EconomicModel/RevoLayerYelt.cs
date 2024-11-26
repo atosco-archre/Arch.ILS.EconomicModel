@@ -11,7 +11,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_ITEM_COUNT = 1024;
         public const int BUFFER_SIZE_BYTE = BUFFER_ITEM_COUNT;
         public const int BUFFER_SIZE_SHORT = BUFFER_ITEM_COUNT << 1;
-        public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
+        //public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
@@ -22,8 +22,7 @@ namespace Arch.ILS.EconomicModel
         private readonly nint[] _RBs;
         private readonly int _lastYearBufferIndex;
         private readonly int _lastBufferIndex;
-        private int _lastYearBufferItemCount, _lastYearBufferSizeShort, _lastYearBufferSizeInt;
-        private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble, _lastBufferSizeLong;
+        private int _lastBufferItemCount, _lastBufferSizeShort/*, _lastBufferSizeInt*/, _lastBufferSizeDouble, _lastBufferSizeLong;
 
         public RevoLayerYelt(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
         {
@@ -57,7 +56,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (count % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
             int currentBuffer = -1;
@@ -118,7 +117,7 @@ namespace Arch.ILS.EconomicModel
                         }
 
                         currentDayBufferSpan[currentInBufferIndex] = *entry.GetDay();
-                        currentYearDayPerilIdEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetYear())) << 48) | (((long)(*entry.GetDay())) << 33) | (((long)(*entry.GetPerilId())) << 32) | (*entry.GetEventId());
+                        currentYearDayPerilIdEventIdBufferSpan[currentInBufferIndex] = (((long)(*entry.GetYear())) << 48) | (((long)(*entry.GetDay())) << 39) | (((long)(*entry.GetPerilId())) << 33) | (*entry.GetEventId());
                         currentLossPctBufferSpan[currentInBufferIndex] = *entry.GetLossPct();
                         currentRPBufferSpan[currentInBufferIndex] = *entry.GetRP();
                         currentRBBufferSpan[currentInBufferIndex] = *entry.GetRB();

@@ -119,7 +119,7 @@ namespace Arch.ILS.EconomicModel
  //    , Day";
 
         private const string GET_MODELLED_LAYER_YELT_QUERY = @"SELECT Year 
-     , CAST(EventId AS INT) EventId
+     , EventId
      , Peril
      , Day
      , LossPct
@@ -131,7 +131,7 @@ namespace Arch.ILS.EconomicModel
    AND LossType = 1";
 
         private const string GET_MODELLED_LAYER_YELT_QUERY_BY_PARTITION = @"SELECT Year 
-     , CAST(EventId AS INT) EventId
+     , EventId
      , Peril
      , Day
      , LossPct
@@ -144,7 +144,7 @@ namespace Arch.ILS.EconomicModel
    AND (Year % {2}) = {3}";
 
         private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RB = @"SELECT Year 
-     , CAST(EventId AS INT) EventId
+     , EventId
      , Peril
      , Day
      , LossPct
@@ -155,7 +155,7 @@ namespace Arch.ILS.EconomicModel
    AND LossType = 1";
 
         private const string GET_MODELLED_LAYER_YELT_QUERY_NO_RP_NO_RB = @"SELECT Year 
-     , CAST(EventId AS INT) EventId
+     , EventId
      , Peril
      , Day
      , LossPct

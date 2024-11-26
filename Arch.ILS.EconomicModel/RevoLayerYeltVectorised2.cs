@@ -13,7 +13,7 @@ namespace Arch.ILS.EconomicModel
         public const int BUFFER_ITEM_COUNT = 1024;
         public const int BUFFER_SIZE_BYTE = BUFFER_ITEM_COUNT;
         public const int BUFFER_SIZE_SHORT = BUFFER_ITEM_COUNT << 1;
-        public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
+        //public const int BUFFER_SIZE_INT = BUFFER_ITEM_COUNT << 2;
         public const int BUFFER_SIZE_DOUBLE = BUFFER_ITEM_COUNT << 3;
         public const int BUFFER_SIZE_LONG = BUFFER_ITEM_COUNT << 3;
 
@@ -23,7 +23,7 @@ namespace Arch.ILS.EconomicModel
         private double** _RPs;
         private double** _RBs;
         private readonly int _lastBufferIndex;
-        private int _lastBufferItemCount, _lastBufferSizeShort, _lastBufferSizeInt, _lastBufferSizeDouble, _lastBufferSizeLong;
+        private int _lastBufferItemCount, _lastBufferSizeShort/*, _lastBufferSizeInt*/, _lastBufferSizeDouble, _lastBufferSizeLong;
         private bool _disposed;
 
         public RevoLayerYeltVectorised2(in int lossAnalysisId, in int layerId, in IEnumerable<RevoLayerYeltEntry> yelt)
@@ -60,7 +60,7 @@ namespace Arch.ILS.EconomicModel
             BufferCount = _lastBufferIndex + 1;
             _lastBufferItemCount = (int)(count % BUFFER_ITEM_COUNT);
             _lastBufferSizeShort = _lastBufferItemCount << 1;
-            _lastBufferSizeInt = _lastBufferItemCount << 2;
+            //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
             _lastBufferSizeLong = _lastBufferSizeDouble;
             int currentBuffer = -1;
@@ -72,8 +72,8 @@ namespace Arch.ILS.EconomicModel
             short* tempLastYear = tempYears + vectorLongCount;
             short* tempDays = (short*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 1), (nuint)Unsafe.SizeOf<short>());
             short* tempCurrentDay = tempDays;
-            int* tempEventIds = (int*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 2), (nuint)Unsafe.SizeOf<int>());
-            int* tempCurrentEventId = tempEventIds;
+            long* tempEventIds = (long*)NativeMemory.AlignedAlloc((nuint)(vectorLongCount << 3), (nuint)Unsafe.SizeOf<long>());
+            long* tempCurrentEventId = tempEventIds;
             nint tempPerilIdAlloc = Marshal.AllocHGlobal(vectorLongCount);
             byte* tempPerilIds = (byte*)tempPerilIdAlloc.ToPointer();
             byte* tempCurrentPerilId = tempPerilIds;
@@ -148,18 +148,18 @@ namespace Arch.ILS.EconomicModel
                             tempCurrentDay = tempDays;
                             tempCurrentPerilId = tempPerilIds;
                             tempCurrentEventId = tempEventIds;
-                            //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
-                            // (((ulong)(ushort)(short)10000)<<48)|(((ulong)(ushort)(short)365)<<33)|(((ulong)(byte)255)<<32)|((ulong)(uint)Int32.MaxValue) = (((long)(short)10000)<<48)|(((long)(short)365)<<33)|(((long)(byte)255)<<32)|((long)Int32.MaxValue) = 2814753063493959679
+                            //the key is identical using long instead of ulong for year in [1, 10000], day in [1, 365], perilId in [0, 63] and EventId in [1, 8589934591]. 
+                            // (((ulong)(ushort)(short)10000)<<48)|(((ulong)(ushort)(short)365)<<39)|(((ulong)(byte)255)<<33)|((ulong)(uint)Int32.MaxValue) = (((long)(short)10000)<<48)|(((long)(short)365)<<39)|(((long)(byte)255)<<33)|((long)Int32.MaxValue) = 2814952070803619839
 
                             if (Avx2.IsSupported)
                             {
-                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 48) | ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 33) | ((Avx2.ConvertToVector256Int64(tempCurrentPerilId)) << 32) | Avx2.ConvertToVector256Int64(tempCurrentEventId);
+                                var key = ((Avx2.ConvertToVector256Int64(tempCurrentYear)) << 48) | ((Avx2.ConvertToVector256Int64(tempCurrentDay)) << 39) | ((Avx2.ConvertToVector256Int64(tempCurrentPerilId)) << 33) | Avx2.LoadVector256(tempCurrentEventId);
                                 Avx2.Store(currentYearDayPerilIdEventIdPtr, key);
                                 currentYearDayPerilIdEventIdPtr += Vector256<long>.Count;
                             }
                             else if (Avx.IsSupported)
                             {
-                                var key = ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 48) | ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 33) | ((Avx.ConvertToVector128Int64(tempCurrentPerilId)) << 32) | Avx.ConvertToVector128Int64(tempCurrentEventId);
+                                var key = ((Avx.ConvertToVector128Int64(tempCurrentYear)) << 48) | ((Avx.ConvertToVector128Int64(tempCurrentDay)) << 39) | ((Avx.ConvertToVector128Int64(tempCurrentPerilId)) << 33) | Avx.LoadVector128(tempCurrentEventId);
                                 Avx.Store(currentYearDayPerilIdEventIdPtr, key);
                                 currentYearDayPerilIdEventIdPtr += Vector128<long>.Count;
                             }
@@ -181,8 +181,8 @@ namespace Arch.ILS.EconomicModel
                 tempCurrentEventId = tempEventIds;
                 while(tempCurrentYear < tempLastYear)
                 {
-                    //the key is identical using long instead of ulong for year in [0, 10000], day in [1, 365], perilId in [0, 255] and EventId in [1, Int32.MaxValue]. 
-                    *currentYearDayPerilIdEventIdPtr++ = (((long)*tempCurrentYear++) << 48) | (((long)*tempCurrentDay++) << 33) | (((long)*tempCurrentPerilId++) << 32) | *tempCurrentEventId++;
+                    //the key is identical using long instead of ulong for year in [1, 10000], day in [1, 365], perilId in [0, 63] and EventId in [1, 8589934591]. 
+                    *currentYearDayPerilIdEventIdPtr++ = (((long)*tempCurrentYear++) << 48) | (((long)*tempCurrentDay++) << 39) | (((long)*tempCurrentPerilId++) << 33) | *tempCurrentEventId++;
                 }
             }
         }

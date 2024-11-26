@@ -21,8 +21,8 @@ namespace Arch.ILS.EconomicModel.Console
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
 
-            //ProcessLayerYelts();
-            UploadRetroYelts(new HashSet<int> { 274 });
+            ProcessLayerYelts();
+            //UploadRetroYelts(new HashSet<int> { 274 });
         }
 
         public static void UploadRetroYelts(HashSet<int> retroProgramId)

@@ -13,7 +13,7 @@ namespace Arch.ILS.EconomicModel
 
         public short Year;
 
-        public int EventId;
+        public long EventId;
 
         public byte PerilId;
 
@@ -33,9 +33,9 @@ namespace Arch.ILS.EconomicModel
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe int* GetEventId()
+        public unsafe long* GetEventId()
         {
-            return (int*)Unsafe.AsPointer(ref EventId);
+            return (long*)Unsafe.AsPointer(ref EventId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
