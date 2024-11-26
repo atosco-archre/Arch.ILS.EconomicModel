@@ -61,7 +61,7 @@ namespace Arch.ILS.EconomicModel
                     yield return new RevoLayerYeltEntry
                     {
                         Year = (short)reader.GetInt32(0),
-                        EventId = reader.GetInt32(1),
+                        EventId = reader.GetInt64(1),
                         PerilId = (byte)Enum.Parse<RevoPeril>(reader.GetString(2)),
                         Day = reader.GetInt16(3),
                         LossPct = reader.GetDouble(4),
@@ -84,7 +84,7 @@ namespace Arch.ILS.EconomicModel
                     yield return new RevoLayerYeltEntry
                     {
                         Year = (short)reader.GetInt32(0),
-                        EventId = reader.GetInt32(1),
+                        EventId = reader.GetInt64(1),
                         PerilId = (byte)Enum.Parse<RevoPeril>(reader.GetString(2)),
                         Day = reader.GetInt16(3),
                         LossPct = reader.GetDouble(4),
