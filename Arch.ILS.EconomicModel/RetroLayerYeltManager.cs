@@ -1,10 +1,14 @@
 ﻿
 using Arch.ILS.EconomicModel.Binary;
+using System.Runtime.InteropServices;
 
 namespace Arch.ILS.EconomicModel
 {
-    public class RetroLayerYeltManager : YeltManager
+    public class RetroLayerYeltManager : YeltManager, IDisposable
     {
+        public const int DEFAULT_TIMER_DUETIME_IN_MILLISECONDS = 0;
+        public const int DEFAULT_TIMER_PERIOD_IN_MILLISECONDS = 60000;
+
         private readonly string _yeltStorageFolderPath;
         private readonly IRevoRepository _revoRepository;
         private readonly IRevoLayerLossRepository _revoLayerLossRepository;
@@ -12,6 +16,8 @@ namespace Arch.ILS.EconomicModel
         private readonly HashSet<int> _selectedRetros;
         private Dictionary<int, Dictionary<int, RetroLayer>> _retroLayers;
         private long _currentMaxRowVersion;
+        private Timer _timer;
+        private bool _disposed;
 
         public RetroLayerYeltManager(string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<int> selectedRetros = null) :
             base(revoRepository)
@@ -21,6 +27,7 @@ namespace Arch.ILS.EconomicModel
             _revoLayerLossRepository = revoLayerLossRepository;
             _retroLayerRepository = revoRepository;
             _selectedRetros = selectedRetros;
+            _disposed = false;
         }
 
         public void Initialise()
@@ -53,9 +60,32 @@ namespace Arch.ILS.EconomicModel
 #endif
         }
 
-        public override void Increment()
+        public void ScheduleSynchronisation(int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
         {
-            base.Increment();
+            if(_timer != null)
+            {
+                _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+                _timer?.Dispose();
+            }
+            _timer = new Timer((obj) => { Synchronise(); }, null, dueTimeInMilliseconds, periodInMilliseconds);
+        }
+
+        public void CancelSchedule()
+        {
+            if (_timer != null)
+            {
+                _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+                _timer?.Dispose();
+                _timer = null;
+            }
+        }
+
+        public override void Synchronise()
+        {
+#if DEBUG
+            Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
+#endif
+            base.Synchronise();
 #if DEBUG
             foreach (var retroLayer in _retroLayerRepository.GetRetroLayers(_currentMaxRowVersion).Result)
 #else
@@ -121,6 +151,32 @@ namespace Arch.ILS.EconomicModel
                 );
 #endif
             }
+        }
+
+        public void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+#if DEBUG
+                    Console.WriteLine("Retro Layer Yelt Synchronisation Timer - Disposing...");
+#endif
+                    CancelSchedule();
+#if DEBUG
+                    Console.WriteLine("Retro Layer Yelt Synchronisation Timer - Disposed...");
+#endif
+                }
+            }
+
+            _disposed = true;
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

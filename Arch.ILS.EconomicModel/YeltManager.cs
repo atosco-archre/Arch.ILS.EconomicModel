@@ -26,7 +26,7 @@ namespace Arch.ILS.EconomicModel
             _currentMaxRowVersion = _lossAnalysesByLayerLossView.Values.SelectMany(x => x.Values.First().Select(y => y.RowVersion)).Max();
         }
 
-        public virtual void Increment()
+        public virtual void Synchronise()
         {
             foreach(var layerLossAnalysis in _layerLossAnalysisRepository.GetLayerLossAnalyses(_currentMaxRowVersion).Result)
             {
