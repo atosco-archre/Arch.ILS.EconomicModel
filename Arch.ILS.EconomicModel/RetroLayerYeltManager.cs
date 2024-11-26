@@ -1,6 +1,5 @@
 ﻿
 using Arch.ILS.EconomicModel.Binary;
-using System.Runtime.InteropServices;
 
 namespace Arch.ILS.EconomicModel
 {
@@ -8,6 +7,7 @@ namespace Arch.ILS.EconomicModel
     {
         public const int DEFAULT_TIMER_DUETIME_IN_MILLISECONDS = 0;
         public const int DEFAULT_TIMER_PERIOD_IN_MILLISECONDS = 60000;
+        public const string ARCHIVE_SUFFIX = "_Archived.bin";
 
         private readonly string _yeltStorageFolderPath;
         private readonly IRevoRepository _revoRepository;
@@ -129,12 +129,16 @@ namespace Arch.ILS.EconomicModel
                 {
                     LayerLossAnalysis latestLossAnalysis = lossViewAnalyses.Value[0];
                     string filePath = Path.Combine(_yeltStorageFolderPath, YeltFileInfoFactory.GetFileNameWithExtension(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion));
+                    string fileNamePrefix = YeltFileInfoFactory.GetFileNamePrefix(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId);
                     IYelt layerYelt = null;
+                    string[] filesToArchive = Directory.GetFiles(_yeltStorageFolderPath, $"{fileNamePrefix}*").Where(x => !x.EndsWith(ARCHIVE_SUFFIX)).ToArray();
+                    bool newFileAdded = false;
                     if (!Path.Exists(filePath))
                     {
                         layerYelt = _revoLayerLossRepository.GetLayerDayYeltVectorised(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId).Result;
                         RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
                         revoYeltBinaryWriter.WriteAll(filePath);
+                        newFileAdded = true;
                     }
 
                     if(!_yeltStorage.ContainsKey(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion))
@@ -146,10 +150,55 @@ namespace Arch.ILS.EconomicModel
                         }
                         _yeltStorage.TryAdd(layerYelt);
                     }
+
+                    if(newFileAdded)
+                        Archive(filesToArchive);
                 }
 #if !DEBUG
                 );
 #endif
+            }
+        }
+
+        private bool IsFileLocked(string filePath)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+
+            //file is not locked
+            return false;
+        }
+
+        private void Archive(string[] filesToArchive)
+        {
+            foreach (string fileToArchive in filesToArchive)
+            {
+                if (IsFileLocked(fileToArchive))
+                {
+#if DEBUG
+                    Console.WriteLine($"{fileToArchive} - File in use - Cannot be archived...");
+#endif
+                }
+                else
+                {
+#if DEBUG
+                    Console.WriteLine($"{fileToArchive} - Archiving...");
+#endif
+                    File.Move(fileToArchive, $"{Path.Combine(Path.GetDirectoryName(fileToArchive), Path.GetFileNameWithoutExtension(fileToArchive))}{ARCHIVE_SUFFIX}");
+                }
             }
         }
 
