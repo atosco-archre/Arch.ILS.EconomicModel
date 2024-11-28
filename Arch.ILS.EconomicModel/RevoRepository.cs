@@ -1016,7 +1016,7 @@ namespace Arch.ILS.EconomicModel
                     .Select(x => new { x.Key, MaxCession = x.Max(xx => xx.Cession), MinCession = x.Min(xx => xx.Cession) });
 
                 if (retroZonePlacements.Any(x => x.MaxCession != x.MinCession))
-                    throw new NotImplementedException("Difference Placements for the same zone and retro program at different dates not handled,");
+                    throw new NotImplementedException("Different Placements for the same zone and retro program at different dates not handled,");
 
                 return layerTopUpZones
                     .Join(retroZonePlacements, ok => ok.TopUpZoneId, ik => ik.Key.TopUpZoneId, (o, i) => new LayerRetroPlacement(o.LayerId, i.Key.RetroProgramId, i.MaxCession))

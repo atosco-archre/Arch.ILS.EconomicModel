@@ -42,6 +42,9 @@ namespace Arch.ILS.EconomicModel
                     layersLossAnalyses[layerLossAnalysis.LossView] = layerLossAnalyses;
                 }
 
+                if(layerLossAnalyses.Count == 0)
+                    throw new Exception($"No loss analysis found for LayerId {layerLossAnalysis.LayerId} - LossAnalysisId {layerLossAnalysis.LossAnalysisId} - LossView {layerLossAnalysis.LossView.ToString()}");
+
                 if (layerLossAnalysis.RowVersion < layerLossAnalyses[0].RowVersion)
                     throw new Exception();
 
