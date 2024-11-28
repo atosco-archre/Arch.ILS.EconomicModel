@@ -35,8 +35,8 @@ namespace Arch.ILS.EconomicModel
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe long* GetEventId()
         {
-            //if ((((ulong)EventId) & 0xFFFFFFFE00000000L) > 0)
-            //    throw new Exception("EventId Spill");
+            if ((((ulong)EventId) & 0xFFFFFFFE00000000L) > 0)
+                EventId = (EventId & 0x1FFFFFFFFL);
             return (long*)Unsafe.AsPointer(ref EventId);
         }
 

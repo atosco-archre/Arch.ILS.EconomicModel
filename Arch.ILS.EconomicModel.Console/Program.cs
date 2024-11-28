@@ -327,15 +327,10 @@ namespace Arch.ILS.EconomicModel.Console
             stopwatch.Restart();
             foreach (var yelt in layerYelt.Values)
             {
-                try
-                {
-                    YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, yelt);
-                    YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
-                }
-                catch(Exception e)
-                {
-
-                }
+                if (yelt.TotalEntryCount == 0)
+                    continue;
+                YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, yelt);
+                YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
             }
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");

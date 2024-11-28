@@ -388,9 +388,9 @@ namespace Arch.ILS.EconomicModel
             _RPs = HasRP ? (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>()) : null;
             _RBs = HasRB ? (double**)NativeMemory.AlignedAlloc(ptrSize, (nuint)Unsafe.SizeOf<IntPtr>()) : null;
 
-            int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH;
             Task dayYearPerilIdEventIdTask =  Task.Factory.StartNew(() =>
             {
+                int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH;
                 using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
                     reader.BaseStream.Position = currentPosition;
@@ -411,9 +411,9 @@ namespace Arch.ILS.EconomicModel
                 }
             });
 
-            currentPosition += (TotalEntryCount << 3);
             Task dayTask = Task.Factory.StartNew(() =>
             {
+                int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH + (TotalEntryCount << 3);
                 using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
                     reader.BaseStream.Position = currentPosition;
@@ -433,10 +433,10 @@ namespace Arch.ILS.EconomicModel
                     reader.Read(MemoryMarshal.Cast<short, byte>(currentDayBufferSpan));
                 }
             });
-
-            currentPosition += (TotalEntryCount << 1);
+            
             Task lossPctTask = Task.Factory.StartNew(() =>
             {
+                int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH + (TotalEntryCount << 3)  + (TotalEntryCount << 1);
                 using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                 {
                     reader.BaseStream.Position = currentPosition;
@@ -457,11 +457,11 @@ namespace Arch.ILS.EconomicModel
                 }
             });
 
-            currentPosition += (TotalEntryCount << 3);
             Task RPTask = Task.Factory.StartNew(() =>
             {
                 if (HasRP)
                 {
+                    int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH + (TotalEntryCount << 4) + (TotalEntryCount << 1);
                     using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                     {
                         reader.BaseStream.Position = currentPosition;
@@ -483,11 +483,11 @@ namespace Arch.ILS.EconomicModel
                 }
             });
 
-            currentPosition += (TotalEntryCount << 3);
             Task RBTask = Task.Factory.StartNew(() =>
             {
                 if (HasRB)
                 {
+                    int currentPosition = RevoYeltBinaryWriter.CURRENT_BINARY_WRITER_HEADER_LENGTH + (TotalEntryCount << 5) + (TotalEntryCount << 1);
                     using (BinaryReader reader = new BinaryReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
                     {
                         reader.BaseStream.Position = currentPosition;
