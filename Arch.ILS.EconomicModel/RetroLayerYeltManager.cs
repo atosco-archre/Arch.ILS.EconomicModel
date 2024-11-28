@@ -117,6 +117,21 @@ namespace Arch.ILS.EconomicModel
 #endif
         }
 
+        public bool TryGetRetroLayers(int retroProgramId, out IEnumerable<RetroLayer> retroLayers)
+        {
+            if (_retroLayers.TryGetValue(retroProgramId, out var layersById))
+            {
+                retroLayers = layersById.Values;
+                return true;
+            }
+            else
+            {
+                retroLayers = Enumerable.Empty<RetroLayer>();
+                return false;
+            }
+            
+        }
+
         private void UpdateStorage(in RetroLayer retroLayer)
         {
             if(_lossAnalysesByLayerLossView.TryGetValue(retroLayer.LayerId, out var lossViewLayerLossAnalyses))
@@ -136,19 +151,20 @@ namespace Arch.ILS.EconomicModel
                     if (!Path.Exists(filePath))
                     {
                         layerYelt = _revoLayerLossRepository.GetLayerDayYeltVectorised(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId).Result;
+                        layerYelt.RowVersion = latestLossAnalysis.RowVersion;
                         RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
                         revoYeltBinaryWriter.WriteAll(filePath);
                         newFileAdded = true;
                     }
 
-                    if(!_yeltStorage.ContainsKey(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion))
+                    if(!YeltStorage.ContainsKey(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion))
                     {
                         if(layerYelt == null)
                         {
                             RevoYeltBinaryReader revoYeltBinaryReader = new RevoYeltBinaryReader(filePath);
                             layerYelt = revoYeltBinaryReader.ReadAll();
                         }
-                        _yeltStorage.TryAdd(layerYelt);
+                        YeltStorage.TryAdd(layerYelt);
                     }
 
                     if(newFileAdded)

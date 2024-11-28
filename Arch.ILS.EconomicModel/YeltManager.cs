@@ -4,16 +4,18 @@ namespace Arch.ILS.EconomicModel
     public class YeltManager
     {
         private readonly ILayerLossAnalysisRepository _layerLossAnalysisRepository;
-        protected readonly YeltStorage _yeltStorage;
+        
         protected Dictionary<int, Dictionary<RevoLossViewType, List<LayerLossAnalysis>>> _lossAnalysesByLayerLossView;
         private long _currentMaxRowVersion;
 
         public YeltManager(ILayerLossAnalysisRepository layerLossAnalysisRepository)
         {
             _layerLossAnalysisRepository = layerLossAnalysisRepository;
-            _yeltStorage = YeltStorage.CreateOrGetInstance();
+            YeltStorage = YeltStorage.CreateOrGetInstance();
             Initialise();
         }
+
+        public YeltStorage YeltStorage{ get; }
 
         private void Initialise()
         {
@@ -51,6 +53,22 @@ namespace Arch.ILS.EconomicModel
                 layerLossAnalyses.Insert(0, layerLossAnalysis);
                 if(layerLossAnalysis.RowVersion > _currentMaxRowVersion)
                     _currentMaxRowVersion = layerLossAnalysis.RowVersion;
+            }
+        }
+
+        public bool TryGetLatestLayerLossAnalysis(int layerId, RevoLossViewType revoLossViewType, out LayerLossAnalysis layerLossAnalysis)
+        {
+            if(_lossAnalysesByLayerLossView.TryGetValue(layerId, out var lossViewTypesAnalyses)
+                && lossViewTypesAnalyses.TryGetValue(revoLossViewType, out var lossAnalyses)
+                && lossAnalyses.Count > 0)
+            {
+                layerLossAnalysis = lossAnalyses[0];
+                return true;
+            }
+            else
+            {
+                layerLossAnalysis = null;
+                return false;
             }
         }
     }

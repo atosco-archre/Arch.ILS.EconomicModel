@@ -22,20 +22,9 @@ namespace Arch.ILS.EconomicModel.Console
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            UploadRetroYelts(new HashSet<int> { 274 });
-        }
-
-        public static void UploadRetroYelts(HashSet<int> retroProgramId)
-        {
-            IRevoRepository revoRepository = GetRevoSnowflakeRepository();
-            IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
-            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramId);
-            retroLayerYeltManager.Initialise();
-            retroLayerYeltManager.ScheduleSynchronisation();
-            Thread.Sleep(140000);
-            retroLayerYeltManager.Dispose();
-            System.Console.ReadLine();
-        }
+            ProcessLayerYelts(new HashSet<int> { 274 }, RevoLossViewType.ArchView);
+            //UploadRetroYelts(new HashSet<int> { 274 });
+        }        
 
         public static void ExportRetroLayerCessions(string outputFilePath, ResetType resetType)
         {
@@ -286,6 +275,70 @@ namespace Arch.ILS.EconomicModel.Console
             var x = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218).ToArray();
             var xd = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218 && x.PortLayerId == 750703).ToArray();
             var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
+        }
+
+        public static void UploadRetroYelts(HashSet<int> retroProgramIds)
+        {
+            IRevoRepository revoRepository = GetRevoSnowflakeRepository();
+            IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
+            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
+            retroLayerYeltManager.Initialise();
+            retroLayerYeltManager.ScheduleSynchronisation();
+            Thread.Sleep(140000);
+            retroLayerYeltManager.Dispose();
+            System.Console.ReadLine();
+        }
+
+        public static void ProcessLayerYelts(HashSet<int> retroProgramIds, RevoLossViewType revoLossViewType)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            System.Console.Write("Process layer Yelts - Initialisation...");
+            stopwatch.Restart();
+            IRevoRepository revoRepository = GetRevoSnowflakeRepository();
+            IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
+            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
+            retroLayerYeltManager.Initialise();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Fetch Layer Yelts...");
+            stopwatch.Restart();
+            Dictionary<int, Dictionary<int, RetroLayer>> retroLayersByRetroIdByLayerId = new();
+            foreach (int retroProgramId in retroProgramIds)
+            {
+                if (retroLayerYeltManager.TryGetRetroLayers(retroProgramId, out var retroLayers))
+                    retroLayersByRetroIdByLayerId[retroProgramId] = retroLayers.ToDictionary(x => x.LayerId);
+            }
+
+            var firstRetroLayers = retroLayersByRetroIdByLayerId.First().Value;
+            YeltStorage yeltStorage = retroLayerYeltManager.YeltStorage;
+            Dictionary<int, IYelt> layerYelt = new Dictionary<int, IYelt>();
+            foreach (int layerId in firstRetroLayers.Keys)
+            {
+                if (!retroLayerYeltManager.TryGetLatestLayerLossAnalysis(layerId, revoLossViewType, out LayerLossAnalysis layerLossAnalysis))
+                    continue;
+                if (yeltStorage.TryGetValue(layerLossAnalysis.LossAnalysisId, layerId, layerLossAnalysis.RowVersion, out IYelt yelt))
+                    layerYelt[layerId] = yelt;
+            }
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Partition Layer Yelts ...");
+            stopwatch.Restart();
+            foreach (var yelt in layerYelt.Values)
+            {
+                try
+                {
+                    YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, yelt);
+                    YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
+                }
+                catch(Exception e)
+                {
+
+                }
+            }
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
         }
 
         public unsafe static void ProcessLayerYelts() 

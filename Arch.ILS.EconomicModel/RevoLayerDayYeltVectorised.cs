@@ -216,7 +216,7 @@ namespace Arch.ILS.EconomicModel
 
         public int LossAnalysisId { get; private set; }
         public int LayerId { get; private set; }
-        public long RowVersion { get; private set; }
+        public long RowVersion { get; set; }
         public int BufferCount { get; private set; }
         public int TotalEntryCount { get; private set; }
         public bool HasRP { get; private set; }

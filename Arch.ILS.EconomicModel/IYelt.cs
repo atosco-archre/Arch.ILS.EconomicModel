@@ -7,7 +7,7 @@ namespace Arch.ILS.EconomicModel
     {
         int LossAnalysisId { get; }
         int LayerId { get; }
-        long RowVersion { get; }
+        long RowVersion { get; set; }
         int BufferCount { get; }
         int TotalEntryCount { get; }
         bool HasRP { get; }
