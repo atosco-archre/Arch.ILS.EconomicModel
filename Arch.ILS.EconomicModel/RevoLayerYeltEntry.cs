@@ -35,6 +35,7 @@ namespace Arch.ILS.EconomicModel
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe long* GetEventId()
         {
+            /*TODO:temporary fix to too long eventids*/
             if ((((ulong)EventId) & 0xFFFFFFFE00000000L) > 0)
                 EventId = (EventId & 0x1FFFFFFFFL);
             return (long*)Unsafe.AsPointer(ref EventId);

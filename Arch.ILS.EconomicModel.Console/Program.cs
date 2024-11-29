@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Amazon.S3.Model;
 using Arch.ILS.Common;
+using Arch.ILS.Core;
 using Arch.ILS.EconomicModel;
 using Arch.ILS.EconomicModel.Binary;
 using Arch.ILS.Snowflake;
@@ -292,14 +293,14 @@ namespace Arch.ILS.EconomicModel.Console
         public static void ProcessLayerYelts(HashSet<int> retroProgramIds, RevoLossViewType revoLossViewType)
         {
             Stopwatch stopwatch = new Stopwatch();
-            System.Console.Write("Process layer Yelts - Initialisation...");
+            System.Console.WriteLine("Process layer Yelts - Initialisation...");
             stopwatch.Restart();
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
             retroLayerYeltManager.Initialise();
             stopwatch.Stop();
-            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+            System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
 
             System.Console.Write("Fetch Layer Yelts...");
             stopwatch.Restart();
@@ -325,13 +326,33 @@ namespace Arch.ILS.EconomicModel.Console
 
             System.Console.Write("Partition Layer Yelts ...");
             stopwatch.Restart();
+            Dictionary<IYelt, YeltPartitionReader> yeltReaders = new Dictionary<IYelt, YeltPartitionReader>();
             foreach (var yelt in layerYelt.Values)
             {
                 if (yelt.TotalEntryCount == 0)
                     continue;
-                YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 365) }, yelt);
+                YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 366) }, yelt);
                 YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
+                int totalLength = yeltPartitionLinkedListReader.TotalLength;
+                if (totalLength != yelt.TotalEntryCount)
+                    throw new Exception();
+                yeltReaders.Add(yelt, yeltPartitionLinkedListReader);
             }
+
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Yelt Keys ...");
+            stopwatch.Restart();
+            long[] mergedSortedKeys = YeltPartitionMerge.Merge_Native(yeltReaders.Values);
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Mapper ...");
+            stopwatch.Restart();
+            YeltPartitionMapper mapper = new YeltPartitionMapper(yeltReaders.Values, mergedSortedKeys);
+            int[] rows = mapper.MapKeys();
+            mapper.Reset();
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
         }
