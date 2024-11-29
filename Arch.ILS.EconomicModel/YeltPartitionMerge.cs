@@ -161,8 +161,15 @@ namespace Arch.ILS.EconomicModel
                 mergeCount = (mergeCount >> 1);
             }
 
-            Array.Resize(ref currentResult[0], currentSizes[0]);
-            return currentResult[0];
+            long[] result = new long[currentSizes[0]];
+            fixed (long* currentResultPtr = currentResult[0])
+            fixed (long* resultPtr = result)
+            {
+                long* source = currentResultPtr;
+                long* destination = resultPtr;
+                Unsafe.CopyBlock(destination, source, (uint)(result.Length << 3));
+            }
+            return result;
         }
 
         public static unsafe long[] Merge_Native(IEnumerable<YeltPartitionReader> readers)
