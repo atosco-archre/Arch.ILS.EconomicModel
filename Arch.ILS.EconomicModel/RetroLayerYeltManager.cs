@@ -30,7 +30,7 @@ namespace Arch.ILS.EconomicModel
             _disposed = false;
         }
 
-        public void Initialise()
+        public void Initialise(bool pauseUpdate = false)
         {
             if (_selectedRetros != null)
             {
@@ -54,7 +54,7 @@ namespace Arch.ILS.EconomicModel
             Parallel.ForEach(_retroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, retroLayer =>
             {
 #endif
-                UpdateStorage(in retroLayer);
+                UpdateStorage(in retroLayer, pauseUpdate);
 #if !DEBUG
             });
 #endif
@@ -62,7 +62,7 @@ namespace Arch.ILS.EconomicModel
 
         public void ScheduleSynchronisation(int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
         {
-            if(_timer != null)
+            if (_timer != null)
             {
                 _timer?.Change(Timeout.Infinite, Timeout.Infinite);
                 _timer?.Dispose();
@@ -80,7 +80,7 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
-        public override void Synchronise()
+        public void Synchronise(bool pauseUpdate = false)
         {
 #if DEBUG
             Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
@@ -110,7 +110,7 @@ namespace Arch.ILS.EconomicModel
                 layers[retroLayer.LayerId] = retroLayer;
                 if (retroLayer.RowVersion > _currentMaxRowVersion)
                     _currentMaxRowVersion = retroLayer.RowVersion;
-                UpdateStorage(in retroLayer);
+                UpdateStorage(in retroLayer, pauseUpdate);
             }
 #if !DEBUG
             );
@@ -129,12 +129,12 @@ namespace Arch.ILS.EconomicModel
                 retroLayers = Enumerable.Empty<RetroLayer>();
                 return false;
             }
-            
+
         }
 
-        private void UpdateStorage(in RetroLayer retroLayer)
+        private void UpdateStorage(in RetroLayer retroLayer, bool pauseUpdate)
         {
-            if(_lossAnalysesByLayerLossView.TryGetValue(retroLayer.LayerId, out var lossViewLayerLossAnalyses))
+            if (_lossAnalysesByLayerLossView.TryGetValue(retroLayer.LayerId, out var lossViewLayerLossAnalyses))
             {
 #if DEBUG
                 foreach(var lossViewAnalyses in lossViewLayerLossAnalyses)
@@ -146,28 +146,38 @@ namespace Arch.ILS.EconomicModel
                     string filePath = Path.Combine(_yeltStorageFolderPath, YeltFileInfoFactory.GetFileNameWithExtension(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion));
                     string fileNamePrefix = YeltFileInfoFactory.GetFileNamePrefix(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId);
                     IYelt layerYelt = null;
-                    string[] filesToArchive = Directory.GetFiles(_yeltStorageFolderPath, $"{fileNamePrefix}*").Where(x => !x.EndsWith(ARCHIVE_SUFFIX)).ToArray();
                     bool newFileAdded = false;
-                    if (!Path.Exists(filePath))
+                    string[] filesToArchive = null;
+                    if (!pauseUpdate)
                     {
-                        layerYelt = _revoLayerLossRepository.GetLayerDayYeltVectorised(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId).Result;
-                        layerYelt.RowVersion = latestLossAnalysis.RowVersion;
-                        RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
-                        revoYeltBinaryWriter.WriteAll(filePath);
-                        newFileAdded = true;
-                    }
-
-                    if(!YeltStorage.ContainsKey(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion))
-                    {
-                        if(layerYelt == null)
+                        filesToArchive = Directory.GetFiles(_yeltStorageFolderPath, $"{fileNamePrefix}*").Where(x => !x.EndsWith(ARCHIVE_SUFFIX)).ToArray();
+                        if (!Path.Exists(filePath))
                         {
-                            RevoYeltBinaryReader revoYeltBinaryReader = new RevoYeltBinaryReader(filePath);
-                            layerYelt = revoYeltBinaryReader.ReadAll();
+                            layerYelt = _revoLayerLossRepository.GetLayerDayYeltVectorised(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId).Result;
+                            layerYelt.RowVersion = latestLossAnalysis.RowVersion;
+                            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
+                            revoYeltBinaryWriter.WriteAll(filePath);
+                            newFileAdded = true;
                         }
-                        YeltStorage.TryAdd(layerYelt);
+                    }
+                    if (!YeltStorage.ContainsKey(latestLossAnalysis.LossAnalysisId, latestLossAnalysis.LayerId, latestLossAnalysis.RowVersion))
+                    {
+                        if (layerYelt == null)
+                        {
+                            if (File.Exists(filePath))
+                            {
+                                RevoYeltBinaryReader revoYeltBinaryReader = new RevoYeltBinaryReader(filePath);
+                                layerYelt = revoYeltBinaryReader.ReadAll();
+                            }
+                            else if (!pauseUpdate)
+                                throw new FileNotFoundException(filePath);
+                        }
+                        
+                        if(layerYelt != null)
+                            YeltStorage.TryAdd(layerYelt);
                     }
 
-                    if(newFileAdded)
+                    if (newFileAdded)
                         Archive(filesToArchive);
                 }
 #if !DEBUG

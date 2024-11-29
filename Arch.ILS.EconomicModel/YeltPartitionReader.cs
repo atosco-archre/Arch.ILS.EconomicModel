@@ -4,8 +4,9 @@ namespace Arch.ILS.EconomicModel
     public unsafe class YeltPartitionReader
     {
         private static int Zero = 0;
-        public unsafe YeltPartitionReader(ref YeltPartition yeltPartitionLinkedList)
+        public unsafe YeltPartitionReader(in IYelt yelt, ref YeltPartition yeltPartitionLinkedList)
         {
+            Yelt = yelt;
             Head = yeltPartitionLinkedList;
             CurrentPartition = Head;
             CurrentPartitionCurrentItem = CurrentPartition.CurrentStartKey;
@@ -13,6 +14,7 @@ namespace Arch.ILS.EconomicModel
             IsOpen = yeltPartitionLinkedList.TotalLength > 0;
         }
 
+        public IYelt Yelt { get; }
         public YeltPartition Head;
         public YeltPartition CurrentPartition;
         public long* CurrentPartitionCurrentItem;
@@ -37,7 +39,7 @@ namespace Arch.ILS.EconomicModel
                 IsOpen = false;
                 CurrentPartition = null;
                 CurrentPartitionCurrentItem = null;
-                CurrentPartitionLastItem= null;
+                CurrentPartitionLastItem = null;
             }
             return IsOpen;
         }
@@ -72,7 +74,7 @@ namespace Arch.ILS.EconomicModel
                 }
             }
 
-            return new YeltPartitionReader(ref headPtr);
+            return new YeltPartitionReader(yeltPartitioner.Yelt, ref headPtr);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Arch.ILS.EconomicModel.Console
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            ProcessLayerYelts(new HashSet<int> { 274 }, RevoLossViewType.ArchView);
+            ProcessLayerYelts(new HashSet<int> { 247/*247*/ }, RevoLossViewType.StressedView);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }        
 
@@ -298,7 +298,7 @@ namespace Arch.ILS.EconomicModel.Console
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
-            retroLayerYeltManager.Initialise();
+            retroLayerYeltManager.Initialise(true);
             stopwatch.Stop();
             System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
 
@@ -351,7 +351,14 @@ namespace Arch.ILS.EconomicModel.Console
             System.Console.Write("Get Mapper ...");
             stopwatch.Restart();
             YeltPartitionMapper mapper = new YeltPartitionMapper(yeltReaders.Values, mergedSortedKeys);
-            int[] rows = mapper.MapKeys();
+            //int[] rows = mapper.MapKeys().MappedIndices;
+            //mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses...");
+            stopwatch.Restart();
+            double[] eventLosses = mapper.Process(1.0);
             mapper.Reset();
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
@@ -402,7 +409,7 @@ namespace Arch.ILS.EconomicModel.Console
             int[] rows = null;
             while (j++ <= 100)
             {
-                rows = mapper.MapKeys();
+                rows = mapper.MapKeys().MappedIndices;
                 mapper.Reset();
             }
             sw.Stop();

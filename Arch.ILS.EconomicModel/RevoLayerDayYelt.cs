@@ -65,9 +65,10 @@ namespace Arch.ILS.EconomicModel
             HasRB = anyRB;
             TotalEntryCount = count;
             dayRefs = dayRefs[1..];
-            _lastBufferIndex = count / BUFFER_ITEM_COUNT;
+            int remainder = (TotalEntryCount % BUFFER_ITEM_COUNT);
+            _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT - (remainder == 0 ? 1 : 0);
             BufferCount = _lastBufferIndex + 1;
-            _lastBufferItemCount = (count % BUFFER_ITEM_COUNT);
+            _lastBufferItemCount = remainder == 0 ? BUFFER_ITEM_COUNT : remainder;
             _lastBufferSizeShort = _lastBufferItemCount << 1;
             //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
@@ -196,9 +197,10 @@ namespace Arch.ILS.EconomicModel
                     HasRB = *(bool*)(headerPtr + RevoYeltBinaryWriter.HASRB_INDEX);
                 }
 
-                _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT;
+                int remainder = (TotalEntryCount % BUFFER_ITEM_COUNT);
+                _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT - (remainder == 0 ? 1 : 0);
                 BufferCount = _lastBufferIndex + 1;
-                _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
+                _lastBufferItemCount = remainder == 0 ? BUFFER_ITEM_COUNT : remainder;
                 _lastBufferSizeShort = _lastBufferItemCount << 1;
                 //_lastBufferSizeInt = _lastBufferItemCount << 2;
                 _lastBufferSizeDouble = _lastBufferItemCount << 3;
@@ -311,9 +313,10 @@ namespace Arch.ILS.EconomicModel
                 }
             }
 
-            _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT;
+            int remainder = (TotalEntryCount % BUFFER_ITEM_COUNT);
+            _lastBufferIndex = TotalEntryCount / BUFFER_ITEM_COUNT - (remainder == 0 ? 1 : 0);
             BufferCount = _lastBufferIndex + 1;
-            _lastBufferItemCount = (TotalEntryCount % BUFFER_ITEM_COUNT);
+            _lastBufferItemCount = remainder == 0 ? BUFFER_ITEM_COUNT : remainder;
             _lastBufferSizeShort = _lastBufferItemCount << 1;
             //_lastBufferSizeInt = _lastBufferItemCount << 2;
             _lastBufferSizeDouble = _lastBufferItemCount << 3;
