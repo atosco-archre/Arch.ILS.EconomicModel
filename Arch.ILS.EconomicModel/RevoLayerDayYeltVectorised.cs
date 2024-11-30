@@ -197,8 +197,8 @@ namespace Arch.ILS.EconomicModel
                 tempLastYear = tempCurrentYear;
                 tempCurrentYear = tempYears;
                 tempCurrentDay = tempDays;
-                tempCurrentEventId = tempEventIds;
                 tempCurrentPerilId = tempPerilIds;
+                tempCurrentEventId = tempEventIds;
                 while(tempCurrentYear < tempLastYear)
                 {
                     //the key is identical using long instead of ulong for day in [1, 365], year in [1, 10000], perilId in [0, 63] and EventId in [1, 8589934591]. 

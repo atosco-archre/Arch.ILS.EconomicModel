@@ -199,6 +199,7 @@ namespace Arch.ILS.EconomicModel
                 tempLastYear = tempCurrentYear;
                 tempCurrentYear = tempYears;
                 tempCurrentDay = tempDays;
+                tempCurrentPerilId = tempPerilIds;
                 tempCurrentEventId = tempEventIds;
                 while (tempCurrentYear < tempLastYear)
                 {
