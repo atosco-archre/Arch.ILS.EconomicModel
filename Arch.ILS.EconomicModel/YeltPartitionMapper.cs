@@ -125,7 +125,7 @@ namespace Arch.ILS.EconomicModel
         {
             int keysLength = SortedKeys.Length;
             int size = YeltPartitionReaders.Count;
-            int** mappedIndices = (int**)NativeMemory.AlignedAlloc((nuint)(size << 2), (nuint)Unsafe.SizeOf<IntPtr>());
+            int** mappedIndices = (int**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * size), (nuint)Unsafe.SizeOf<IntPtr>());
             fixed (long* sortedKeys = SortedKeys)
             {
                 long* currentKey = sortedKeys;
