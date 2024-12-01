@@ -120,8 +120,7 @@ namespace Arch.ILS.EconomicModel
                 tempResult[(i >> 1)] = sortedKeys;
             }
 
-            i -= 1;
-            if (i < orderedReaders.Length)
+            if (--i < orderedReaders.Length)
             {
                 var reader = orderedReaders[i];
                 long[] sortedKeys = new long[reader.TotalLength];
@@ -136,10 +135,11 @@ namespace Arch.ILS.EconomicModel
             long[][] currentResult = tempResult;
             int[] currentSizes = tempSizes;
             mergeCount = (mergeCount >> 1);
+            bool hasSingleton = false;
             while (mergeCount > 0)
             {
                 tempResult = new long[mergeCount][];
-                tempSizes = new int[mergeCount];
+                tempSizes = new int[mergeCount];                
                 for (int j = 1; j < currentResult.Length; j += 2)
                 {
                     var resultA = currentResult[j - 1];
@@ -156,9 +156,17 @@ namespace Arch.ILS.EconomicModel
                     }
                     tempResult[(j >> 1)] = sortedKeys;
                 }
+
+                if (hasSingleton)
+                {
+                    tempSizes[tempResult.Length - 1] = currentSizes[currentResult.Length - 1];
+                    tempResult[tempResult.Length - 1] = currentResult[currentResult.Length - 1];
+                }
+
                 currentResult = tempResult;
                 currentSizes = tempSizes;
-                mergeCount = (mergeCount >> 1);
+                hasSingleton = (mergeCount % 2) != 0;
+                mergeCount = mergeCount == 1 ? 0 : (mergeCount >> 1) + (hasSingleton ? 1 : 0);
             }
 
             long[] result = new long[currentSizes[0]];
@@ -188,8 +196,7 @@ namespace Arch.ILS.EconomicModel
                 tempResult[(i >> 1)] = sortedKeys;
             }
 
-            i -= 1;
-            if (i < orderedReaders.Length)
+            if (--i < orderedReaders.Length)
             {
                 var reader = orderedReaders[i];
                 long* sortedKeys = (long*)NativeMemory.AlignedAlloc((nuint)(reader.TotalLength << 3), (nuint)Unsafe.SizeOf<long>());
@@ -201,10 +208,11 @@ namespace Arch.ILS.EconomicModel
             int* currentSizes = tempSizes;
             int mergeCount = tempMergeCount;
             tempMergeCount = (tempMergeCount >> 1);
+            bool hasSingleton = false;
             while (tempMergeCount > 0)
             {
                 tempResult = (long**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * tempMergeCount), (nuint)Unsafe.SizeOf<IntPtr>());
-                tempSizes = (int*)NativeMemory.AlignedAlloc((nuint)(tempMergeCount << 2), (nuint)Unsafe.SizeOf<int>());
+                tempSizes = (int*)NativeMemory.AlignedAlloc((nuint)(tempMergeCount << 2), (nuint)Unsafe.SizeOf<int>());               
                 for (int j = 1; j < mergeCount; j += 2)
                 {
                     long* keysA = currentResult[j - 1];
@@ -216,12 +224,19 @@ namespace Arch.ILS.EconomicModel
                     tempResult[(j >> 1)] = sortedKeys;
                 }
 
-                for (int j = 0; j < mergeCount; j++)
+                if (hasSingleton)
                 {
-                    if (currentResult[j] != null)
+                    tempSizes[tempMergeCount - 1] = currentSizes[mergeCount - 1];
+                    tempResult[tempMergeCount - 1] = currentResult[mergeCount - 1];
+                }
+
+                for (int k = 0; k < mergeCount; k++)
+                {
+                    if (currentResult[k] != null)
                     {
-                        NativeMemory.AlignedFree(currentResult[j]);
-                        currentResult[j] = null;
+                        if(!hasSingleton || (k != mergeCount - 1))
+                            NativeMemory.AlignedFree(currentResult[k]);
+                        currentResult[k] = null;
                     }
                 }
 
@@ -234,7 +249,8 @@ namespace Arch.ILS.EconomicModel
                 tempSizes = null;
 
                 mergeCount = tempMergeCount;
-                tempMergeCount = (tempMergeCount >> 1);
+                hasSingleton = (tempMergeCount % 2) != 0;
+                tempMergeCount = tempMergeCount == 1 ? 0 : (tempMergeCount >> 1) + (hasSingleton ? 1 : 0);
             }
 
             int size = currentSizes[0];
@@ -248,7 +264,9 @@ namespace Arch.ILS.EconomicModel
             NativeMemory.AlignedFree(currentResult[0]);
             currentResult[0] = null;
             NativeMemory.AlignedFree(currentResult);
+            currentResult = null;
             NativeMemory.AlignedFree(currentSizes);
+            currentSizes = null;
 
             return result;
         }
