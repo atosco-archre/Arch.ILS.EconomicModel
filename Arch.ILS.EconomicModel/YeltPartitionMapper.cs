@@ -121,7 +121,7 @@ namespace Arch.ILS.EconomicModel
             return (mappedIndices, startIndexInMappedIndices);
         }
 
-        private unsafe MappedIndices MapKeys2()
+        private unsafe MappedIndices MapKeysB()
         {
             int keysLength = SortedKeys.Length;
             int size = YeltPartitionReaders.Count;
@@ -275,7 +275,7 @@ namespace Arch.ILS.EconomicModel
 
         public unsafe double[] ProcessB(double cession, int maxDegreeOfParallelism = 2)
         {
-            MappedIndices mappedIndices = MapKeys2();
+            MappedIndices mappedIndices = MapKeysB();
             int** mappedIndicesPtr = mappedIndices.Indices;
             int size = mappedIndices.Size;
             Reset();
@@ -363,7 +363,7 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] Process2(double cession, int maxDegreeOfParallelism = 2)
+        public unsafe double[] ProcessC(double cession, int maxDegreeOfParallelism = 2)
         {
             (int[] mappedIndices, int[] startIndicesInMappedIndices) = MapKeys();
             Reset();
@@ -393,68 +393,47 @@ namespace Arch.ILS.EconomicModel
 #if !DEBUG
             );
 #endif         
-            transa trans = transa.T;
-            GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
-            int count = YeltPartitionReaders.Count;
-            GCHandle count_pin = GCHandle.Alloc(count, GCHandleType.Pinned);
-            double[] cessions = Enumerable.Repeat(cession, count).ToArray();
+
+            int columns = YeltPartitionReaders.Count;
+            double[] cessions = Enumerable.Repeat(cession, columns).ToArray();
             double[] eventLosses = new double[SortedKeys.Length];
+            //double* eventLossesPtr2 = (double*)NativeMemory.AlignedAlloc((nuint)(SortedKeys.Length << 3), (nuint)Unsafe.SizeOf<double>());
             fixed (double* lossesPtr = losses)
             fixed (int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
             fixed (int* mappedIndicesPtr = mappedIndices)
             fixed (double* cessionsPtr = cessions)
             fixed (double* eventLossesPtr = eventLosses)
             {
-                double* outputPtr = eventLossesPtr;
-
-                Console.WriteLine($"trans_pin {trans_pin.AddrOfPinnedObject()}");
-                Console.WriteLine($"count_pin {count_pin.AddrOfPinnedObject()}");
-                Console.WriteLine($"lossesPtr {(nuint)lossesPtr}");
-                Console.WriteLine($"startIndicesInMappedIndicesPtr {(nuint)startIndicesInMappedIndicesPtr}");
-                Console.WriteLine($"mappedIndicesPtr {(nuint)mappedIndicesPtr}");
-                Console.WriteLine($"cessionsPtr {(nuint)cessionsPtr}");
-                Console.WriteLine($"outputPtr {(nuint)outputPtr}");
-
-
-                Console.WriteLine($"trans_pinPtrAddress {GCHandle.ToIntPtr(trans_pin)}");
-                Console.WriteLine($"count_pinPtrAddress {GCHandle.ToIntPtr(count_pin)}");
-                Console.WriteLine($"lossesPtrPtr {(nuint)(&lossesPtr)}");
-                Console.WriteLine($"startIndicesInMappedIndicesPtrPtr {(nuint)(&startIndicesInMappedIndicesPtr)}");
-                Console.WriteLine($"mappedIndicesPtrPtr {(nuint)(&mappedIndicesPtr)}");
-                Console.WriteLine($"cessionsPtrPtr {(nuint)(&cessionsPtr)}");
-                Console.WriteLine($"outputPtrPtr {(nuint)(&outputPtr)}");
-                Console.WriteLine($"outputPtr {(nuint)(&eventLossesPtr)}");
-
-                mkl_cspblas_dcsrgemv(ref trans, ref count, losses, startIndicesInMappedIndices, mappedIndices, cessions, eventLosses);
-
+                GCHandle columns_pin = GCHandle.Alloc(columns, GCHandleType.Pinned);
+                sparse_index_base_t indexing = sparse_index_base_t.SPARSE_INDEX_BASE_ZERO;
+                GCHandle indexing_pin = GCHandle.Alloc(indexing, GCHandleType.Pinned);
+                int rows = SortedKeys.Length;
+                GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);                
+                IntPtr A = new IntPtr();
+                sparse_status_t csc_creation_status = mkl_sparse_d_create_csc(&A, indexing, rows, columns, startIndicesInMappedIndicesPtr, startIndicesInMappedIndicesPtr + 1, mappedIndicesPtr, lossesPtr);
+                sparse_operation_t operation = sparse_operation_t.SPARSE_OPERATION_NON_TRANSPOSE;
+                GCHandle operation_pin = GCHandle.Alloc(operation, GCHandleType.Pinned);
+                double alpha = 1;
+                GCHandle alpha_pin = GCHandle.Alloc(alpha, GCHandleType.Pinned);
+                matrix_descr matrix_descr  = new matrix_descr { sparse_matrix_type_t = sparse_matrix_type_t.SPARSE_MATRIX_TYPE_GENERAL, sparse_fill_mode_t = sparse_fill_mode_t.SPARSE_FILL_MODE_FULL, sparse_diag_type_t = sparse_diag_type_t.SPARSE_DIAG_NON_UNIT };
+                GCHandle matrix_descr_pin = GCHandle.Alloc(matrix_descr, GCHandleType.Pinned);
+                double beta = 1;
+                GCHandle beta_pin = GCHandle.Alloc(beta, GCHandleType.Pinned);
+                sparse_status_t mv_status = mkl_sparse_d_mv(operation, alpha, A, matrix_descr, cessionsPtr, beta, eventLossesPtr);
+                sparse_status_t destroy_status = mkl_sparse_destroy(A);
+                /*obsolete:*/
+                //transa trans = transa.T;
+                //GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
+                //mkl_cspblas_dcsrgemv(ref trans, ref columns, losses, startIndicesInMappedIndices, mappedIndices, cessions, eventLosses);
+                indexing_pin.Free();
+                rows_pin.Free();
+                operation_pin.Free();
+                alpha_pin.Free();
+                matrix_descr_pin.Free();
+                beta_pin.Free();
+                columns_pin.Free();
+                //trans_pin.Free();
             }
-            double sum = eventLosses.Select((x, i) => (x, i)).Where(ii => ii.i > 315).Sum(s => s.x);
-            var zz = mappedIndices.Where(x => x == 0).ToList();
-            var zzz = mappedIndices.Select((x, i) => (x, i)).Where(xx => xx.x == 0).ToList();
-
-            GCHandle losses_pin = GCHandle.Alloc(losses, GCHandleType.Pinned);
-            GCHandle startIndicesInMappedIndices_pin = GCHandle.Alloc(startIndicesInMappedIndices, GCHandleType.Pinned);
-            GCHandle mappedIndices_pin = GCHandle.Alloc(mappedIndices, GCHandleType.Pinned);
-            GCHandle cessions_pin = GCHandle.Alloc(cessions, GCHandleType.Pinned);
-            //GCHandle eventLosses_pin = GCHandle.Alloc(eventLosses, GCHandleType.Pinned);
-            //double* eventLossesPtr2 = (double*)NativeMemory.AlignedAlloc((nuint)(SortedKeys.Length << 3), (nuint)Unsafe.SizeOf<double>());
-            Console.WriteLine($"trans_pin {trans_pin.AddrOfPinnedObject()}");
-            Console.WriteLine($"count_pin {count_pin.AddrOfPinnedObject()}");
-            Console.WriteLine($"losses_pin {losses_pin.AddrOfPinnedObject()}");
-            Console.WriteLine($"startIndicesInMappedIndices_pin {startIndicesInMappedIndices_pin.AddrOfPinnedObject()}");
-            Console.WriteLine($"mappedIndices_pin {mappedIndices_pin.AddrOfPinnedObject()}");
-            Console.WriteLine($"cessions_pin {cessions_pin.AddrOfPinnedObject()}");
-            //Console.WriteLine($"eventLosses_pin {eventLosses_pin.AddrOfPinnedObject()}");
-            mkl_cspblas_dcsrgemv2(ref trans, ref count, losses, startIndicesInMappedIndices, mappedIndices, cessions, eventLosses);
-            trans_pin.Free();
-            count_pin.Free();
-            losses_pin.Free();
-            startIndicesInMappedIndices_pin.Free();
-            mappedIndices_pin.Free();
-            cessions_pin.Free();
-            //NativeMemory.Free(eventLossesPtr2);
-            //eventLosses_pin.Free();
-            Console.WriteLine(eventLosses.Sum());
             return eventLosses;
         }
 
