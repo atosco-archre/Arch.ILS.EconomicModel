@@ -376,7 +376,7 @@ namespace Arch.ILS.EconomicModel.Console
 
             System.Console.Write("Get Cession Event Losses B...");
             stopwatch.Restart();
-            double[] eventLossesB = mapper.PartitionProcess(1.0);
+            double[] eventLossesB = mapper.ProcessPartitions(1.0);
             mapper.Reset();
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
@@ -390,7 +390,7 @@ namespace Arch.ILS.EconomicModel.Console
 
             System.Console.Write("Get Cession Event Losses D...");
             stopwatch.Restart();
-            double[] eventLossesD = mapper.PartitionProcessNative(1.0);
+            double[] eventLossesD = mapper.ProcessPartitionsNative(1.0);
             mapper.Reset();
             stopwatch.Stop();
 

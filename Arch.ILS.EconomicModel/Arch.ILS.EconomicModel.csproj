@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>True</Optimize>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\Arch.ILS.Common\Arch.ILS.Common\Arch.ILS.Common.csproj" />
     <ProjectReference Include="..\..\Arch.ILS.Core\Arch.ILS.Core\Arch.ILS.Core.csproj" />
     <ProjectReference Include="..\..\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine.csproj" />
+    <ProjectReference Include="..\..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj" />
     <ProjectReference Include="..\..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj" />
     <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
   </ItemGroup>

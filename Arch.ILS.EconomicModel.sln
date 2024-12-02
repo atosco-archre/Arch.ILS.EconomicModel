@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LargeLoss.LayeringService.C
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Arch.ILS.EconomicModel.Historical.Database", "Arch.ILS.EconomicModel.Historical.Database\Arch.ILS.EconomicModel.Historical.Database.sqlproj", "{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.IntelMKL", "..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj", "{C247F1B2-3238-4B66-82FF-BF1B23569242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

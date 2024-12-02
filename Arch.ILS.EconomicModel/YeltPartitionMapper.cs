@@ -314,7 +314,7 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] PartitionProcess(double cession, int maxDegreeOfParallelism = 2)
+        public unsafe double[] ProcessPartitions(double cession, int maxDegreeOfParallelism = 2)
         {
             MappedIndices mappedIndices = MapPartitionedKeys();
             int** mappedIndicesPtr = mappedIndices.Indices;
@@ -483,7 +483,7 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] PartitionProcessNative(double cession)
+        public unsafe double[] ProcessPartitionsNative(double cession)
         {
             MappedIndices mappedIndices = MapPartitionedKeys();
             int** mappedIndicesPtr = mappedIndices.Indices;
@@ -531,7 +531,6 @@ namespace Arch.ILS.EconomicModel
 
             return eventLosses;
         }
-
 
         public void Reset()
         {
