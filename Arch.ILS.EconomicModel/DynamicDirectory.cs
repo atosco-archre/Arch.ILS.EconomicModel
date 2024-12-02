@@ -47,14 +47,14 @@ namespace Arch.ILS.EconomicModel
             {
                 int sizeIndex = Array.BinarySearch(Primes, fixedCapacity);
                 _size = (uint)((sizeIndex < 0) ? 
-                    Primes[(~sizeIndex) == Primes.Length - 1 ? (~sizeIndex) : (~sizeIndex) + 1] : 
-                    Primes[sizeIndex == Primes.Length - 1 ? sizeIndex : sizeIndex + 1]);
+                    Primes[(~sizeIndex) == Primes.Length ? Primes.Length - 1 : (~sizeIndex)] : 
+                    Primes[sizeIndex]);
             }
 
             _entriesByteCount = (nuint)(Unsafe.SizeOf<Entry>() * fixedCapacity);
             _entries = (Entry*)NativeMemory.AlignedAlloc(_entriesByteCount, _entryAlignment);
 #if DEBUG
-        NativeMemory.Clear(_entries, _entriesByteCount); // Not absolutely necessary so only DEBUG
+            NativeMemory.Clear(_entries, _entriesByteCount); // Not absolutely necessary so only DEBUG
 #endif
 
             _bucketsByteCount = (nuint)(Unsafe.SizeOf<IntPtr>() * _size);
