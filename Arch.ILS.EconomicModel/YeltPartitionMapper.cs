@@ -29,7 +29,12 @@ namespace Arch.ILS.EconomicModel
 
         #endregion Types
 
+        #region Constants
+
         public const int DefaultBufferSize = 1024;
+        public const int DefaultPartitionCount = 8;
+
+        #endregion Constants
 
         public YeltPartitionMapper(IEnumerable<YeltPartitionReader> yeltPartitionReaders, long[] sortedKeys, int bufferSize = DefaultBufferSize)
         { 
@@ -44,145 +49,183 @@ namespace Arch.ILS.EconomicModel
         public long[] SortedKeys { get; }
         public int BufferSize { get; }
 
-        public unsafe (int[] MappedIndices, int[] StartIndicesInMappedIndices) MapKeys()
+        public unsafe (int[] MappedIndices, int[] StartIndicesInMappedIndices) MapKeys(int partitionCount = DefaultPartitionCount)
         {
             int keysLength = SortedKeys.Length;
+            Range[] ranges = new Range[partitionCount];
+            int partitionSize = YeltPartitionReaders.Count / partitionCount;
+            int currentPartitionIndex = 0;
+            for (int i = 0; i < partitionCount - 1; i++)
+                ranges[i] = new Range(currentPartitionIndex, currentPartitionIndex += partitionSize);
+            ranges[partitionCount - 1] = new Range(currentPartitionIndex, YeltPartitionReaders.Count);
             int[] mappedIndices = new int[TotalLength];
             int[] startIndexInMappedIndices = new int[YeltPartitionReaders.Count + 1];
-            fixed (long* sortedKeys = SortedKeys)
+
+            int indexerStartIndex = 0;
+            startIndexInMappedIndices[0] = indexerStartIndex;
+            for (int k = 1; k < startIndexInMappedIndices.Length; ++k)
+                startIndexInMappedIndices[k] = (indexerStartIndex += YeltPartitionReaders[k - 1].TotalLength);
+
+            Task[] tasks = new Task[partitionCount];
+            for (int partitionIndex = 0; partitionIndex < partitionCount; ++partitionIndex)
             {
-                long* currentKey = sortedKeys;
-                long* lastKey = sortedKeys + keysLength - 1;
-                var end = lastKey + 1;
-                YeltPartitionIndexer[] indexers = new YeltPartitionIndexer[YeltPartitionReaders.Count];
-                int indexerStartIndex = 0;
-                fixed (int* keysPtr = mappedIndices)
+                tasks[partitionIndex] = Task.Factory.StartNew((rangeObj) =>
                 {
-                    int* currentKeysPtr = keysPtr;
-                    indexers[0] = new YeltPartitionIndexer(YeltPartitionReaders[0], currentKeysPtr);
-                    startIndexInMappedIndices[0] = indexerStartIndex;
-                    int i = 1;
-                    for (; i < indexers.Length; i++)
+                    Range range = (Range)rangeObj;
+                    fixed (long* sortedKeys = SortedKeys)
                     {
-                        indexers[i] = new YeltPartitionIndexer(YeltPartitionReaders[i], indexers[i - 1].CurrentPosition + YeltPartitionReaders[i - 1].TotalLength);
-                        startIndexInMappedIndices[i] = (indexerStartIndex += YeltPartitionReaders[i - 1].TotalLength);
-                    }
-                    startIndexInMappedIndices[i] = (indexerStartIndex += YeltPartitionReaders[i - 1].TotalLength);
+                        long* currentKey = sortedKeys;
+                        long* lastKey = sortedKeys + keysLength - 1;
+                        var end = lastKey + 1;
 
-                    int currentKeyIndex = 0;
-                    using (DynamicDirectory<Int64Span, YeltPartitionIndexer> keyIndexMapper = new(YeltPartitionReaders.Count))
-                    {
-                        for (int r = 0; r < indexers.Length; r++)
+                        int readerStartIndex = range.Start.Value;
+                        int readerEndIndex = range.End.Value;
+                        int readersCount = readerEndIndex - readerStartIndex;
+                        YeltPartitionIndexer[] indexers = new YeltPartitionIndexer[readersCount];
+
+                        fixed (int* keysPtr = mappedIndices)
                         {
-                            YeltPartitionIndexer indexer = indexers[r];
-                            if (indexer.YeltPartitionReader.IsOpen)
+                            int* currentKeysPtr = keysPtr;
+                            int i = readerStartIndex, j = 0;
+                            indexers[j] = new YeltPartitionIndexer(YeltPartitionReaders[i], currentKeysPtr);
+                            for (++j, ++i; i < readerEndIndex; ++i, ++j)
+                                indexers[j] = new YeltPartitionIndexer(YeltPartitionReaders[i], indexers[j - 1].CurrentPosition + YeltPartitionReaders[i - 1].TotalLength);
+
+                            int currentKeyIndex = 0;
+                            using (DynamicDirectory<Int64Span, YeltPartitionIndexer> keyIndexMapper = new(YeltPartitionReaders.Count))
                             {
-                                var newKey = new Int64Span(indexer.YeltPartitionReader.CurrentPartitionCurrentItem);
-                                keyIndexMapper.Add(ref newKey, ref indexer);
-                            }
-                        }
-
-                        while (currentKey != end)
-                        {
-                            Int64Span key = new Int64Span(currentKey);
-                            var entry = keyIndexMapper.GetFirstRef(ref key);
-
-                            while (entry != null)
-                            {
-                                YeltPartitionIndexer indexer = entry->value;
-                                YeltPartitionReader reader = indexer.YeltPartitionReader;
-
-                                if (*reader.CurrentPartitionCurrentItem == *currentKey)
+                                for (int r = 0; r < indexers.Length; r++)
                                 {
-                                    indexer.Write(ref currentKeyIndex);
-                                    var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
-                                    if (reader.SetNext())
+                                    YeltPartitionIndexer indexer = indexers[r];
+                                    if (indexer.YeltPartitionReader.IsOpen)
                                     {
-                                        var newKey = new Int64Span(reader.CurrentPartitionCurrentItem);
-                                        keyIndexMapper.Move(ref newKey, entry);
+                                        var newKey = new Int64Span(indexer.YeltPartitionReader.CurrentPartitionCurrentItem);
+                                        keyIndexMapper.Add(ref newKey, ref indexer);
                                     }
-                                    entry = tempEntry;
                                 }
-                                else
+
+                                while (currentKey != end)
                                 {
-                                    var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
-                                    entry = tempEntry;
+                                    Int64Span key = new Int64Span(currentKey);
+                                    var entry = keyIndexMapper.GetFirstRef(ref key);
+
+                                    while (entry != null)
+                                    {
+                                        YeltPartitionIndexer indexer = entry->value;
+                                        YeltPartitionReader reader = indexer.YeltPartitionReader;
+
+                                        if (*reader.CurrentPartitionCurrentItem == *currentKey)
+                                        {
+                                            indexer.Write(ref currentKeyIndex);
+                                            var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
+                                            if (reader.SetNext())
+                                            {
+                                                var newKey = new Int64Span(reader.CurrentPartitionCurrentItem);
+                                                keyIndexMapper.Move(ref newKey, entry);
+                                            }
+                                            entry = tempEntry;
+                                        }
+                                        else
+                                        {
+                                            var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
+                                            entry = tempEntry;
+                                        }
+                                    }
+
+                                    currentKey++;
+                                    currentKeyIndex++;
                                 }
                             }
-
-                            currentKey++;
-                            currentKeyIndex++;
                         }
                     }
-                }
+                }, ranges[partitionIndex]);
             }
+            Task.WaitAll(tasks);
             return (mappedIndices, startIndexInMappedIndices);
         }
 
-        private unsafe MappedIndices MapKeysB()
+        private unsafe MappedIndices MapPartitionedKeys(int partitionCount = DefaultPartitionCount)
         {
             int keysLength = SortedKeys.Length;
             int size = YeltPartitionReaders.Count;
+            Range[] ranges = new Range[partitionCount];
+            int partitionSize = YeltPartitionReaders.Count / partitionCount;
+            int currentPartitionIndex = 0;
+            for (int i = 0; i < partitionCount - 1; i++)
+                ranges[i] = new Range(currentPartitionIndex, currentPartitionIndex += partitionSize);
+            ranges[partitionCount - 1] = new Range(currentPartitionIndex, YeltPartitionReaders.Count);
             int** mappedIndices = (int**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * size), (nuint)Unsafe.SizeOf<IntPtr>());
-            fixed (long* sortedKeys = SortedKeys)
+
+            Task[] tasks = new Task[partitionCount];
+            for(int partitionIndex = 0; partitionIndex < partitionCount; ++partitionIndex)
             {
-                long* currentKey = sortedKeys;
-                long* lastKey = sortedKeys + keysLength - 1;
-                long* end = lastKey + 1;
-                YeltPartitionIndexer[] indexers = new YeltPartitionIndexer[YeltPartitionReaders.Count];
-
-                for (int i = 0; i < indexers.Length; i++)
+                tasks[partitionIndex] = Task.Factory.StartNew((rangeObj) =>
                 {
-                    mappedIndices[i] = (int*)NativeMemory.AlignedAlloc((nuint)((YeltPartitionReaders[i].TotalLength) << 2), (nuint)Unsafe.SizeOf<int>());
-                    indexers[i] = new YeltPartitionIndexer(YeltPartitionReaders[i], mappedIndices[i]);
-                }
-              
-                int currentKeyIndex = 0;
-                using (DynamicDirectory<Int64Span, YeltPartitionIndexer> keyIndexMapper = new(YeltPartitionReaders.Count))
-                {
-                    for (int r = 0; r < indexers.Length; r++)
+                    Range range = (Range)rangeObj;
+                    fixed (long* sortedKeys = SortedKeys)
                     {
-                        YeltPartitionIndexer indexer = indexers[r];
-                        if (indexer.YeltPartitionReader.IsOpen)
+                        long* currentKey = sortedKeys;
+                        long* lastKey = sortedKeys + keysLength - 1;
+                        long* end = lastKey + 1;
+                        int readerStartIndex = range.Start.Value;
+                        int readerEndIndex = range.End.Value;
+                        int readersCount = readerEndIndex - readerStartIndex;
+                        YeltPartitionIndexer[] indexers = new YeltPartitionIndexer[readersCount];
+                        for (int i = readerStartIndex, j = 0; i < readerEndIndex; i++, j++)
                         {
-                            var newKey = new Int64Span(indexer.YeltPartitionReader.CurrentPartitionCurrentItem);
-                            keyIndexMapper.Add(ref newKey, ref indexer);
+                            mappedIndices[i] = (int*)NativeMemory.AlignedAlloc((nuint)((YeltPartitionReaders[i].TotalLength) << 2), (nuint)Unsafe.SizeOf<int>());
+                            indexers[j] = new YeltPartitionIndexer(YeltPartitionReaders[i], mappedIndices[i]);
                         }
-                    }
 
-                    while (currentKey != end)
-                    {
-                        Int64Span key = new Int64Span(currentKey);
-                        var entry = keyIndexMapper.GetFirstRef(ref key);
-
-                        while (entry != null)
+                        int currentKeyIndex = 0;
+                        using (DynamicDirectory<Int64Span, YeltPartitionIndexer> keyIndexMapper = new(readersCount))
                         {
-                            YeltPartitionIndexer indexer = entry->value;
-                            YeltPartitionReader reader = indexer.YeltPartitionReader;
-
-                            if (*reader.CurrentPartitionCurrentItem == *currentKey)
+                            for (int r = 0; r < indexers.Length; r++)
                             {
-                                indexer.Write(ref currentKeyIndex);
-                                var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
-                                if (reader.SetNext())
+                                YeltPartitionIndexer indexer = indexers[r];
+                                if (indexer.YeltPartitionReader.IsOpen)
                                 {
-                                    var newKey = new Int64Span(reader.CurrentPartitionCurrentItem);
-                                    keyIndexMapper.Move(ref newKey, entry);
+                                    var newKey = new Int64Span(indexer.YeltPartitionReader.CurrentPartitionCurrentItem);
+                                    keyIndexMapper.Add(ref newKey, ref indexer);
                                 }
-                                entry = tempEntry;
                             }
-                            else
+
+                            while (currentKey != end)
                             {
-                                var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
-                                entry = tempEntry;
+                                Int64Span key = new Int64Span(currentKey);
+                                var entry = keyIndexMapper.GetFirstRef(ref key);
+
+                                while (entry != null)
+                                {
+                                    YeltPartitionIndexer indexer = entry->value;
+                                    YeltPartitionReader reader = indexer.YeltPartitionReader;
+
+                                    if (*reader.CurrentPartitionCurrentItem == *currentKey)
+                                    {
+                                        indexer.Write(ref currentKeyIndex);
+                                        var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
+                                        if (reader.SetNext())
+                                        {
+                                            var newKey = new Int64Span(reader.CurrentPartitionCurrentItem);
+                                            keyIndexMapper.Move(ref newKey, entry);
+                                        }
+                                        entry = tempEntry;
+                                    }
+                                    else
+                                    {
+                                        var tempEntry = keyIndexMapper.GetNextRef(ref key, entry);
+                                        entry = tempEntry;
+                                    }
+                                }
+
+                                currentKey++;
+                                currentKeyIndex++;
                             }
                         }
-
-                        currentKey++;
-                        currentKeyIndex++;
                     }
-                }
+                }, ranges[partitionIndex]);
             }
+            Task.WaitAll(tasks);
 
             return new(mappedIndices, size);
         }
@@ -271,9 +314,9 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] ProcessB(double cession, int maxDegreeOfParallelism = 2)
+        public unsafe double[] PartitionProcess(double cession, int maxDegreeOfParallelism = 2)
         {
-            MappedIndices mappedIndices = MapKeysB();
+            MappedIndices mappedIndices = MapPartitionedKeys();
             int** mappedIndicesPtr = mappedIndices.Indices;
             int size = mappedIndices.Size;
             Reset();
@@ -360,7 +403,7 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] ProcessC(double cession, int maxDegreeOfParallelism = 2)
+        public unsafe double[] ProcessNative(double cession, int maxDegreeOfParallelism = 2)
         {
             (int[] mappedIndices, int[] startIndicesInMappedIndices) = MapKeys();
             Reset();
@@ -440,9 +483,9 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] ProcessD(double cession)
+        public unsafe double[] PartitionProcessNative(double cession)
         {
-            MappedIndices mappedIndices = MapKeysB();
+            MappedIndices mappedIndices = MapPartitionedKeys();
             int** mappedIndicesPtr = mappedIndices.Indices;
             int size = mappedIndices.Size;
             Reset();

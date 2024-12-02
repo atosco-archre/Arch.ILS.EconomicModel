@@ -345,6 +345,17 @@ namespace Arch.ILS.EconomicModel.Console
             System.Console.Write("Get Yelt Keys ...");
             stopwatch.Restart();
             long[] mergedSortedKeys = YeltPartitionMerge.Merge_Native(yeltReaders.Values);
+            //long[] mergedSortedKeys2 = YeltPartitionMerge.Merge(yeltReaders.Values);
+
+            //if (mergedSortedKeys2.Length != mergedSortedKeys.Length)
+            //    throw new Exception();
+
+            //for (int i = 0; i < mergedSortedKeys2.Length; i++)
+            //{
+            //    if (mergedSortedKeys2[i] != mergedSortedKeys[i])
+            //        throw new Exception();
+            //}
+
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
 
@@ -352,7 +363,7 @@ namespace Arch.ILS.EconomicModel.Console
             stopwatch.Restart();
             YeltPartitionMapper mapper = new YeltPartitionMapper(yeltReaders.Values, mergedSortedKeys);
             //int[] rows = mapper.MapKeys().MappedIndices;
-            //mapper.Reset();
+            mapper.Reset();
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
 
@@ -362,6 +373,41 @@ namespace Arch.ILS.EconomicModel.Console
             mapper.Reset();
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses B...");
+            stopwatch.Restart();
+            double[] eventLossesB = mapper.PartitionProcess(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses C...");
+            stopwatch.Restart();
+            double[] eventLossesC = mapper.ProcessNative(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses D...");
+            stopwatch.Restart();
+            double[] eventLossesD = mapper.PartitionProcessNative(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+            System.Console.WriteLine(eventLosses.Sum());
+            System.Console.WriteLine(eventLossesB.Sum());
+            System.Console.WriteLine(eventLossesC.Sum());
+            System.Console.WriteLine(eventLossesD.Sum());
+
+            if (Math.Abs(eventLosses.Sum() - eventLossesB.Sum()) > 0.0000001)
+                throw new Exception();
+
+            if (Math.Abs(eventLossesB.Sum() - eventLossesC.Sum()) > 0.0000001)
+                throw new Exception();
+
+            if (Math.Abs(eventLossesB.Sum() - eventLossesD.Sum()) > 0.0000001)
+                throw new Exception();
         }
 
         public unsafe static void ProcessLayerYelts() 
@@ -409,7 +455,7 @@ namespace Arch.ILS.EconomicModel.Console
             int[] rows = null;
             while (j++ <= 100)
             {
-                rows = mapper.MapKeys().MappedIndices;
+                rows = mapper.MapKeys(1).MappedIndices;
                 mapper.Reset();
             }
             sw.Stop();
