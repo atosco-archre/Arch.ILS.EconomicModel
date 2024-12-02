@@ -1,12 +1,10 @@
 ﻿
-using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Security;
 
-using Studio.Core;
 using Arch.ILS.IntelMKL;
 using static Arch.ILS.IntelMKL.SparseBlas;
 
@@ -359,7 +357,6 @@ namespace Arch.ILS.EconomicModel
             }
             NativeMemory.AlignedFree(mappedIndicesPtr);
             mappedIndicesPtr = null;
-
             return eventLosses;
         }
 
@@ -411,6 +408,8 @@ namespace Arch.ILS.EconomicModel
                 GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);                
                 IntPtr A = new IntPtr();
                 sparse_status_t csc_creation_status = mkl_sparse_d_create_csc(&A, indexing, rows, columns, startIndicesInMappedIndicesPtr, startIndicesInMappedIndicesPtr + 1, mappedIndicesPtr, lossesPtr);
+                if (csc_creation_status != sparse_status_t.SPARSE_STATUS_SUCCESS)
+                    throw new MklException("mkl_sparse_d_create_csc");
                 sparse_operation_t operation = sparse_operation_t.SPARSE_OPERATION_NON_TRANSPOSE;
                 GCHandle operation_pin = GCHandle.Alloc(operation, GCHandleType.Pinned);
                 double alpha = 1;
@@ -420,8 +419,12 @@ namespace Arch.ILS.EconomicModel
                 double beta = 1;
                 GCHandle beta_pin = GCHandle.Alloc(beta, GCHandleType.Pinned);
                 sparse_status_t mv_status = mkl_sparse_d_mv(operation, alpha, A, matrix_descr, cessionsPtr, beta, eventLossesPtr);
+                if (mv_status != sparse_status_t.SPARSE_STATUS_SUCCESS)
+                    throw new MklException("mkl_sparse_d_mv");
                 sparse_status_t destroy_status = mkl_sparse_destroy(A);
-                /*obsolete:*/
+                if (destroy_status != sparse_status_t.SPARSE_STATUS_SUCCESS)
+                    throw new MklException("mkl_sparse_destroy");
+                /*mkl_cspblas_dcsrgemv not recommanded for large matrix. Throws access violation when large matrix*/
                 //transa trans = transa.T;
                 //GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
                 //mkl_cspblas_dcsrgemv(ref trans, ref columns, losses, startIndicesInMappedIndices, mappedIndices, cessions, eventLosses);
@@ -437,99 +440,43 @@ namespace Arch.ILS.EconomicModel
             return eventLosses;
         }
 
-        public unsafe double[] ProcessD(double cession, int maxDegreeOfParallelism = 2)
+        public unsafe double[] ProcessD(double cession)
         {
             MappedIndices mappedIndices = MapKeysB();
             int** mappedIndicesPtr = mappedIndices.Indices;
             int size = mappedIndices.Size;
             Reset();
             double[] eventLosses = new double[SortedKeys.Length];
-            BlockingCollection<double[]> eventLossesCollection = new BlockingCollection<double[]>();
-
-            Task aggregator = Task.Factory.StartNew((obj) => 
-            {
-                double[] output = (double[])obj;
-                int n = output.Length;
-                GCHandle n_pin = GCHandle.Alloc(n, GCHandleType.Pinned);
-                double a = 1;
-                GCHandle a_pin = GCHandle.Alloc(a, GCHandleType.Pinned);
-                int incx = 1;
-                GCHandle incx_pin = GCHandle.Alloc(a, GCHandleType.Pinned);
-                int incy = 1;
-                GCHandle incy_pin = GCHandle.Alloc(a, GCHandleType.Pinned);
-                fixed (double* outputPtr = output)
-                {
-                    foreach (double[] eventLosses in eventLossesCollection.GetConsumingEnumerable())
-                    {
-                        fixed (double* eventLossesPtr = eventLosses)
-                        {
-                            Blas.daxpy(ref n, ref a, eventLosses, ref incx, output, ref incy);
-                        }
-                    }
-                }
-                n_pin.Free();
-                a_pin.Free();
-                incx_pin.Free();
-                incy_pin.Free();
-            }, eventLosses);
-
-#if DEBUG
+            int columns = 1;
+            GCHandle columns_pin = GCHandle.Alloc(columns, GCHandleType.Pinned);
+            transa trans = transa.T;
+            GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
             for (int k = 0; k < YeltPartitionReaders.Count; ++k)
-#else
-            Parallel.For(0, YeltPartitionReaders.Count, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, k =>
-#endif
             {
-                int columns = 1;
                 double[] cessions = [1];
-                double[] readerEventLosses = new double[SortedKeys.Length];
-                fixed (double* eventLossesPtr = readerEventLosses)
+                fixed (double* eventLossesPtr = eventLosses)
                 fixed (double* cessionsPtr = cessions)
                 {
                     int* mappedIndicesCurrentIndexPtr = mappedIndicesPtr[k];
                     YeltPartitionReader currentReader = YeltPartitionReaders[k];
                     YeltPartition yeltPartition = currentReader.Head;
-                    GCHandle columns_pin = GCHandle.Alloc(columns, GCHandleType.Pinned);
-                    sparse_index_base_t indexing = sparse_index_base_t.SPARSE_INDEX_BASE_ZERO;
-                    GCHandle indexing_pin = GCHandle.Alloc(indexing, GCHandleType.Pinned);
-                    int rows = SortedKeys.Length;
-                    GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
-                    sparse_operation_t operation = sparse_operation_t.SPARSE_OPERATION_NON_TRANSPOSE;
-                    GCHandle operation_pin = GCHandle.Alloc(operation, GCHandleType.Pinned);
-                    double alpha = 1;
-                    GCHandle alpha_pin = GCHandle.Alloc(alpha, GCHandleType.Pinned);
-                    matrix_descr matrix_descr = new matrix_descr { sparse_matrix_type_t = sparse_matrix_type_t.SPARSE_MATRIX_TYPE_GENERAL, sparse_fill_mode_t = sparse_fill_mode_t.SPARSE_FILL_MODE_FULL, sparse_diag_type_t = sparse_diag_type_t.SPARSE_DIAG_NON_UNIT };
-                    GCHandle matrix_descr_pin = GCHandle.Alloc(matrix_descr, GCHandleType.Pinned);
-                    double beta = 1;
-                    GCHandle beta_pin = GCHandle.Alloc(beta, GCHandleType.Pinned);
+                    //int rows = SortedKeys.Length;
+                    //GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
                     while (yeltPartition != null)
                     {
                         double* lossesPtr = yeltPartition.CurrentStartLossPct;
                         int[] startIndicesInMappedIndices = [0, yeltPartition.CurrentLength];
                         fixed(int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
                         {
-                            IntPtr A = new IntPtr();
-                            sparse_status_t csc_creation_status = mkl_sparse_d_create_csc(&A, indexing, rows, columns, startIndicesInMappedIndicesPtr, startIndicesInMappedIndicesPtr + 1, mappedIndicesCurrentIndexPtr, lossesPtr);
-                            sparse_status_t mv_status = mkl_sparse_d_mv(operation, alpha, A, matrix_descr, cessionsPtr, beta, eventLossesPtr);
-                            sparse_status_t destroy_status = mkl_sparse_destroy(A);
+                            mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesInMappedIndicesPtr, mappedIndicesCurrentIndexPtr, cessionsPtr, eventLossesPtr);
                             yeltPartition = yeltPartition.NextNode;
-
                         }
                     }
-                    columns_pin.Free(); 
-                    indexing_pin.Free();
-                    rows_pin.Free();
-                    operation_pin.Free();
-                    alpha_pin.Free();
-                    matrix_descr_pin.Free();
-                    beta_pin.Free();
                 }
-                eventLossesCollection.TryAdd(readerEventLosses);
             }
-#if !DEBUG
-            );
-#endif         
-            eventLossesCollection.CompleteAdding();
-            aggregator.Wait();
+            columns_pin.Free();
+            //rows_pin.Free();
+            trans_pin.Free();
 
             for (int i = 0; i < size; ++i)
             {
