@@ -571,6 +571,26 @@ namespace Arch.ILS.EconomicModel
 
         #endregion Retro Layers
 
+        #region Portfolio Retro Layers
+
+        public Task<IEnumerable<PortfolioRetroLayer>> GetPortfolioRetroLayers()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(GET_PORTFOLIO_RETRO_LAYERS)).GetObjects<PortfolioRetroLayer>();
+            });
+        }
+
+        public Task<IEnumerable<PortfolioRetroLayer>> GetPortfolioRetroLayers(long afterRowVersion)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(string.Format(GET_PORTFOLIO_RETRO_LAYERS_INCREMENTAL, afterRowVersion))).GetObjects<PortfolioRetroLayer>();
+            });
+        }
+
+        #endregion Portfolio Retro Layers
+
         #region Portfolio Info
 
         public Task<Dictionary<int, Portfolio>> GetPortfolios()
@@ -1754,6 +1774,19 @@ namespace Arch.ILS.EconomicModel
  GROUP BY A.LayerId, SI.RetroProgramId";
 
         private const string GET_RETRO_LAYERS_INCREMENTAL = GET_RETRO_LAYERS + " HAVING MAX(CONVERT(BIGINT, A.RowVersion)) > {0}";
+
+        private const string GET_PORTFOLIO_RETRO_LAYERS = @"SELECT DISTINCT P.LayerId
+     , P.PortLayerId
+     , C.RetroProgramId, CONVERT(BIGINT, C.RowVersion) AS RowVersion 
+  FROM dbo.PortLayer P
+ INNER JOIN dbo.PortLayerCession C
+    ON C.PortLayerId = P.PortLayerId 
+ WHERE P.IsActive = 1
+   AND P.IsDeleted = 0   
+   AND C.IsActive = 1
+   AND C.IsDeleted = 0";
+
+        private const string GET_PORTFOLIO_RETRO_LAYERS_INCREMENTAL = GET_PORTFOLIO_RETRO_LAYERS + " HAVING MAX(CONVERT(BIGINT, C.RowVersion)) > {0}";
 
         #endregion Constants
     }

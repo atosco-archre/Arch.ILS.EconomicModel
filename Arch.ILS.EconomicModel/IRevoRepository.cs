@@ -1,7 +1,7 @@
 ﻿
 namespace Arch.ILS.EconomicModel
 {
-    public interface IRevoRepository : ILayerLossAnalysisRepository, IRetroLayerRepository
+    public interface IRevoRepository : ILayerLossAnalysisRepository, IRetroLayerRepository, IPortfolioRetroLayerRepository
     {
         Task<Dictionary<int, Layer>> GetLayers();
         Task<Dictionary<int, RetroProgram>> GetRetroPrograms();
