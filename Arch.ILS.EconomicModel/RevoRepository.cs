@@ -1775,9 +1775,12 @@ namespace Arch.ILS.EconomicModel
 
         private const string GET_RETRO_LAYERS_INCREMENTAL = GET_RETRO_LAYERS + " HAVING MAX(CONVERT(BIGINT, A.RowVersion)) > {0}";
 
-        private const string GET_PORTFOLIO_RETRO_LAYERS = @"SELECT DISTINCT P.LayerId
-     , P.PortLayerId
-     , C.RetroProgramId, CONVERT(BIGINT, C.RowVersion) AS RowVersion 
+        private const string GET_PORTFOLIO_RETRO_LAYERS = @"SELECT DISTINCT
+       P.PortLayerId
+     , P.LayerId
+     , P.PortfolioId
+     , C.RetroProgramId
+     , CONVERT(BIGINT, C.RowVersion) AS RowVersion 
   FROM dbo.PortLayer P
  INNER JOIN dbo.PortLayerCession C
     ON C.PortLayerId = P.PortLayerId 

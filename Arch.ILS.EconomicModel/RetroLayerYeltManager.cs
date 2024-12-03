@@ -3,7 +3,7 @@ using Arch.ILS.EconomicModel.Binary;
 
 namespace Arch.ILS.EconomicModel
 {
-    public class RetroLayerYeltManager : YeltManager, IDisposable
+    public class RetroLayerYeltManager : YeltManager, IYeltManager, IDisposable
     {
         public const int DEFAULT_TIMER_DUETIME_IN_MILLISECONDS = 0;
         public const int DEFAULT_TIMER_PERIOD_IN_MILLISECONDS = 60000;
@@ -19,9 +19,10 @@ namespace Arch.ILS.EconomicModel
         private Timer _timer;
         private bool _disposed;
 
-        public RetroLayerYeltManager(string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<int> selectedRetros = null) :
+        public RetroLayerYeltManager(in ViewType viewType, string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<int> selectedRetros = null) :
             base(revoRepository)
         {
+            ViewType = viewType;
             _yeltStorageFolderPath = yeltStorageFolderPath;
             _revoRepository = revoRepository;
             _revoLayerLossRepository = revoLayerLossRepository;
@@ -29,6 +30,8 @@ namespace Arch.ILS.EconomicModel
             _selectedRetros = selectedRetros;
             _disposed = false;
         }
+
+        public ViewType ViewType { get; }
 
         public void Initialise(bool pauseUpdate = false)
         {
@@ -132,9 +135,14 @@ namespace Arch.ILS.EconomicModel
 
         }
 
+        public bool TryGetLatestLayerLossAnalysis(in int layerId, in RevoLossViewType revoLossViewType, out LayerLossAnalysis layerLossAnalysis)
+        {
+            return TryGetLatestLayerLossAnalysis(in layerId, in revoLossViewType, ViewType, out layerLossAnalysis);
+        }
+
         private void UpdateStorage(in RetroLayer retroLayer, bool pauseUpdate)
         {
-            if (_lossAnalysesByLayerLossView.TryGetValue(retroLayer.LayerId, out var lossViewLayerLossAnalyses))
+            if (TryGetValue(ViewType, retroLayer.LayerId, out var lossViewLayerLossAnalyses))
             {
 #if DEBUG
                 foreach(var lossViewAnalyses in lossViewLayerLossAnalyses)

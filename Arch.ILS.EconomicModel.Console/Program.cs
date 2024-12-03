@@ -23,7 +23,8 @@ namespace Arch.ILS.EconomicModel.Console
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            ProcessLayerYelts(new HashSet<int> { 247/*247*/ }, RevoLossViewType.StressedView);
+            //ProcessRetroLayerYelts(new HashSet<int> { 247/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
+            ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (839,  247) }, RevoLossViewType.StressedView, ViewType.Projected);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }
 
@@ -282,7 +283,7 @@ namespace Arch.ILS.EconomicModel.Console
         {
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
-            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
+            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(ViewType.InForce, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
             retroLayerYeltManager.Initialise();
             retroLayerYeltManager.ScheduleSynchronisation();
             Thread.Sleep(140000);
@@ -290,14 +291,14 @@ namespace Arch.ILS.EconomicModel.Console
             System.Console.ReadLine();
         }
 
-        public static void ProcessLayerYelts(HashSet<int> retroProgramIds, RevoLossViewType revoLossViewType)
+        public static void ProcessRetroLayerYelts(HashSet<int> retroProgramIds, RevoLossViewType revoLossViewType, ViewType viewType)
         {
             Stopwatch stopwatch = new Stopwatch();
             System.Console.WriteLine("Process layer Yelts - Initialisation...");
             stopwatch.Restart();
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
-            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(@"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
+            RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
             retroLayerYeltManager.Initialise(true);
             stopwatch.Stop();
             System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
@@ -317,6 +318,133 @@ namespace Arch.ILS.EconomicModel.Console
             foreach (int layerId in firstRetroLayers.Keys)
             {
                 if (!retroLayerYeltManager.TryGetLatestLayerLossAnalysis(layerId, revoLossViewType, out LayerLossAnalysis layerLossAnalysis))
+                    continue;
+                if (yeltStorage.TryGetValue(layerLossAnalysis.LossAnalysisId, layerId, layerLossAnalysis.RowVersion, out IYelt yelt))
+                    layerYelt[layerId] = yelt;
+            }
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Partition Layer Yelts ...");
+            stopwatch.Restart();
+            Dictionary<IYelt, YeltPartitionReader> yeltReaders = new Dictionary<IYelt, YeltPartitionReader>();
+            foreach (var yelt in layerYelt.Values)
+            {
+                if (yelt.TotalEntryCount == 0)
+                    continue;
+                YeltPartitioner yeltPartitioner = new YeltPartitioner(new Range[] { new Range(1, 366) }, yelt);
+                YeltPartitionReader yeltPartitionLinkedListReader = YeltPartitionReader.Initialise(yeltPartitioner);
+                int totalLength = yeltPartitionLinkedListReader.TotalLength;
+                if (totalLength != yelt.TotalEntryCount)
+                    throw new Exception();
+                yeltReaders.Add(yelt, yeltPartitionLinkedListReader);
+            }
+
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Yelt Keys ...");
+            stopwatch.Restart();
+            long[] mergedSortedKeys = YeltPartitionMerge.Merge_Native(yeltReaders.Values);
+            //long[] mergedSortedKeys2 = YeltPartitionMerge.Merge(yeltReaders.Values);
+
+            //if (mergedSortedKeys2.Length != mergedSortedKeys.Length)
+            //    throw new Exception();
+
+            //for (int i = 0; i < mergedSortedKeys2.Length; i++)
+            //{
+            //    if (mergedSortedKeys2[i] != mergedSortedKeys[i])
+            //        throw new Exception();
+            //}
+
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Mapper ...");
+            stopwatch.Restart();
+            YeltPartitionMapper mapper = new YeltPartitionMapper(yeltReaders.Values, mergedSortedKeys);
+            //int[] rows = mapper.MapKeys().MappedIndices;
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            //System.Console.Write("Get Basic Mapper ...");
+            //stopwatch.Restart();
+            //mapper.MapPartitionedKeysBasic();
+            //mapper.Reset();
+            //stopwatch.Stop();
+            //System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses...");
+            stopwatch.Restart();
+            double[] eventLosses = mapper.Process(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses B...");
+            stopwatch.Restart();
+            double[] eventLossesB = mapper.ProcessPartitions(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses C...");
+            stopwatch.Restart();
+            double[] eventLossesC = mapper.ProcessNative(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Get Cession Event Losses D...");
+            stopwatch.Restart();
+            double[] eventLossesD = mapper.ProcessPartitionsNative(1.0);
+            mapper.Reset();
+            stopwatch.Stop();
+
+            System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+            System.Console.WriteLine(eventLosses.Sum());
+            System.Console.WriteLine(eventLossesB.Sum());
+            System.Console.WriteLine(eventLossesC.Sum());
+            System.Console.WriteLine(eventLossesD.Sum());
+
+            if (Math.Abs(eventLosses.Sum() - eventLossesB.Sum()) > 0.0000001)
+                throw new Exception();
+
+            if (Math.Abs(eventLossesB.Sum() - eventLossesC.Sum()) > 0.0000001)
+                throw new Exception();
+
+            if (Math.Abs(eventLossesB.Sum() - eventLossesD.Sum()) > 0.0000001)
+                throw new Exception();
+        }
+
+        public static void ProcessPortfolioRetroLayerYelts(HashSet<(int portfolioId, int retroId)> portfolioRetroProgramIds, RevoLossViewType revoLossViewType, ViewType viewType)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            System.Console.WriteLine("Process layer Yelts - Initialisation...");
+            stopwatch.Restart();
+            IRevoRepository revoRepository = GetRevoSnowflakeRepository();
+            IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
+            PortfolioRetroLayerYeltManager portfolioRetroLayerYeltManager = new PortfolioRetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, portfolioRetroProgramIds);
+            portfolioRetroLayerYeltManager.Initialise();
+            stopwatch.Stop();
+            System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
+
+            System.Console.Write("Fetch Layer Yelts...");
+            stopwatch.Restart();
+            Dictionary<(int portfolioId, int retroId), Dictionary<int, PortfolioRetroLayer>> portfolioRetroLayersByRetroIdByLayerId = new();
+            foreach ((int portfolioId, int retroProgramId) portfolioRetroId in portfolioRetroProgramIds)
+            {
+                if (portfolioRetroLayerYeltManager.TryGetPortfolioRetroLayers(portfolioRetroId, out var portfolioRetroLayers))
+                    portfolioRetroLayersByRetroIdByLayerId[portfolioRetroId] = portfolioRetroLayers.ToDictionary(x => x.LayerId);
+            }
+
+            var firstRetroLayers = portfolioRetroLayersByRetroIdByLayerId.First().Value;
+            YeltStorage yeltStorage = portfolioRetroLayerYeltManager.YeltStorage;
+            Dictionary<int, IYelt> layerYelt = new Dictionary<int, IYelt>();
+            foreach (int layerId in firstRetroLayers.Keys)
+            {
+                if (!portfolioRetroLayerYeltManager.TryGetLatestLayerLossAnalysis(layerId, revoLossViewType, out LayerLossAnalysis layerLossAnalysis))
                     continue;
                 if (yeltStorage.TryGetValue(layerLossAnalysis.LossAnalysisId, layerId, layerLossAnalysis.RowVersion, out IYelt yelt))
                     layerYelt[layerId] = yelt;

@@ -3,7 +3,7 @@ using Arch.ILS.EconomicModel.Binary;
 
 namespace Arch.ILS.EconomicModel
 {
-    public class PortfolioRetroLayerYeltManager : YeltManager, IDisposable
+    public class PortfolioRetroLayerYeltManager : YeltManager, IYeltManager, IDisposable
     {
         public const int DEFAULT_TIMER_DUETIME_IN_MILLISECONDS = 0;
         public const int DEFAULT_TIMER_PERIOD_IN_MILLISECONDS = 60000;
@@ -19,9 +19,10 @@ namespace Arch.ILS.EconomicModel
         private Timer _timer;
         private bool _disposed;
 
-        public PortfolioRetroLayerYeltManager(string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<(int portfolioId, int retroId)> selectedPortfolioRetros = null) :
+        public PortfolioRetroLayerYeltManager(in ViewType viewType, in string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<(int portfolioId, int retroId)> selectedPortfolioRetros = null) :
             base(revoRepository)
         {
+            ViewType = viewType;
             _yeltStorageFolderPath = yeltStorageFolderPath;
             _revoRepository = revoRepository;
             _revoLayerLossRepository = revoLayerLossRepository;
@@ -30,7 +31,9 @@ namespace Arch.ILS.EconomicModel
             _disposed = false;
         }
 
-        public void Initialise(bool pauseUpdate = false)
+        public ViewType ViewType { get; }
+
+        public void Initialise(bool pauseRepoUpdate = false)
         {
             if (_selectedPortfolioRetros != null)
             {
@@ -54,7 +57,7 @@ namespace Arch.ILS.EconomicModel
             Parallel.ForEach(_portfolioRetroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, portfolioRetroLayer =>
             {
 #endif
-                UpdateStorage(in portfolioRetroLayer, pauseUpdate);
+                UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
 #if !DEBUG
             });
 #endif
@@ -80,7 +83,7 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
-        public void Synchronise(bool pauseUpdate = false)
+        public void Synchronise(bool pauseRepoUpdate = false)
         {
 #if DEBUG
             Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
@@ -111,16 +114,21 @@ namespace Arch.ILS.EconomicModel
                 layers[portfolioRetroLayer.LayerId] = portfolioRetroLayer;
                 if (portfolioRetroLayer.RowVersion > _currentMaxRowVersion)
                     _currentMaxRowVersion = portfolioRetroLayer.RowVersion;
-                UpdateStorage(in portfolioRetroLayer, pauseUpdate);
+                UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
             }
 #if !DEBUG
             );
 #endif
         }
 
-        public bool TryGetRetroLayers(int portfolioId, int retroProgramId, out IEnumerable<PortfolioRetroLayer> portfolioRetroLayers)
+        public bool TryGetPortfolioRetroLayers(int portfolioId, int retroProgramId, out IEnumerable<PortfolioRetroLayer> portfolioRetroLayers)
         {
-            if (_portfolioRetroLayers.TryGetValue((portfolioId, retroProgramId), out var layersById))
+            return TryGetPortfolioRetroLayers((portfolioId, retroProgramId), out portfolioRetroLayers);
+        }
+
+        public bool TryGetPortfolioRetroLayers((int portfolioId, int retroProgramId) portfolioRetroId, out IEnumerable<PortfolioRetroLayer> portfolioRetroLayers)
+        {
+            if (_portfolioRetroLayers.TryGetValue(portfolioRetroId, out var layersById))
             {
                 portfolioRetroLayers = layersById.Values;
                 return true;
@@ -133,9 +141,14 @@ namespace Arch.ILS.EconomicModel
 
         }
 
+        public bool TryGetLatestLayerLossAnalysis(in int layerId, in RevoLossViewType revoLossViewType, out LayerLossAnalysis layerLossAnalysis)
+        {
+            return TryGetLatestLayerLossAnalysis(in layerId, in revoLossViewType, ViewType, out layerLossAnalysis);
+        }
+
         private void UpdateStorage(in PortfolioRetroLayer portfolioRetroLayer, bool pauseUpdate)
         {
-            if (_lossAnalysesByLayerLossView.TryGetValue(portfolioRetroLayer.LayerId, out var lossViewLayerLossAnalyses))
+            if (TryGetValue(ViewType, portfolioRetroLayer.LayerId, out var lossViewLayerLossAnalyses))
             {
 #if DEBUG
                 foreach(var lossViewAnalyses in lossViewLayerLossAnalyses)
