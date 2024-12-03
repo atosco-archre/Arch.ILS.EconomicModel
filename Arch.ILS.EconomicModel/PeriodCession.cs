@@ -3,11 +3,11 @@ namespace Arch.ILS.EconomicModel
 {
     public readonly struct PeriodCession
     {
-        public PeriodCession(in DateTime startInclusive, in DateTime endInclusive, in decimal cession)
+        public PeriodCession(in DateTime startInclusive, in DateTime endInclusive, in decimal netCession)
         {
             StartInclusive = startInclusive;
             EndInclusive = endInclusive;
-            NetCession = cession;
+            NetCession = netCession;
         }
 
         public DateTime StartInclusive { get; init; }

@@ -696,7 +696,7 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public Task<PortfolioRetroCessions> GetLayerView(int partitionCount = 8)
+        public Task<PortfolioRetroCessions> GetPortfolioRetroCessionView(ResetType resetType = ResetType.LOD, int partitionCount = 8)
         {
             return Task.Factory.StartNew(() =>
             {
@@ -773,7 +773,7 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
-        public Task<RetroCessions> GetRetroAllocationView(ResetType resetType = ResetType.LOD)
+        public Task<RetroCessions> GetRetroCessionView(ResetType resetType = ResetType.LOD)
         {
             return Task.Factory.StartNew(() =>
             {

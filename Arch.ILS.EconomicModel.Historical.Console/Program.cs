@@ -91,7 +91,7 @@ namespace Arch.ILS.EconomicModel.Historical.Console
             //RevoConnectionStrings connectionSettings = new RevoConnectionStrings(connectionProtection, false);
             //RevoRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
             RevoRepository revoRepository = new RevoSnowflakeRepository(new SnowflakeConnectionStrings().RevoBermudaConnectionString);
-            var retroAllocationView = revoRepository.GetRetroAllocationView().Result;
+            var retroAllocationView = revoRepository.GetRetroCessionView().Result;
             var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
             ScenarioConnectionStrings scenarioConnectionSettings = new ScenarioConnectionStrings();
             ScenarioSqlRepository scenarioRepository = new ScenarioSqlRepository(scenarioConnectionSettings.GetConnectionString(ScenarioConnectionStrings.ARG_DWVARLSQL01));

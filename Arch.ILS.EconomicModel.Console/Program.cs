@@ -8,6 +8,7 @@ using Arch.ILS.EconomicModel;
 using Arch.ILS.EconomicModel.Binary;
 using Arch.ILS.Snowflake;
 using Google.Apis.Storage.v1.Data;
+using static Arch.ILS.EconomicModel.Console.Program;
 
 namespace Arch.ILS.EconomicModel.Console
 {
@@ -23,8 +24,8 @@ namespace Arch.ILS.EconomicModel.Console
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            //ProcessRetroLayerYelts(new HashSet<int> { 247/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
-            ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (839,  247) }, RevoLossViewType.StressedView, ViewType.Projected);
+            ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
+            //ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (839,  247) }, RevoLossViewType.StressedView, ViewType.Projected);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }
 
@@ -42,7 +43,7 @@ namespace Arch.ILS.EconomicModel.Console
             //var retroInitialCessions = revoRepository.GetRetroInitialCessions().Result.ToList();
             //var investorResetCessions = revoRepository.GetInvestorResetCessions().Result.ToList();
             //var investorInitialCessions = revoRepository.GetInvestorInitialCessions().Result.ToList();
-            var retroAllocationView = revoRepository.GetRetroAllocationView(resetType).Result;
+            var retroAllocationView = revoRepository.GetRetroCessionView(resetType).Result;
             var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
             var layerDetails = revoRepository.GetLayerDetails().Result;
             var retroPrograms = revoRepository.GetRetroPrograms().Result;
@@ -65,7 +66,7 @@ namespace Arch.ILS.EconomicModel.Console
         {
             /*Authentication*/
             RevoRepository revoRepository = GetRevoSnowflakeRepository();
-            var retroAllocationView = revoRepository.GetRetroAllocationView();
+            var retroAllocationView = revoRepository.GetRetroCessionView();
             var retroProfiles = revoRepository.GetRetroProfiles();
             var retroPrograms = revoRepository.GetRetroPrograms();
             var layerDetails = revoRepository.GetLayerDetails();
@@ -133,7 +134,7 @@ namespace Arch.ILS.EconomicModel.Console
         {
             /*Authentication*/
             RevoRepository revoRepository = GetRevoSnowflakeRepository();
-            var retroAllocationView = revoRepository.GetRetroAllocationView();
+            var retroAllocationView = revoRepository.GetRetroCessionView();
             var retroPrograms = revoRepository.GetRetroPrograms();
             var layerDetails = revoRepository.GetLayerDetails();
             var submissions = revoRepository.GetSubmissions();
@@ -208,7 +209,7 @@ namespace Arch.ILS.EconomicModel.Console
         {
             /*Authentication*/
             RevoRepository revoRepository = GetRevoSnowflakeRepository();
-            var retroAllocationView = revoRepository.GetRetroAllocationView(resetType);
+            var retroAllocationView = revoRepository.GetRetroCessionView(resetType);
             var retroPrograms = revoRepository.GetRetroPrograms();
             var layerDetails = revoRepository.GetLayerDetails();
             var submissions = revoRepository.GetSubmissions();
@@ -265,18 +266,29 @@ namespace Arch.ILS.EconomicModel.Console
             }
         }
 
-        public static void SetPortfolioLayerCession()
+        public static void ExportPortfolioLayerCession(string outputFilePath, ResetType resetType = ResetType.LOD)
         {
             /*Authentication*/
             RevoRepository revoRepository = GetRevoSnowflakeRepository();
             /*Queries*/
-            var Layers2 = revoRepository.GetLayers().Result;
+            var Layers = revoRepository.GetLayers().Result;
             var portfolios = revoRepository.GetPortfolios().Result;
             var portLayers = revoRepository.GetPortfolioLayers().Result;
-            var result = revoRepository.GetLayerView().Result;
-            var x = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218).ToArray();
-            var xd = result.GetPortfolioLevelLayerCessions().Where(x => x.RetroProgramId == 218 && x.PortLayerId == 750703).ToArray();
-            var portLayersCessions2 = revoRepository.GetPortfolioLayerCessionsParallel().Result.ToArray();
+            var portfolioRetroCessionView = revoRepository.GetPortfolioRetroCessionView(resetType).Result;
+            var portfolioLevelLayerCessions = portfolioRetroCessionView.GetPortfolioLevelLayerCessions().ToArray();
+
+            using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine($"RetroLevel,RetroProgramId,RetroProgramType,RetroInceptionDate,RetroExpirationDate,LayerId,LayerInceptionDate,LayerExpirationDate,CessionStartDateInclusive,CessionEndDateInclusive,CededPremium,CededLimit");
+                //foreach (RetroLayerMetrics retroLayerMetric in retroLayerMetrics)
+                //{
+                //    var retro = retroPrograms.Result[retroLayerMetric.RetroProgramid];
+                //    var layer = layerDetails.Result[retroLayerMetric.LayerId];
+                //    sw.WriteLine($"{retro.RetroLevelType},{retroLayerMetric.RetroProgramid},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{retroLayerMetric.LayerId},{layer.Inception},{layer.Expiration},{layer.Status.ToString()},{retroLayerMetric.StartDateInclusive},{retroLayerMetric.EndDateInclusive},{retroLayerMetric.CededPremium},{retroLayerMetric.CededLimit}");
+                //}
+                sw.Flush();
+            }
         }
 
         public static void UploadRetroYelts(HashSet<int> retroProgramIds)

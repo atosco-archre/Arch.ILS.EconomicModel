@@ -73,12 +73,12 @@ namespace Arch.ILS.EconomicModel
                         {
                             var periodCession = new PeriodCession(retroCession.OverlapStart, retroCession.OverlapEnd, retroCession.CessionGross);
                             var sLayerCumulativeCessions = CollectionsMarshal.AsSpan<PeriodCession>(layerCumulativeCessions);
-                            FindNetCessions(new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, ref periodCession), sLayerCumulativeCessions, ref currentLevelLayerPeriodCessions);
+                            FindNetCessions(new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, retroCession.CessionGross, ref periodCession), sLayerCumulativeCessions, ref currentLevelLayerPeriodCessions);
                         }
                         else
                         {
                             PeriodCession periodCession = new PeriodCession(retroCession.OverlapStart, retroCession.OverlapEnd, retroCession.CessionGross);
-                            LayerPeriodCession cession = new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, ref periodCession);
+                            LayerPeriodCession cession = new LayerPeriodCession(retroCession.RetroLevelType, retroCession.RetroProgramId, in layerId, retroCession.CessionGross, ref periodCession);
                             currentLevelLayerPeriodCessions.Add(cession);
                         }
                     }
@@ -179,19 +179,19 @@ namespace Arch.ILS.EconomicModel
             if (rangeA.TryGetLeftNonOverlap(ref rangeB, out DateTimeRange leftNonOverlap))
             {
                 PeriodCession cession = new PeriodCession(leftNonOverlap.StartInclusive, leftNonOverlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession);
-                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, currentLayerRetroCession.GrossCession, ref cession), previousCumulativeCessions, ref output);
             }
 
             if (rangeA.TryGetRightNonOverlap(ref rangeB, out DateTimeRange rightNonOverlap))
             {
                 PeriodCession cession = new PeriodCession(rightNonOverlap.StartInclusive, rightNonOverlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession);
-                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, currentLayerRetroCession.GrossCession, ref cession), previousCumulativeCessions, ref output);
             }
 
             if (rangeA.TryGetOverlap(ref rangeB, out DateTimeRange overlap))
             {
                 PeriodCession cession = new PeriodCession(overlap.StartInclusive, overlap.EndInclusive, currentLayerRetroCession.PeriodCession.NetCession * (1.0m - cessionB.NetCession));
-                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, ref cession), previousCumulativeCessions, ref output);
+                FindNetCessions(new LayerPeriodCession(currentLayerRetroCession.RetroLevel, currentLayerRetroCession.RetroProgramId, currentLayerRetroCession.LayerId, currentLayerRetroCession.GrossCession, ref cession), previousCumulativeCessions, ref output);
             }
         }
     }

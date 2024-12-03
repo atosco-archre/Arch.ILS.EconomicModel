@@ -5,7 +5,10 @@
 Debug/
 Release/
 .vs/
-
+*/**/bin/Debug
+*/**/bin/Release
+*/**/obj/Debug
+*/**/obj/Release
 /Arch.ILS.EconomicModel.Console/App.config
 /Arch.ILS.EconomicModel.Console/App.config.config
 /Arch.ILS.EconomicModel.Historical.Console/App.config
