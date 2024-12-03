@@ -25,5 +25,11 @@ namespace Arch.ILS.EconomicModel
         {
             *CurrentPosition++ = *index;
         }
+
+        public void Write(int index)
+        {
+            *CurrentPosition++ = index;
+        }
+
     }
 }

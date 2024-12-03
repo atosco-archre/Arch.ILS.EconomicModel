@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -19,12 +20,12 @@ namespace Arch.ILS.EconomicModel
         {
             public MappedIndices(int** mappedIndices, int size)
             {
-                Indices = mappedIndices; 
+                Indices = mappedIndices;
                 Size = size;
             }
 
             public int** Indices { get; }
-            public int Size{ get; }
+            public int Size { get; }
         }
 
         #endregion Types
@@ -36,8 +37,14 @@ namespace Arch.ILS.EconomicModel
 
         #endregion Constants
 
+        #region Variables
+
+        private Dictionary<long, int> _keyIndices;
+
+        #endregion Variables
+
         public YeltPartitionMapper(IEnumerable<YeltPartitionReader> yeltPartitionReaders, long[] sortedKeys, int bufferSize = DefaultBufferSize)
-        { 
+        {
             YeltPartitionReaders = yeltPartitionReaders.Where(x => x.IsOpen).ToArray();
             TotalLength = YeltPartitionReaders.Sum(x => x.TotalLength);
             SortedKeys = sortedKeys;
@@ -157,7 +164,7 @@ namespace Arch.ILS.EconomicModel
             int** mappedIndices = (int**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * size), (nuint)Unsafe.SizeOf<IntPtr>());
 
             Task[] tasks = new Task[partitionCount];
-            for(int partitionIndex = 0; partitionIndex < partitionCount; ++partitionIndex)
+            for (int partitionIndex = 0; partitionIndex < partitionCount; ++partitionIndex)
             {
                 tasks[partitionIndex] = Task.Factory.StartNew((rangeObj) =>
                 {
@@ -226,13 +233,38 @@ namespace Arch.ILS.EconomicModel
                 }, ranges[partitionIndex]);
             }
             Task.WaitAll(tasks);
+            return new(mappedIndices, size);
+        }
+        private unsafe MappedIndices MapPartitionedKeysBasic(int partitionCount = DefaultPartitionCount)
+        {
+            if (_keyIndices == null)
+                _keyIndices = SortedKeys.Select((x, i) => (x, i)).ToDictionary(k => k.x, v => v.i);
 
+            int keysLength = SortedKeys.Length;
+            int size = YeltPartitionReaders.Count;
+            int** mappedIndices = (int**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * size), (nuint)Unsafe.SizeOf<IntPtr>());
+            Parallel.For(0, size, (i) => 
+            {
+                mappedIndices[i] = (int*)NativeMemory.AlignedAlloc((nuint)((YeltPartitionReaders[i].TotalLength) << 2), (nuint)Unsafe.SizeOf<int>());
+                var reader = YeltPartitionReaders[i];
+                var indexer = new YeltPartitionIndexer(YeltPartitionReaders[i], mappedIndices[i]);
+
+                if(indexer.YeltPartitionReader.IsOpen)
+                {
+                    do
+                    {
+                        indexer.Write(_keyIndices[*indexer.YeltPartitionReader.CurrentPartitionCurrentItem]);
+                        reader.SetNext();
+                    } 
+                    while (indexer.YeltPartitionReader.IsOpen);
+                }
+            });
             return new(mappedIndices, size);
         }
 
         public unsafe double[] Process(double cession, int maxDegreeOfParallelism = 2)
         {
-            (int[] mappedIndices, int[] startIndicesInMappedIndices) = MapKeys(); 
+            (int[] mappedIndices, int[] startIndicesInMappedIndices) = MapKeys();
             Reset();
             double[] eventLosses = new double[SortedKeys.Length];
 
@@ -292,7 +324,7 @@ namespace Arch.ILS.EconomicModel
                             {
                                 Vector<double> v_Cession_LossPcts = Vector.Load<double>(currentPtr) * v_Cession;
                                 currentPtr += inVectorCount;
-                                for(int i = 0; i < inVectorCount; ++i)
+                                for (int i = 0; i < inVectorCount; ++i)
                                     Add(ref s_EventLosses[*mappedIndicesCurrentIndexPtr++], v_Cession_LossPcts[i]);
                             }
                         }
@@ -363,7 +395,7 @@ namespace Arch.ILS.EconomicModel
                             for (int i = 0; i < inVectorCount; ++i)
                             {
                                 Add(ref s_EventLosses[*mappedIndicesCurrentIndexPtr++], v_Cession_LossPcts[i]);
-                            }                              
+                            }
                         }
                     }
                     else if (Vector.IsHardwareAccelerated)
@@ -448,7 +480,7 @@ namespace Arch.ILS.EconomicModel
                 sparse_index_base_t indexing = sparse_index_base_t.SPARSE_INDEX_BASE_ZERO;
                 GCHandle indexing_pin = GCHandle.Alloc(indexing, GCHandleType.Pinned);
                 int rows = SortedKeys.Length;
-                GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);                
+                GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
                 IntPtr A = new IntPtr();
                 sparse_status_t csc_creation_status = mkl_sparse_d_create_csc(&A, indexing, rows, columns, startIndicesInMappedIndicesPtr, startIndicesInMappedIndicesPtr + 1, mappedIndicesPtr, lossesPtr);
                 if (csc_creation_status != sparse_status_t.SPARSE_STATUS_SUCCESS)
@@ -457,7 +489,7 @@ namespace Arch.ILS.EconomicModel
                 GCHandle operation_pin = GCHandle.Alloc(operation, GCHandleType.Pinned);
                 double alpha = 1;
                 GCHandle alpha_pin = GCHandle.Alloc(alpha, GCHandleType.Pinned);
-                matrix_descr matrix_descr  = new matrix_descr { sparse_matrix_type_t = sparse_matrix_type_t.SPARSE_MATRIX_TYPE_GENERAL, sparse_fill_mode_t = sparse_fill_mode_t.SPARSE_FILL_MODE_FULL, sparse_diag_type_t = sparse_diag_type_t.SPARSE_DIAG_NON_UNIT };
+                matrix_descr matrix_descr = new matrix_descr { sparse_matrix_type_t = sparse_matrix_type_t.SPARSE_MATRIX_TYPE_GENERAL, sparse_fill_mode_t = sparse_fill_mode_t.SPARSE_FILL_MODE_FULL, sparse_diag_type_t = sparse_diag_type_t.SPARSE_DIAG_NON_UNIT };
                 GCHandle matrix_descr_pin = GCHandle.Alloc(matrix_descr, GCHandleType.Pinned);
                 double beta = 1;
                 GCHandle beta_pin = GCHandle.Alloc(beta, GCHandleType.Pinned);
@@ -509,7 +541,7 @@ namespace Arch.ILS.EconomicModel
                     {
                         double* lossesPtr = yeltPartition.CurrentStartLossPct;
                         int[] startIndicesInMappedIndices = [0, yeltPartition.CurrentLength];
-                        fixed(int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
+                        fixed (int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
                         {
                             mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesInMappedIndicesPtr, mappedIndicesCurrentIndexPtr, cessionsPtr, eventLossesPtr);
                             yeltPartition = yeltPartition.NextNode;

@@ -25,7 +25,7 @@ namespace Arch.ILS.EconomicModel.Console
             //ProcessLayerYelts();
             ProcessLayerYelts(new HashSet<int> { 247/*247*/ }, RevoLossViewType.StressedView);
             //UploadRetroYelts(new HashSet<int> { 274 });
-        }        
+        }
 
         public static void ExportRetroLayerCessions(string outputFilePath, ResetType resetType)
         {
@@ -70,7 +70,7 @@ namespace Arch.ILS.EconomicModel.Console
             var layerDetails = revoRepository.GetLayerDetails();
             var submissions = revoRepository.GetSubmissions();
             var fxRates = revoRepository.GetFXRates();
-             
+
             Task.WaitAll(retroAllocationView, retroProfiles, retroPrograms, layerDetails, submissions, fxRates);
             Dictionary<int, Dictionary<int, decimal>> retroProfileUwYearPremium = new Dictionary<int, Dictionary<int, decimal>>();
             var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
@@ -367,6 +367,13 @@ namespace Arch.ILS.EconomicModel.Console
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
 
+            //System.Console.Write("Get Basic Mapper ...");
+            //stopwatch.Restart();
+            //mapper.MapPartitionedKeysBasic();
+            //mapper.Reset();
+            //stopwatch.Stop();
+            //System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
+
             System.Console.Write("Get Cession Event Losses...");
             stopwatch.Restart();
             double[] eventLosses = mapper.Process(1.0);
@@ -410,7 +417,7 @@ namespace Arch.ILS.EconomicModel.Console
                 throw new Exception();
         }
 
-        public unsafe static void ProcessLayerYelts() 
+        public unsafe static void ProcessLayerYelts()
         {
             int bucket = 0;
             nuint i = (uint)bucket - 1;
@@ -425,7 +432,7 @@ namespace Arch.ILS.EconomicModel.Console
             sx2.Stop();
             System.Console.WriteLine(sx2.Elapsed);
             sx2.Restart();
-            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);    
+            RevoYeltBinaryWriter revoYeltBinaryWriter = new RevoYeltBinaryWriter(layerYelt);
             revoYeltBinaryWriter.WriteAll(filePath);
             sx2.Stop();
             System.Console.WriteLine(sx2.Elapsed);
@@ -506,7 +513,7 @@ namespace Arch.ILS.EconomicModel.Console
             }
 
             public int RetroProgramId { get; }
-            public decimal CededPremium { get; set; } 
+            public decimal CededPremium { get; set; }
             public Dictionary<DateTime, decimal> DateCededLimits { get; }
         }
 
