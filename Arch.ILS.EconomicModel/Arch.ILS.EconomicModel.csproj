@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj" />
     <ProjectReference Include="..\..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj" />
     <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core\Studio.Core.csproj" />
   </ItemGroup>
 
 </Project>

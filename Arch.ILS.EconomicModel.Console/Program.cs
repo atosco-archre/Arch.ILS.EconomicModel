@@ -311,7 +311,7 @@ namespace Arch.ILS.EconomicModel.Console
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
-            retroLayerYeltManager.Initialise(false);
+            retroLayerYeltManager.Initialise(true);
             stopwatch.Stop();
             System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
 

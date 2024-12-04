@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.Benc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.Console", "Arch.ILS.EconomicModel.Console\Arch.ILS.EconomicModel.Console.csproj", "{3411F895-31B3-4A68-982E-107B919F3118}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core", "..\Studio.Core\Studio.Core\Studio.Core.csproj", "{6899DD8C-554A-4881-A045-6F26476B3E37}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core.Sql", "..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj", "{C64026DA-3EEB-4610-8944-7EF60FFCF748}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Common", "..\Arch.ILS.Common\Arch.ILS.Common\Arch.ILS.Common.csproj", "{06176188-B895-45CB-A544-0116A52241FB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.Core", "..\Arch.ILS.Core\Arch.ILS.Core\Arch.ILS.Core.csproj", "{39002927-96A7-4650-B1FB-BCA7774C11D4}"
@@ -29,9 +25,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LargeLoss.LayeringService.C
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Arch.ILS.EconomicModel.Historical.Database", "Arch.ILS.EconomicModel.Historical.Database\Arch.ILS.EconomicModel.Historical.Database.sqlproj", "{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.IntelMKL", "..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj", "{C247F1B2-3238-4B66-82FF-BF1B23569242}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arch.ILS.EconomicModel.UnitTest", "Arch.ILS.EconomicModel.UnitTest\Arch.ILS.EconomicModel.UnitTest.csproj", "{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core.Sql", "..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj", "{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core", "..\Studio.Core\Studio.Core\Studio.Core.csproj", "{85713DC9-C62D-478C-A2AD-C70AA200F602}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.IntelMKL", "..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj", "{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,14 +51,6 @@ Global
 		{3411F895-31B3-4A68-982E-107B919F3118}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3411F895-31B3-4A68-982E-107B919F3118}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3411F895-31B3-4A68-982E-107B919F3118}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6899DD8C-554A-4881-A045-6F26476B3E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6899DD8C-554A-4881-A045-6F26476B3E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6899DD8C-554A-4881-A045-6F26476B3E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6899DD8C-554A-4881-A045-6F26476B3E37}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C64026DA-3EEB-4610-8944-7EF60FFCF748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C64026DA-3EEB-4610-8944-7EF60FFCF748}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C64026DA-3EEB-4610-8944-7EF60FFCF748}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C64026DA-3EEB-4610-8944-7EF60FFCF748}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06176188-B895-45CB-A544-0116A52241FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06176188-B895-45CB-A544-0116A52241FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06176188-B895-45CB-A544-0116A52241FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,14 +83,22 @@ Global
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C247F1B2-3238-4B66-82FF-BF1B23569242}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85713DC9-C62D-478C-A2AD-C70AA200F602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85713DC9-C62D-478C-A2AD-C70AA200F602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85713DC9-C62D-478C-A2AD-C70AA200F602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85713DC9-C62D-478C-A2AD-C70AA200F602}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

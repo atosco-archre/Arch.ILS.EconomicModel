@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core\Studio.Core.csproj" />
     <ProjectReference Include="..\Arch.ILS.EconomicModel.Historical\Arch.ILS.EconomicModel.Historical.csproj" />
   </ItemGroup>
 

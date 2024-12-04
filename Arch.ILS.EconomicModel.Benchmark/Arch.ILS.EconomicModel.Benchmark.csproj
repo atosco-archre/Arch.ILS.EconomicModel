@@ -14,8 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Arch.ILS.Core\Arch.ILS.Core\Arch.ILS.Core.csproj" />
-    <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
-    <ProjectReference Include="..\..\Studio.Core\Studio.Core\Studio.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Arch.ILS.Common\Arch.ILS.Common\Arch.ILS.Common.csproj" />
     <ProjectReference Include="..\..\LargeLoss.LayeringService.Client\LargeLoss.LayeringService.Client\LargeLoss.LayeringService.Client.csproj" />
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj" />
+    <ProjectReference Include="..\..\Studio.Core\Studio.Core\Studio.Core.csproj" />
     <ProjectReference Include="..\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.csproj" />
   </ItemGroup>
 
