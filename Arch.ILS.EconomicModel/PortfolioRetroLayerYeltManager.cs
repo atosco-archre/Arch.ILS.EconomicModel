@@ -19,8 +19,8 @@ namespace Arch.ILS.EconomicModel
         private Timer _timer;
         private bool _disposed;
 
-        public PortfolioRetroLayerYeltManager(in ViewType viewType, in string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<(int portfolioId, int retroId)> selectedPortfolioRetros = null) :
-            base(revoRepository)
+        public PortfolioRetroLayerYeltManager(in ViewType viewType, in string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<(int portfolioId, int retroId)> selectedPortfolioRetros = null, HashSet<SegmentType> segmentFilter = null)
+            : base(revoRepository, revoRepository, segmentFilter)
         {
             ViewType = viewType;
             _yeltStorageFolderPath = yeltStorageFolderPath;
@@ -33,34 +33,37 @@ namespace Arch.ILS.EconomicModel
 
         public ViewType ViewType { get; }
 
-        public void Initialise(bool pauseRepoUpdate = false)
+        public Task Initialise(bool pauseRepoUpdate = false)
         {
-            if (_selectedPortfolioRetros != null)
+            return Task.Factory.StartNew(() => 
             {
-                _portfolioRetroLayers = _portfolioRetroLayerRepository.GetPortfolioRetroLayers().Result
-                    .Where(x => _selectedPortfolioRetros.Contains((x.PortfolioId, x.RetroProgramId)))
-                    .GroupBy(g => (g.PortfolioId, g.RetroProgramId))
-                    .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
-            }
-            else
-            {
-                _portfolioRetroLayers = _portfolioRetroLayerRepository.GetPortfolioRetroLayers().Result
-                    .GroupBy(g => (g.PortfolioId, g.RetroProgramId))
-                    .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
-            }
+                base.Initialise().Wait();
+                if (_selectedPortfolioRetros != null)
+                {
+                    _portfolioRetroLayers = _portfolioRetroLayerRepository.GetPortfolioRetroLayers().Result
+                        .Where(x => _selectedPortfolioRetros.Contains((x.PortfolioId, x.RetroProgramId)))
+                        .GroupBy(g => (g.PortfolioId, g.RetroProgramId))
+                        .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
+                }
+                else
+                {
+                    _portfolioRetroLayers = _portfolioRetroLayerRepository.GetPortfolioRetroLayers().Result
+                        .GroupBy(g => (g.PortfolioId, g.RetroProgramId))
+                        .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
+                }
 
-            _currentMaxRowVersion = _portfolioRetroLayers.Values.SelectMany(x => x.Values).Select(y => y.RowVersion).Max();
-
+                _currentMaxRowVersion = _portfolioRetroLayers.Values.SelectMany(x => x.Values).Select(y => y.RowVersion).Max();
 #if DEBUG
-            foreach(PortfolioRetroLayer portfolioRetroLayer in _portfolioRetroLayers.Values.SelectMany(x => x.Values))
+                foreach(PortfolioRetroLayer portfolioRetroLayer in _portfolioRetroLayers.Values.SelectMany(x => x.Values))
 #else
-            Parallel.ForEach(_portfolioRetroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, portfolioRetroLayer =>
-            {
+                Parallel.ForEach(_portfolioRetroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, portfolioRetroLayer =>
+                {
 #endif
-                UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
+                    UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
 #if !DEBUG
-            });
+                });
 #endif
+            });
         }
 
         public void ScheduleSynchronisation(int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
@@ -83,42 +86,45 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
-        public void Synchronise(bool pauseRepoUpdate = false)
+        public Task Synchronise(bool pauseRepoUpdate = false)
         {
-#if DEBUG
-            Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
-#endif
-            base.Synchronise();
-#if DEBUG
-            foreach (var portfolioRetroLayer in _portfolioRetroLayerRepository.GetPortfolioRetroLayers(_currentMaxRowVersion).Result)
-#else
-            Parallel.ForEach(_portfolioRetroLayerRepository.GetPortfolioRetroLayers(_currentMaxRowVersion).Result, (portfolioRetroLayer) =>
-#endif
+            return Task.Factory.StartNew(() =>
             {
-                (int PortfolioId, int RetroProgramId) key = (portfolioRetroLayer.PortfolioId, portfolioRetroLayer.RetroProgramId);
-                if (_selectedPortfolioRetros != null && !_selectedPortfolioRetros.Contains(key))
+#if DEBUG
+                Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
+#endif
+                base.Synchronise().Wait();
+#if DEBUG
+                foreach (var portfolioRetroLayer in _portfolioRetroLayerRepository.GetPortfolioRetroLayers(_currentMaxRowVersion).Result)
+#else
+                Parallel.ForEach(_portfolioRetroLayerRepository.GetPortfolioRetroLayers(_currentMaxRowVersion).Result, (portfolioRetroLayer) =>
+#endif
+                {
+                    (int PortfolioId, int RetroProgramId) key = (portfolioRetroLayer.PortfolioId, portfolioRetroLayer.RetroProgramId);
+                    if (_selectedPortfolioRetros != null && !_selectedPortfolioRetros.Contains(key))
 #if DEBUG
                     continue;
 #else
-                    return;
+                        return;
 #endif
-                if (!_portfolioRetroLayers.TryGetValue(key, out var layers))
-                {
-                    layers = new Dictionary<int, PortfolioRetroLayer>();
-                    _portfolioRetroLayers[key] = layers;
+                    if (!_portfolioRetroLayers.TryGetValue(key, out var layers))
+                    {
+                        layers = new Dictionary<int, PortfolioRetroLayer>();
+                        _portfolioRetroLayers[key] = layers;
+                    }
+
+                    if (layers.TryGetValue(portfolioRetroLayer.LayerId, out var layer) && layer.RowVersion > portfolioRetroLayer.RowVersion)
+                        throw new Exception();
+
+                    layers[portfolioRetroLayer.LayerId] = portfolioRetroLayer;
+                    if (portfolioRetroLayer.RowVersion > _currentMaxRowVersion)
+                        _currentMaxRowVersion = portfolioRetroLayer.RowVersion;
+                    UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
                 }
-
-                if (layers.TryGetValue(portfolioRetroLayer.LayerId, out var layer) && layer.RowVersion > portfolioRetroLayer.RowVersion)
-                    throw new Exception();
-
-                layers[portfolioRetroLayer.LayerId] = portfolioRetroLayer;
-                if (portfolioRetroLayer.RowVersion > _currentMaxRowVersion)
-                    _currentMaxRowVersion = portfolioRetroLayer.RowVersion;
-                UpdateStorage(in portfolioRetroLayer, pauseRepoUpdate);
-            }
 #if !DEBUG
-            );
+                );
 #endif
+            });
         }
 
         public bool TryGetPortfolioRetroLayers(int portfolioId, int retroProgramId, out IEnumerable<PortfolioRetroLayer> portfolioRetroLayers)

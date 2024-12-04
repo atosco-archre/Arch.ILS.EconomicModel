@@ -14,10 +14,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Arch.ILS.Core\Arch.ILS.Core\Arch.ILS.Core.csproj" />
+    <ProjectReference Include="..\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Indexer\Output\" />
+    <Folder Include="YeltProcess\Output\" />
   </ItemGroup>
 
 </Project>

@@ -3,8 +3,8 @@ using Arch.ILS.EconomicModel.Benchmark.Indexer;
 
 
 /*Upload*/
-LayerUploadBenchmark layerUploadBenchmark = new LayerUploadBenchmark();
-layerUploadBenchmark.RunBenchmarks();
+//LayerUploadBenchmark layerUploadBenchmark = new LayerUploadBenchmark();
+//layerUploadBenchmark.RunBenchmarks();
 
 //MockRevoLayerYeltRepository mockRevoLayerLossRepository = new MockRevoLayerYeltRepository(1001);
 //var test = mockRevoLayerLossRepository.GetLayerYeltUnmanagedVectorised().Result;
@@ -15,3 +15,7 @@ layerUploadBenchmark.RunBenchmarks();
 //layerIndexerBenchmark.RunBenchmarks();
 
 //IndexerCheckTest.Execute();
+
+/*Yelt Process*/
+YeltProcessBenchmark yeltProcessBenchmark = new YeltProcessBenchmark();
+yeltProcessBenchmark.RunBenchmarks();

@@ -5,9 +5,9 @@ namespace Arch.ILS.EconomicModel
     {
         ViewType ViewType { get; }
 
-        void Initialise(bool pauseRepoUpdate = false);
+        Task Initialise(bool pauseRepoUpdate = false);
 
-        void Synchronise(bool pauseRepoUpdate = false);
+        Task Synchronise(bool pauseRepoUpdate = false);
 
         void ScheduleSynchronisation(int dueTimeInMilliseconds, int periodInMilliseconds);
 

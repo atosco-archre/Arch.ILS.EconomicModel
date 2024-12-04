@@ -243,6 +243,29 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
+        public Task<Dictionary<int, LayerMetaInfo>> GetLayerMetaInfos()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                Dictionary<int, LayerMetaInfo> layerMetaInfos = new Dictionary<int, LayerMetaInfo>();
+                using (var reader = _repository.ExecuteReaderSql(Translate(GET_LAYER_META_INFOS)))
+                {
+                    while (reader.Read())
+                    {
+                        int index = 0;
+                        int layerId = reader.GetInt32(index);
+                        layerMetaInfos[layerId] = new LayerMetaInfo
+                        { 
+                            LayerId  = layerId,
+                            Segment = Enum.Parse<SegmentType>(reader.GetString(++index))
+                        };
+                    }
+                }
+
+                return layerMetaInfos;
+            });
+        }
+
         public Task<IEnumerable<Reinstatement>> GetLayerReinstatements()
         {
             return Task.Factory.StartNew(() =>
@@ -1377,6 +1400,12 @@ namespace Arch.ILS.EconomicModel
       --,BudgetROL
       --,BudgetPremium
       --,BudgetShare
+  FROM dbo.Layer
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
+
+        private const string GET_LAYER_META_INFOS = @"SELECT LayerId
+     , Segment
   FROM dbo.Layer
  WHERE IsActive = 1
    AND IsDeleted = 0";

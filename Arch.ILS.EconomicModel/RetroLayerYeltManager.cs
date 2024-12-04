@@ -19,8 +19,8 @@ namespace Arch.ILS.EconomicModel
         private Timer _timer;
         private bool _disposed;
 
-        public RetroLayerYeltManager(in ViewType viewType, string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<int> selectedRetros = null) :
-            base(revoRepository)
+        public RetroLayerYeltManager(in ViewType viewType, string yeltStorageFolderPath, IRevoRepository revoRepository, IRevoLayerLossRepository revoLayerLossRepository, HashSet<int> selectedRetros = null, HashSet<SegmentType> segmentFilter = null) 
+            : base(revoRepository, revoRepository, segmentFilter)
         {
             ViewType = viewType;
             _yeltStorageFolderPath = yeltStorageFolderPath;
@@ -33,34 +33,38 @@ namespace Arch.ILS.EconomicModel
 
         public ViewType ViewType { get; }
 
-        public void Initialise(bool pauseUpdate = false)
+        public Task Initialise(bool pauseUpdate = false)
         {
-            if (_selectedRetros != null)
+            return Task.Factory.StartNew(() =>
             {
-                _retroLayers = _retroLayerRepository.GetRetroLayers().Result
-                    .Where(x => _selectedRetros.Contains(x.RetroProgramId))
-                    .GroupBy(g => g.RetroProgramId)
-                    .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
-            }
-            else
-            {
-                _retroLayers = _retroLayerRepository.GetRetroLayers().Result
-                    .GroupBy(g => g.RetroProgramId)
-                    .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
-            }
+                base.Initialise().Wait();
+                if (_selectedRetros != null)
+                {
+                    _retroLayers = _retroLayerRepository.GetRetroLayers().Result
+                        .Where(x => _selectedRetros.Contains(x.RetroProgramId))
+                        .GroupBy(g => g.RetroProgramId)
+                        .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
+                }
+                else
+                {
+                    _retroLayers = _retroLayerRepository.GetRetroLayers().Result
+                        .GroupBy(g => g.RetroProgramId)
+                        .ToDictionary(k => k.Key, v => v.ToDictionary(kk => kk.LayerId));
+                }
 
-            _currentMaxRowVersion = _retroLayers.Values.SelectMany(x => x.Values).Select(y => y.RowVersion).Max();
+                _currentMaxRowVersion = _retroLayers.Values.SelectMany(x => x.Values).Select(y => y.RowVersion).Max();
 
 #if DEBUG
             foreach(RetroLayer retroLayer in _retroLayers.Values.SelectMany(x => x.Values))
 #else
-            Parallel.ForEach(_retroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, retroLayer =>
-            {
+                Parallel.ForEach(_retroLayers.Values.SelectMany(x => x.Values), new ParallelOptions { MaxDegreeOfParallelism = 2 }, retroLayer =>
+                {
 #endif
-                UpdateStorage(in retroLayer, pauseUpdate);
+                    UpdateStorage(in retroLayer, pauseUpdate);
 #if !DEBUG
-            });
+                });
 #endif
+            });
         }
 
         public void ScheduleSynchronisation(int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
@@ -83,41 +87,44 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
-        public void Synchronise(bool pauseUpdate = false)
+        public Task Synchronise(bool pauseUpdate = false)
         {
-#if DEBUG
-            Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
-#endif
-            base.Synchronise();
-#if DEBUG
-            foreach (var retroLayer in _retroLayerRepository.GetRetroLayers(_currentMaxRowVersion).Result)
-#else
-            Parallel.ForEach(_retroLayerRepository.GetRetroLayers(_currentMaxRowVersion).Result, (retroLayer) =>
-#endif
+            return Task.Factory.StartNew(() =>
             {
-                if (_selectedRetros != null && !_selectedRetros.Contains(retroLayer.RetroProgramId))
 #if DEBUG
-                    continue;
-#else
-                    return;
+                Console.WriteLine($"Synchronise Layer YELTs based on Retros...{DateTime.Now}");
 #endif
-                if (!_retroLayers.TryGetValue(retroLayer.RetroProgramId, out var layers))
+                base.Synchronise().Wait();
+#if DEBUG
+                foreach (var retroLayer in _retroLayerRepository.GetRetroLayers(_currentMaxRowVersion).Result)
+#else
+                Parallel.ForEach(_retroLayerRepository.GetRetroLayers(_currentMaxRowVersion).Result, (retroLayer) =>
+#endif
                 {
-                    layers = new Dictionary<int, RetroLayer>();
-                    _retroLayers[retroLayer.RetroProgramId] = layers;
+                    if (_selectedRetros != null && !_selectedRetros.Contains(retroLayer.RetroProgramId))
+#if DEBUG
+                        continue;
+#else
+                        return;
+#endif
+                    if (!_retroLayers.TryGetValue(retroLayer.RetroProgramId, out var layers))
+                    {
+                        layers = new Dictionary<int, RetroLayer>();
+                        _retroLayers[retroLayer.RetroProgramId] = layers;
+                    }
+
+                    if (layers.TryGetValue(retroLayer.LayerId, out var layer) && layer.RowVersion > retroLayer.RowVersion)
+                        throw new Exception();
+
+                    layers[retroLayer.LayerId] = retroLayer;
+                    if (retroLayer.RowVersion > _currentMaxRowVersion)
+                        _currentMaxRowVersion = retroLayer.RowVersion;
+                    UpdateStorage(in retroLayer, pauseUpdate);
                 }
-
-                if (layers.TryGetValue(retroLayer.LayerId, out var layer) && layer.RowVersion > retroLayer.RowVersion)
-                    throw new Exception();
-
-                layers[retroLayer.LayerId] = retroLayer;
-                if (retroLayer.RowVersion > _currentMaxRowVersion)
-                    _currentMaxRowVersion = retroLayer.RowVersion;
-                UpdateStorage(in retroLayer, pauseUpdate);
-            }
 #if !DEBUG
             );
 #endif
+            });
         }
 
         public bool TryGetRetroLayers(int retroProgramId, out IEnumerable<RetroLayer> retroLayers)
