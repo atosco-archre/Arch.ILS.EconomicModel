@@ -24,8 +24,8 @@ namespace Arch.ILS.EconomicModel.Console
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
-            //ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (839,  247) }, RevoLossViewType.StressedView, ViewType.Projected);
+            //ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
+            ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> {(1003, 274)/*, (1003, 317)*/ /*(839,  247)*/ }, RevoLossViewType.StressedView, ViewType.Projected);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }
 
@@ -311,7 +311,7 @@ namespace Arch.ILS.EconomicModel.Console
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
             RetroLayerYeltManager retroLayerYeltManager = new RetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, retroProgramIds);
-            retroLayerYeltManager.Initialise(true);
+            retroLayerYeltManager.Initialise(false);
             stopwatch.Stop();
             System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
 

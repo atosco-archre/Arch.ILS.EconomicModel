@@ -12,6 +12,9 @@ Release/
 /Arch.ILS.EconomicModel.Console/App.config
 /Arch.ILS.EconomicModel.Console/App.config.config
 /Arch.ILS.EconomicModel.Historical.Console/App.config
+*.config
+[Aa]ppsettings.json
+[Aa]ppsettings.[Dd]evelopment.json
 
 # Build results
 [Dd]ebug/
