@@ -526,27 +526,21 @@ namespace Arch.ILS.EconomicModel
             GCHandle columns_pin = GCHandle.Alloc(columns, GCHandleType.Pinned);
             transa trans = transa.T;
             GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
-            int[] startIndicesInMappedIndices = new int[2];
-            double[] cessions = new double[1];
-            fixed (int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
+            int* startIndicesInMappedIndicesPtr = stackalloc int[2];
+            double* cessionsPtr = stackalloc double[1];
             fixed (double* eventLossesPtr = eventLosses)
-            fixed (double* cessionsPtr = cessions)
             {
-                int* startIndicesPtr = startIndicesInMappedIndicesPtr;
                 double* destinationLossesPtr = eventLossesPtr;
-                double* cessionPtr = cessionsPtr;
                 for (int k = 0; k < YeltPartitionReaders.Count; ++k)
                 {
-                    *cessionPtr = 1;
+                    *cessionsPtr = 1;
                     int* mappedIndicesCurrentIndexPtr = mappedIndicesPtr[k];
                     YeltPartitionReader currentReader = YeltPartitionReaders[k];
                     YeltPartition yeltPartition = currentReader.Head;
-                    //int rows = SortedKeys.Length;
-                    //GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
                     while (yeltPartition != null)
                     {
-                        *(startIndicesPtr + 1) = yeltPartition.CurrentLength;
-                        mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesPtr, mappedIndicesCurrentIndexPtr, cessionPtr, destinationLossesPtr);
+                        *(startIndicesInMappedIndicesPtr + 1) = yeltPartition.CurrentLength;
+                        mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesInMappedIndicesPtr, mappedIndicesCurrentIndexPtr, cessionsPtr, destinationLossesPtr);
                         mappedIndicesCurrentIndexPtr += yeltPartition.CurrentLength;
                         yeltPartition = yeltPartition.NextNode;
                     }
