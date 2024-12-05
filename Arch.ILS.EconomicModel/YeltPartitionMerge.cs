@@ -207,8 +207,8 @@ namespace Arch.ILS.EconomicModel
             long** currentResult = tempResult;
             int* currentSizes = tempSizes;
             int mergeCount = tempMergeCount;
-            tempMergeCount = (tempMergeCount >> 1);
-            bool hasSingleton = false;
+            bool hasSingleton = (tempMergeCount % 2) != 0;
+            tempMergeCount = tempMergeCount == 1 ? 0 : (tempMergeCount >> 1) + (hasSingleton ? 1 : 0);
             while (tempMergeCount > 0)
             {
                 tempResult = (long**)NativeMemory.AlignedAlloc((nuint)(Unsafe.SizeOf<IntPtr>() * tempMergeCount), (nuint)Unsafe.SizeOf<IntPtr>());
