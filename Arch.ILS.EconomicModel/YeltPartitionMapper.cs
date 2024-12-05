@@ -92,7 +92,7 @@ namespace Arch.ILS.EconomicModel
 
                         fixed (int* keysPtr = mappedIndices)
                         {
-                            int* currentKeysPtr = keysPtr;
+                            int* currentKeysPtr = keysPtr + startIndexInMappedIndices[readerStartIndex];
                             int i = readerStartIndex, j = 0;
                             indexers[j] = new YeltPartitionIndexer(YeltPartitionReaders[i], currentKeysPtr);
                             for (++j, ++i; i < readerEndIndex; ++i, ++j)

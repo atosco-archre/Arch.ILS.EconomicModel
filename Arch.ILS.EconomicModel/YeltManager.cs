@@ -1,7 +1,4 @@
 ﻿
-using System;
-using System.Linq;
-
 namespace Arch.ILS.EconomicModel
 {
     public class YeltManager
