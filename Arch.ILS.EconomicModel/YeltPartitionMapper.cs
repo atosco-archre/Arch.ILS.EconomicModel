@@ -526,29 +526,33 @@ namespace Arch.ILS.EconomicModel
             GCHandle columns_pin = GCHandle.Alloc(columns, GCHandleType.Pinned);
             transa trans = transa.T;
             GCHandle trans_pin = GCHandle.Alloc(trans, GCHandleType.Pinned);
-            for (int k = 0; k < YeltPartitionReaders.Count; ++k)
+            int[] startIndicesInMappedIndices = [0, 0];
+            fixed (int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
+            fixed (double* eventLossesPtr = eventLosses)
             {
-                double[] cessions = [1];
-                fixed (double* eventLossesPtr = eventLosses)
-                fixed (double* cessionsPtr = cessions)
+                int* startIndicesPtr = startIndicesInMappedIndicesPtr;
+                double* destinationLossesPtr = eventLossesPtr;
+                for (int k = 0; k < YeltPartitionReaders.Count; ++k)
                 {
-                    int* mappedIndicesCurrentIndexPtr = mappedIndicesPtr[k];
-                    YeltPartitionReader currentReader = YeltPartitionReaders[k];
-                    YeltPartition yeltPartition = currentReader.Head;
-                    //int rows = SortedKeys.Length;
-                    //GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
-                    while (yeltPartition != null)
+                    double[] cessions = [1];
+                    fixed (double* cessionsPtr = cessions)
                     {
-                        double* lossesPtr = yeltPartition.CurrentStartLossPct;
-                        int[] startIndicesInMappedIndices = [0, yeltPartition.CurrentLength];
-                        fixed (int* startIndicesInMappedIndicesPtr = startIndicesInMappedIndices)
+                        int* mappedIndicesCurrentIndexPtr = mappedIndicesPtr[k];
+                        YeltPartitionReader currentReader = YeltPartitionReaders[k];
+                        YeltPartition yeltPartition = currentReader.Head;
+                        //int rows = SortedKeys.Length;
+                        //GCHandle rows_pin = GCHandle.Alloc(rows, GCHandleType.Pinned);
+                        while (yeltPartition != null)
                         {
-                            mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesInMappedIndicesPtr, mappedIndicesCurrentIndexPtr, cessionsPtr, eventLossesPtr);
+                            *(startIndicesPtr + 1) = yeltPartition.CurrentLength;
+                            mkl_cspblas_dcsrgemv_ptr(ref trans, ref columns, yeltPartition.CurrentStartLossPct, startIndicesPtr, mappedIndicesCurrentIndexPtr, cessionsPtr, destinationLossesPtr);
+                            mappedIndicesCurrentIndexPtr += yeltPartition.CurrentLength;
                             yeltPartition = yeltPartition.NextNode;
                         }
                     }
                 }
             }
+
             columns_pin.Free();
             //rows_pin.Free();
             trans_pin.Free();
