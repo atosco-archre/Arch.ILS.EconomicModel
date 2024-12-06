@@ -255,8 +255,8 @@ namespace Arch.ILS.EconomicModel
                         int index = 0;
                         int layerId = reader.GetInt32(index);
                         layerMetaInfos[layerId] = new LayerMetaInfo
-                        { 
-                            LayerId  = layerId,
+                        {
+                            LayerId = layerId,
                             Segment = Enum.Parse<SegmentType>(reader.GetString(++index))
                         };
                     }
@@ -856,7 +856,7 @@ namespace Arch.ILS.EconomicModel
                         continue;
 
                     if (resetType == ResetType.LOD)
-                    {                        
+                    {
                         if (resetDates.Length == 1)
                         {
                             var initialCession = resetDates[0];
@@ -944,7 +944,7 @@ namespace Arch.ILS.EconomicModel
                             else
                                 resetCession = resetDates.Last(x => x.StartDate <= layer.Inception);
 
-                            DateTime resetStart = resetCession.StartDate;                            
+                            DateTime resetStart = resetCession.StartDate;
                             DateTime resetEnd = retroProgram.Expiration;
                             if (!TryGetPeriodIntersection(resetStart, resetEnd, retroProgram.Inception, retroProgram.Expiration, out DateTime retroOverlapStart, out DateTime retroOverlapEnd)
                                 || !TryGetLayerRetroIntersection(layer, retroProgram.RetroProgramType, retroOverlapStart, retroOverlapEnd, out DateTime resetOverlapStart, out DateTime resetOverlapEnd))
@@ -960,7 +960,7 @@ namespace Arch.ILS.EconomicModel
                                 OverlapEnd = resetOverlapEnd,
                                 ResetType = ResetType.RAD
                             });
-                            
+
                         }
                     }
                     else throw new NotImplementedException($"RssetType {resetType} not implemented.");

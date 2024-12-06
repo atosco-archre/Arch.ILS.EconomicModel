@@ -17,15 +17,14 @@ namespace Arch.ILS.EconomicModel.Console
         public static unsafe void Main(string[] args)
         {
             //ExportRetroLayerCessions(@"C:\Data\RetroAllocations LOD Resets.csv", ResetType.LOD);
-            //ExportRetroCessionMetrics(@"C:\Data\RetroMetrics.csv", new DateTime(2024, 9, 30), true);
-            //ExportRetroLayerCessionMetrics(@"C:\Data\RetroLayerMetrics_RADReset.csv", new DateTime(2024, 9, 30), ResetType.RAD, true);
+            ExportRetroCessionMetrics(@"C:\Data\RetroMetrics.csv", new DateTime(2024, 9, 30), ResetType.RAD, true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
             //ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
-            ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (1003, 274)/*, (1003, 317)*/ /*(839,  247)*/ }, RevoLossViewType.StressedView, ViewType.Projected);
+            //ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (1003, 274)/*, (1003, 317)*//*, (839,  247)*/ }, RevoLossViewType.StressedView, ViewType.InForce);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }
 
@@ -130,137 +129,34 @@ namespace Arch.ILS.EconomicModel.Console
             }
         }
 
-        public static void ExportRetroCessionMetrics(string outputFilePath, DateTime currentFxDate, bool useBoundFx = true, string baseCurrency = "USD")
+        public static void ExportRetroCessionMetrics(string outputFilePath, DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, Currency baseCurrency = Currency.USD)
         {
             /*Authentication*/
-            RevoRepository revoRepository = GetRevoSnowflakeRepository();
-            var retroAllocationView = revoRepository.GetRetroCessionView();
-            var retroPrograms = revoRepository.GetRetroPrograms();
-            var layerDetails = revoRepository.GetLayerDetails();
-            var submissions = revoRepository.GetSubmissions();
-            var fxRates = revoRepository.GetFXRates();
+            IRevoRepository revoRepository = GetRevoSnowflakeRepository();
+            RetroMetricsFactory retroMetricsFactory = new RetroMetricsFactory(revoRepository);
+            RetroSummaryMetrics retroSummaryMetrics = retroMetricsFactory.GetRetroMetrics(currentFxDate, resetType, useBoundFx, baseCurrency).Result;
 
-            Task.WaitAll(retroAllocationView, retroPrograms, layerDetails, submissions, fxRates);
-            Dictionary<int, RetroMetrics> retroMetricsById = new();
-            var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
-
-            foreach (var layerCession in levelLayerCessions)
-            {
-                if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
-                    continue;
-                /*if (layerDetail.Status != ContractStatus.Bound
-                    && layerDetail.Status != ContractStatus.Signed
-                    && layerDetail.Status != ContractStatus.SignReady
-                    // && layerDetail.Status != ContractStatus.Budget
-                    )
-                    continue;*/
-                if (!submissions.Result.TryGetValue(layerDetail.SubmissionId, out var submission))
-                    continue;
-                var fxRate = RevoHelper.GetFxRate(useBoundFx, currentFxDate, baseCurrency, submission, layerDetail, fxRates.Result);
-                var retroProgram = retroPrograms.Result[layerCession.RetroProgramId];
-
-                if (!retroMetricsById.TryGetValue(retroProgram.RetroProgramId, out var retroMetrics))
-                {
-                    retroMetrics = new RetroMetrics(retroProgram.RetroProgramId);
-                    retroMetricsById[retroProgram.RetroProgramId] = retroMetrics;
-                }
-
-                decimal cededPremium = layerDetail.Premium
-                    * (layerDetail.Placement == decimal.Zero ? decimal.Zero : 1 / layerDetail.Placement)
-                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
-                    * fxRate
-                    * layerCession.PeriodCession.NetCession
-                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0))
-                    * (decimal)(((layerCession.PeriodCession.EndInclusive - layerCession.PeriodCession.StartInclusive).TotalDays + 1) / ((layerDetail.Expiration - layerDetail.Inception).TotalDays + 1));
-                retroMetrics.CededPremium += cededPremium;
-
-                decimal limit100Pct = GetLimit100Pct(layerDetail);
-                decimal cededLimit = limit100Pct
-                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
-                    * fxRate
-                    * layerCession.PeriodCession.NetCession
-                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0));
-
-                var currentDate = layerCession.PeriodCession.StartInclusive;
-                var dateCededLimits = retroMetrics.DateCededLimits;
-                while (currentDate <= layerCession.PeriodCession.EndInclusive)
-                {
-                    if (dateCededLimits.ContainsKey(currentDate))
-                        dateCededLimits[currentDate] += cededLimit;
-                    else
-                        dateCededLimits[currentDate] = cededLimit;
-                    currentDate.AddDays(1);
-                }
-            }
-
+            /*Retro Metrics*/
             using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.WriteLine($"RetroProgramId,CededPremium,CededLimit");
-                foreach (KeyValuePair<int, RetroMetrics> retroMetrics in retroMetricsById.OrderBy(x => x.Key))
+                sw.WriteLine($"RetroProgramId,SubjectPremium,SubjectPremiumPlaced,CededPremium,SubjectLimit,SubjectLimitPlaced,CededLimit");
+                foreach (KeyValuePair<int, RetroMetrics> retroMetrics in retroSummaryMetrics.RetroMetricsByRetroProgramId.OrderBy(x => x.Key))
                 {
-                    sw.WriteLine($"{retroMetrics.Key},{retroMetrics.Value.CededPremium},{retroMetrics.Value.DateCededLimits.Values.Max()}");
+                    var limitMetrics = retroMetrics.Value.DateLimits.Values;
+                    sw.WriteLine($"{retroMetrics.Key},{retroMetrics.Value.SubjectPremium},{retroMetrics.Value.SubjectPremiumPlaced},{retroMetrics.Value.CededPremium},{limitMetrics.Select(x => x.SubjectLimit).Max()},{limitMetrics.Select(x => x.SubjectLimitPlaced).Max()},{limitMetrics.Select(x => x.CededLimit).Max()}");
                 }
                 sw.Flush();
             }
-        }
 
-        public static void ExportRetroLayerCessionMetrics(string outputFilePath, DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, string baseCurrency = "USD")
-        {
-            /*Authentication*/
-            RevoRepository revoRepository = GetRevoSnowflakeRepository();
-            var retroAllocationView = revoRepository.GetRetroCessionView(resetType);
-            var retroPrograms = revoRepository.GetRetroPrograms();
-            var layerDetails = revoRepository.GetLayerDetails();
-            var submissions = revoRepository.GetSubmissions();
-            var fxRates = revoRepository.GetFXRates();
-
-            Task.WaitAll(retroAllocationView, retroPrograms, layerDetails, submissions, fxRates);
-            List<RetroLayerMetrics> retroLayerMetrics = new();
-            var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
-
-            foreach (LayerPeriodCession layerCession in levelLayerCessions)
-            {
-                if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
-                    continue;
-                /*if (layerDetail.Status != ContractStatus.Bound
-                    && layerDetail.Status != ContractStatus.Signed
-                    && layerDetail.Status != ContractStatus.SignReady
-                    // && layerDetail.Status != ContractStatus.Budget
-                    )
-                    continue;*/
-                if (!submissions.Result.TryGetValue(layerDetail.SubmissionId, out var submission))
-                    continue;
-                var fxRate = RevoHelper.GetFxRate(useBoundFx, currentFxDate, baseCurrency, submission, layerDetail, fxRates.Result);
-                var retroProgram = retroPrograms.Result[layerCession.RetroProgramId];
-
-                decimal cededPremium = layerDetail.Premium
-                    * (layerDetail.Placement == decimal.Zero ? decimal.Zero : 1 / layerDetail.Placement)
-                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
-                    * fxRate
-                    * layerCession.PeriodCession.NetCession
-                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0))
-                    * (decimal)(((layerCession.PeriodCession.EndInclusive - layerCession.PeriodCession.StartInclusive).TotalDays + 1) / ((layerDetail.Expiration - layerDetail.Inception).TotalDays + 1));
-
-                decimal limit100Pct = GetLimit100Pct(layerDetail);
-                decimal cededLimit = limit100Pct
-                    * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
-                    * fxRate
-                    * layerCession.PeriodCession.NetCession
-                    * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0));
-
-                retroLayerMetrics.Add(new RetroLayerMetrics(layerCession.RetroProgramId, layerCession.LayerId, layerCession.PeriodCession.StartInclusive, layerCession.PeriodCession.EndInclusive, cededPremium, cededLimit));
-            }
-
-            using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+            /*Retro Layer Metrics*/
+            using (FileStream fs = new FileStream(Path.Combine(Path.GetDirectoryName(outputFilePath), $"{Path.GetFileNameWithoutExtension(outputFilePath)}_Layers.csv"), FileMode.Create, FileAccess.Write, FileShare.Read))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.WriteLine($"RetroLevel,RetroProgramId,RetroProgramType,RetroInceptionDate,RetroExpirationDate,LayerId,LayerInceptionDate,LayerExpirationDate,CessionStartDateInclusive,CessionEndDateInclusive,CededPremium,CededLimit");
-                foreach (RetroLayerMetrics retroLayerMetric in retroLayerMetrics)
+                sw.WriteLine($"RetroLevel,RetroProgramId,RetroProgramType,RetroInceptionDate,RetroExpirationDate,LayerId,LayerInceptionDate,LayerExpirationDate,LayerStatus,CessionStartDateInclusive,CessionEndDateInclusive,SubjectPremium,SubjectPremiumPlaced,CededPremium,SubjectLimit,SubjectLimitPlaced,CededLimit,GrossCessionAfterPlacement,NetCession");
+                foreach (RetroLayerMetrics m in retroSummaryMetrics.RetroLayerMetrics)
                 {
-                    var retro = retroPrograms.Result[retroLayerMetric.RetroProgramid];
-                    var layer = layerDetails.Result[retroLayerMetric.LayerId];
-                    sw.WriteLine($"{retro.RetroLevelType},{retroLayerMetric.RetroProgramid},{retro.RetroProgramType.ToString()},{retro.Inception},{retro.Expiration},{retroLayerMetric.LayerId},{layer.Inception},{layer.Expiration},{layer.Status.ToString()},{retroLayerMetric.StartDateInclusive},{retroLayerMetric.EndDateInclusive},{retroLayerMetric.CededPremium},{retroLayerMetric.CededLimit}");
+                    sw.WriteLine($"{m.RetroLevel},{m.RetroProgramid},{m.RetroProgramType.ToString()},{m.RetroInceptionDate},{m.RetroExpirationDate},{m.LayerId},{m.LayerInceptionDate},{m.LayerExpirationDate},{m.LayerStatus.ToString()},{m.StartDateInclusive},{m.EndDateInclusive},{m.SubjectPremium},{m.SubjectPremiumPlaced},{m.CededPremium},{m.SubjectLimit},{m.SubjectLimitPlaced},{m.CededLimit},{m.GrossCessionAfterPlacement},{m.NetCession}");
                 }
                 sw.Flush();
             }
@@ -437,7 +333,7 @@ namespace Arch.ILS.EconomicModel.Console
             stopwatch.Restart();
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             IRevoLayerLossRepository revoLayerLossRepository = GetRevoLayerLossSnowflakeRepository();
-            PortfolioRetroLayerYeltManager portfolioRetroLayerYeltManager = new PortfolioRetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, portfolioRetroProgramIds, new HashSet<SegmentType> { SegmentType.PC });
+            PortfolioRetroLayerYeltManager portfolioRetroLayerYeltManager = new PortfolioRetroLayerYeltManager(viewType, @"C:\Data\Revo_Yelts", revoRepository, revoLayerLossRepository, portfolioRetroProgramIds/*, new HashSet<SegmentType> { SegmentType.PC }*/);
             portfolioRetroLayerYeltManager.Initialise(true).Wait();
             stopwatch.Stop();
             System.Console.WriteLine($"Process layer Yelts - Initialisation - Time Elapsed: {stopwatch.Elapsed}...");
@@ -478,7 +374,7 @@ namespace Arch.ILS.EconomicModel.Console
                     throw new Exception();
                 yeltReaders.Add(yelt, yeltPartitionLinkedListReader);
             }
-
+            System.Console.WriteLine($"Processing {yeltReaders.Count} Yelt Partitions... - {yeltReaders.Values.Sum(x => x.TotalLength)} entries");
             stopwatch.Stop();
             System.Console.WriteLine($"Time Elapsed: {stopwatch.Elapsed}...");
 
@@ -640,26 +536,6 @@ namespace Arch.ILS.EconomicModel.Console
             RevoSqlRepository revoRepository = new RevoSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVO));
             return new RevoLayerLossSqlRepository(connectionSettings.GetConnectionString(RevoConnectionStrings.REVOLAYERLOSS));
         }
-
-        #region Types
-
-        internal record class RetroMetrics
-        {
-            public RetroMetrics(int retroProgramid)
-            {
-                RetroProgramId = retroProgramid;
-                CededPremium = decimal.Zero;
-                DateCededLimits = new Dictionary<DateTime, decimal>();
-            }
-
-            public int RetroProgramId { get; }
-            public decimal CededPremium { get; set; }
-            public Dictionary<DateTime, decimal> DateCededLimits { get; }
-        }
-
-        internal record class RetroLayerMetrics(int RetroProgramid, int LayerId, DateTime StartDateInclusive, DateTime EndDateInclusive, decimal CededPremium, decimal CededLimit);
-
-        #endregion Types
     }
 }
 
