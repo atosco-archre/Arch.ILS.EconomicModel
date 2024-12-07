@@ -16,8 +16,8 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            //ExportRetroLayerCessions(@"C:\Data\RetroAllocations LOD Resets.csv", ResetType.LOD);
-            ExportRetroCessionMetrics(@"C:\Data\RetroMetrics.csv", new DateTime(2024, 9, 30), ResetType.RAD, true);
+            ExportRetroLayerCessions(@"C:\Data\RetroAllocations LOD Resets.csv", ResetType.LOD);
+            //ExportRetroCessionMetrics(@"C:\Data\RetroMetrics_All.csv", new DateTime(2024, 9, 30), ResetType.RAD, true, retroIdFilter: /*new HashSet<int> { 274 }*/null);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
@@ -32,6 +32,10 @@ namespace Arch.ILS.EconomicModel.Console
         {
             /*Authentication*/
             RevoSnowflakeRepository revoRepository = GetRevoSnowflakeRepository();
+            RevoRepositoryTracker revoRepositoryTracker = new RevoRepositoryTracker(revoRepository);
+            revoRepositoryTracker.Initialise();
+            revoRepositoryTracker.ScheduleSynchronisation();
+            System.Console.ReadLine();
             //var retroAllocations = revoRepository.GetRetroAllocations().Result;
             //var spInsurers = revoRepository.GetSPInsurers().Result;
             //var retroprograms = revoRepository.GetRetroPrograms().Result;
@@ -129,12 +133,12 @@ namespace Arch.ILS.EconomicModel.Console
             }
         }
 
-        public static void ExportRetroCessionMetrics(string outputFilePath, DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, Currency baseCurrency = Currency.USD)
+        public static void ExportRetroCessionMetrics(string outputFilePath, DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, Currency baseCurrency = Currency.USD, HashSet<int> retroIdFilter = null)
         {
             /*Authentication*/
             IRevoRepository revoRepository = GetRevoSnowflakeRepository();
             RetroMetricsFactory retroMetricsFactory = new RetroMetricsFactory(revoRepository);
-            RetroSummaryMetrics retroSummaryMetrics = retroMetricsFactory.GetRetroMetrics(currentFxDate, resetType, useBoundFx, baseCurrency).Result;
+            RetroSummaryMetrics retroSummaryMetrics = retroMetricsFactory.GetRetroMetrics(currentFxDate, resetType, useBoundFx, baseCurrency, retroIdFilter).Result;
 
             /*Retro Metrics*/
             using (FileStream fs = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))

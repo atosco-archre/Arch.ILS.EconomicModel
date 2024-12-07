@@ -5,7 +5,7 @@ namespace Arch.ILS.EconomicModel
     {
         #region Retro Cession Info
 
-        Task<IList<RetroAllocation>> GetRetroAllocations();
+        Task<IList<RetroAllocation>> GetRetroAllocations(HashSet<int> retroIdFilter = null);
 
         Task<IEnumerable<PortLayerCession>> GetPortfolioLayerCessions();
 
@@ -21,7 +21,11 @@ namespace Arch.ILS.EconomicModel
 
         Task<IEnumerable<InvestorCession>> GetInvestorResetCessions();
 
+        Task<IEnumerable<InvestorCession>> GetInvestorResetCessions(Task<IEnumerable<RetroInvestorReset>> retroInvestorsResets, Task<IEnumerable<RetroProgramReset>> retroProgramResets);
+
         Task<IEnumerable<InvestorCession>> GetInvestorInitialCessions();
+
+        Task<IEnumerable<InvestorCession>> GetInvestorInitialCessions(Task<IList<RetroInvestor>> retroInvestors, Task<Dictionary<int, SPInsurer>> spInsurers, Task<Dictionary<int, RetroProgram>> retroPrograms);
 
         Task<IEnumerable<LayerRetroPlacement>> GetLayerRetroPlacements();
 

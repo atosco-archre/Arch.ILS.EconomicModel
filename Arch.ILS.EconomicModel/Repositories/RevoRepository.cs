@@ -1,13 +1,11 @@
 ﻿
-using System;
 using System.Buffers;
-using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 using Arch.ILS.Core;
+using Arch.ILS.EconomicModel.Repositories;
 using Studio.Core;
-using Studio.Core.Sql;
 
 namespace Arch.ILS.EconomicModel
 {
@@ -636,12 +634,14 @@ namespace Arch.ILS.EconomicModel
 
         #region Retro Cession Info
 
-        public Task<IList<RetroAllocation>> GetRetroAllocations()
+        public Task<IList<RetroAllocation>> GetRetroAllocations(HashSet<int> retroIdFilter = null)
         {
             return Task.Factory.StartNew(() =>
             {
                 IList<RetroAllocation> retroAllocations = new List<RetroAllocation>();
-                using (var reader = _repository.ExecuteReaderSql(Translate(GET_RETRO_ALLOCATION)))
+                using (var reader = _repository.ExecuteReaderSql(Translate(retroIdFilter == null 
+                    ? GET_RETRO_ALLOCATION 
+                    : string.Format(GET_RETRO_ALLOCATION_FILTERED, string.Join(',', retroIdFilter.Select(x => $"({x})"))))))
                 {
                     while (reader.Read())
                     {
@@ -804,19 +804,18 @@ namespace Arch.ILS.EconomicModel
                 var retroInvestorsTask = GetRetroInvestors();
                 var spInsurersTask = GetSPInsurers();
                 var layerRetroPlacementsTask = GetLayerRetroPlacements();
-                var investorResetCessionsTask = GetInvestorResetCessions();
-                var investorInitialCessionsTask = GetInvestorInitialCessions();
-                var layersTask = GetLayers();
                 var retroProgramsTask = GetRetroPrograms();
-
-                Task.WaitAll(investorResetCessionsTask, investorInitialCessionsTask);
+                var investorResetCessionsTask = GetInvestorResetCessions();
+                var investorInitialCessionsTask = GetInvestorInitialCessions(retroInvestorsTask, spInsurersTask, retroProgramsTask);
+                var layersTask = GetLayers();
+                Task.WaitAll(retroInvestorsTask, spInsurersTask, retroProgramsTask, investorResetCessionsTask, investorInitialCessionsTask);
                 InvestorCession[] investorInitialCessions = investorInitialCessionsTask.Result.ToArray();
                 InvestorCession[] investorResetCessions = investorResetCessionsTask.Result.ToArray();
                 Dictionary<(int RetroProgramId, int RetroInvestorId), InvestorCession[]> investorRetroCessionPeriods = investorResetCessions.Union(investorInitialCessions.Except(investorResetCessions, new InvestorRetroProgramResetDateComparer()))
                     .GroupBy(g => (g.RetroProgramId, g.RetroInvestorId))
                     .ToDictionary(k => k.Key, v => v.OrderBy(o => o.StartDate).ToArray());//take investor cessions preferably from the RetroInvestorReset table rather than the RetroInvestor table. 
 
-                Task.WaitAll(retroAllocationsTask, retroInvestorsTask, spInsurersTask, layerRetroPlacementsTask);
+                Task.WaitAll(retroAllocationsTask, layerRetroPlacementsTask);
                 IList<RetroAllocation> retroAllocations = retroAllocationsTask.Result;
                 IList<RetroInvestor> retroInvestors = retroInvestorsTask.Result;
                 Dictionary<int, SPInsurer> spInsurers = spInsurersTask.Result;
@@ -1026,6 +1025,19 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
+        public Task<IEnumerable<InvestorCession>> GetInvestorResetCessions(Task<IEnumerable<RetroInvestorReset>> retroInvestorsResets, Task<IEnumerable<RetroProgramReset>> retroProgramResets)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return retroInvestorsResets.Result
+                    .Join(retroProgramResets.Result, ok => ok.RetroProgramResetId, ik => ik.RetroProgramResetId, (o, i) => new { i.RetroProgramId, i.StartDate, i.RetroProgramResetId, o })
+                    .GroupBy(g => (g.RetroProgramId, g.StartDate, g.RetroProgramResetId, g.o.RetroInvestorId))
+                    .Select(x => new InvestorCession(x.Key.RetroInvestorId, x.Key.RetroProgramResetId, x.Key.RetroProgramId, x.Key.StartDate, x.Sum(oo => oo.o.InvestmentSignedAmt), x.Max(oo => oo.o.TargetCollateral), x.Sum(oo => oo.o.InvestmentSigned)))
+                    //.Where(r => r.CessionBeforePlacement != 0)
+                    ;
+            });
+        }
+
         public Task<IEnumerable<InvestorCession>> GetInvestorInitialCessions()
         {
             return Task.Factory.StartNew(() =>
@@ -1033,6 +1045,23 @@ namespace Arch.ILS.EconomicModel
                 var retroInvestorsTask = GetRetroInvestors();
                 var spInsurersTask = GetSPInsurers();
                 var retroProgramTask = GetRetroPrograms();
+                Task.WaitAll(retroInvestorsTask, spInsurersTask, retroProgramTask);
+                var retroInvestors = retroInvestorsTask.Result;
+                var spInsurers = spInsurersTask.Result;
+                var retroPrograms = retroProgramTask.Result;
+                return retroInvestors
+                    .Join(spInsurers, ri => ri.SPInsurerId, spi => spi.Key, (ri, spi) => new { spi.Value.RetroProgramId, ri })
+                    .GroupBy(temp => (temp.RetroProgramId, temp.ri.RetroInvestorId))
+                    .Join(retroPrograms, ok => ok.Key.RetroProgramId, ik => ik.Key, (o, i) => new InvestorCession(o.Key.RetroInvestorId, InvestorCession.DefaultRetroProgramResetId, i.Value.RetroProgramId, i.Value.Inception, o.Sum(oo => oo.ri.InvestmentSignedAmt), o.Max(oo => oo.ri.TargetCollateral), o.Sum(oo => oo.ri.InvestmentSigned)))
+                    //.Where(r => r.CessionBeforePlacement != 0)
+                    ;
+            });
+        }
+
+        public Task<IEnumerable<InvestorCession>> GetInvestorInitialCessions(Task<IList<RetroInvestor>> retroInvestorsTask, Task<Dictionary<int, SPInsurer>> spInsurersTask, Task<Dictionary<int, RetroProgram>> retroProgramTask)
+        {
+            return Task.Factory.StartNew(() =>
+            {
                 Task.WaitAll(retroInvestorsTask, spInsurersTask, retroProgramTask);
                 var retroInvestors = retroInvestorsTask.Result;
                 var spInsurers = spInsurersTask.Result;
@@ -1182,6 +1211,26 @@ namespace Arch.ILS.EconomicModel
         }
 
         #endregion Layer Loss Analyses
+
+        #region Change Tracker
+
+        public long GetLatestRowVersion(RevoDataTable revoDataTable)
+        {
+            return revoDataTable switch
+            {
+                RevoDataTable.RetroAllocation => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ALLOCATION_TABLE))),
+                RevoDataTable.RetroInvestor => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_TABLE))),
+                RevoDataTable.SPInsurer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_SPINSURER_TABLE))),
+                RevoDataTable.Layer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, LAYER_TABLE))),
+                RevoDataTable.RetroProgram => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_TABLE))),
+                RevoDataTable.RetroZone => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ZONE_TABLE))),
+                RevoDataTable.RetroInvestorReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_RESET_TABLE))),
+                RevoDataTable.RetroProgramReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_RESET_TABLE))),
+                _ => throw new NotImplementedException(revoDataTable.ToString())
+            };
+        }
+
+        #endregion Change Tracker
 
         #region Query Conversion
 
@@ -1508,6 +1557,60 @@ namespace Arch.ILS.EconomicModel
  WHERE IsActive = 1
    AND IsDeleted = 0;";
 
+        private const string GET_RETRO_ALLOCATION_FILTERED = @"WITH SelectedRetros AS
+ (
+    SELECT RetroProgramId
+      FROM (VALUES {0}) R(RetroProgramId)
+ )
+ SELECT R.RetroAllocationId
+      --,R.ROL
+      --,R.EL
+      --,R.Zone
+      --,R.Message
+      ,R.LayerId
+      ,R.RetroInvestorId
+      --,R.CreateDate
+      --,R.CreateUser
+      --,R.ModifyDate
+      --,R.ModifyUser
+      --,R.IsActive
+      --,R.IsDeleted
+      --,R.RegisStatus
+      --,R.RegisMessage
+      ,R.CessionNet
+      --,R.CessionDemand
+      ,R.CessionGross
+      ,CONVERT(BIGINT, R.RowVersion) AS RowVersion
+      ,R.CessionCapFactor
+      --,R.CessionCapFactorSent
+      --,R.CessionGrossFinalSent
+      --,R.CessionNetFinalSent
+      --,R.AllocationStatus
+      ,R.Override
+      ,R.Brokerage
+      ,R.Taxes
+      --,R.OverrideSent
+      --,R.BrokerageSent
+      --,R.TaxesSent
+      ,R.ManagementFee
+      ,R.TailFee
+      --,R.IsPortInExpiredLayer
+      ,R.TopUpZoneId
+      ,R.CessionPlaced
+  FROM dbo.RetroAllocation R
+ INNER JOIN dbo.RetroInvestor RI
+    ON RI.RetroInvestorId = R.RetroInvestorId
+ INNER JOIN dbo.SpInsurer SPI
+    ON SPI.SPInsurerId = RI.SPInsurerId
+ INNER JOIN SelectedRetros 
+    ON SelectedRetros.RetroProgramId = SPI.RetroProgramId
+ WHERE R.IsActive = 1
+   AND R.IsDeleted = 0
+   AND RI.IsActive = 1
+   AND RI.IsDeleted = 0
+   AND SPI.IsActive = 1
+   AND SPI.IsDeleted = 0;";
+
         private const string GET_RETRO_INVESTOR_RESET = @"SELECT RetroInvestorResetId
       ,RetroInvestorId
       ,RetroProgramResetId
@@ -1819,6 +1922,18 @@ namespace Arch.ILS.EconomicModel
    AND C.IsDeleted = 0";
 
         private const string GET_PORTFOLIO_RETRO_LAYERS_INCREMENTAL = GET_PORTFOLIO_RETRO_LAYERS + " HAVING MAX(CONVERT(BIGINT, C.RowVersion)) > {0}";
+
+        private const string GET_LATEST_ROWVERSION = " SELECT MAX(CONVERT(BIGINT, RowVersion)) AS RowVersion FROM {0}";
+
+        private const string RETRO_ALLOCATION_TABLE = "dbo.RetroAllocation";
+        private const string RETRO_INVESTOR_TABLE = "dbo.RetroInvestor";
+        private const string RETRO_SPINSURER_TABLE = "dbo.SPInsurer";
+        private const string LAYER_TABLE = "dbo.Layer";
+        private const string RETRO_PROGRAM_TABLE = "dbo.RetroProgram";
+        private const string RETRO_ZONE_TABLE = "dbo.RetroZone";
+        private const string RETRO_INVESTOR_RESET_TABLE = "dbo.RetroInvestorReset";
+        private const string RETRO_PROGRAM_RESET_TABLE = "dbo.RetroProgramReset";
+
 
         #endregion Constants
     }

@@ -13,7 +13,7 @@ namespace Arch.ILS.EconomicModel
             _revoRepository = revoRepository;
         }
 
-        public Task<RetroSummaryMetrics> GetRetroMetrics(DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, Currency baseCurrency = Currency.USD, HashSet<ContractStatus> contractStatusesFilter = null, PremiumAllocationType premiumAllocationType = PremiumAllocationType.Linear, int maxDegreeOfParallelism = 8)
+        public Task<RetroSummaryMetrics> GetRetroMetrics(DateTime currentFxDate, ResetType resetType, bool useBoundFx = true, Currency baseCurrency = Currency.USD, HashSet<int> retroIdFilter = null, HashSet<ContractStatus> contractStatusesFilter = null, PremiumAllocationType premiumAllocationType = PremiumAllocationType.Linear, int maxDegreeOfParallelism = 8)
         {
             return Task.Factory.StartNew(() =>
             {
@@ -24,12 +24,13 @@ namespace Arch.ILS.EconomicModel
                 var layerDetails = _revoRepository.GetLayerDetails();
                 var submissions = _revoRepository.GetSubmissions();
                 var fxRates = _revoRepository.GetFXRates();
-                var layerRetroPlacements = _revoRepository.GetLayerRetroPlacements().Result.ToDictionary(x => (x.RetroProgramId, x.LayerId));
+                var layerRetroPlacementsTask = _revoRepository.GetLayerRetroPlacements();
 
-                Task.WaitAll(retroAllocationView, retroPrograms, layerDetails, submissions, fxRates);
+                Task.WaitAll(retroAllocationView, retroPrograms, layerDetails, submissions, fxRates, layerRetroPlacementsTask);
                 ConcurrentBag<RetroLayerMetrics> retroLayerMetrics = new();
                 ConcurrentDictionary<int, RetroMetrics> retroMetricsById = new();
                 var levelLayerCessions = retroAllocationView.Result.GetLevelLayerCessions();
+                var layerRetroPlacements = layerRetroPlacementsTask.Result.ToDictionary(x => (x.RetroProgramId, x.LayerId));
 
 #if DEBUG
                 foreach (var layerCession in levelLayerCessions)
@@ -37,6 +38,12 @@ namespace Arch.ILS.EconomicModel
                 Parallel.ForEach(levelLayerCessions, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, layerCession =>
 #endif
                 {
+                    if(!retroIdFilter.Contains(layerCession.RetroProgramId))
+#if DEBUG
+                        continue;
+#else
+                        return;
+#endif
                     if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
 #if DEBUG
                         continue;
