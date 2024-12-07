@@ -1214,20 +1214,23 @@ namespace Arch.ILS.EconomicModel
 
         #region Change Tracker
 
-        public long GetLatestRowVersion(RevoDataTable revoDataTable)
+        public Task<long> GetLatestRowVersion(RevoDataTable revoDataTable)
         {
-            return revoDataTable switch
+            return Task.Factory.StartNew(() =>
             {
-                RevoDataTable.RetroAllocation => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ALLOCATION_TABLE))),
-                RevoDataTable.RetroInvestor => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_TABLE))),
-                RevoDataTable.SPInsurer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_SPINSURER_TABLE))),
-                RevoDataTable.Layer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, LAYER_TABLE))),
-                RevoDataTable.RetroProgram => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_TABLE))),
-                RevoDataTable.RetroZone => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ZONE_TABLE))),
-                RevoDataTable.RetroInvestorReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_RESET_TABLE))),
-                RevoDataTable.RetroProgramReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_RESET_TABLE))),
-                _ => throw new NotImplementedException(revoDataTable.ToString())
-            };
+                return revoDataTable switch
+                {
+                    RevoDataTable.RetroAllocation => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ALLOCATION_TABLE))),
+                    RevoDataTable.RetroInvestor => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_TABLE))),
+                    RevoDataTable.SPInsurer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_SPINSURER_TABLE))),
+                    RevoDataTable.Layer => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, LAYER_TABLE))),
+                    RevoDataTable.RetroProgram => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_TABLE))),
+                    RevoDataTable.RetroZone => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_ZONE_TABLE))),
+                    RevoDataTable.RetroInvestorReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_INVESTOR_RESET_TABLE))),
+                    RevoDataTable.RetroProgramReset => (long)_repository.ExecuteScalar(Translate(string.Format(GET_LATEST_ROWVERSION, RETRO_PROGRAM_RESET_TABLE))),
+                    _ => throw new NotImplementedException(revoDataTable.ToString())
+                };
+            });
         }
 
         #endregion Change Tracker
