@@ -12,15 +12,15 @@ namespace Arch.ILS.EconomicModel
         //public int ReinstCount { get; set; }
         public decimal Placement { get; set; }
         public decimal OccLimit { get; set; }
-        //public decimal OccRetention { get; set; }
+        public decimal OccRetention { get; set; }
         //public decimal CascadeRetention { get; set; }
         //public decimal AAD { get; set; }
         //public decimal Var1Retention { get; set; }
         //public decimal Var2Retention { get; set; }
         public decimal AggLimit { get; set; }
-        //public decimal AggRetention { get; set; }
-        //public decimal Franchise { get; set; }
-        //public decimal FranchiseReverse { get; set; }
+        public decimal AggRetention { get; set; }
+        public decimal Franchise { get; set; }
+        public decimal FranchiseReverse { get; set; }
         public decimal RiskLimit { get; set; }
         public DateTime Inception { get; set; }
         public int UWYear { get; set; }
@@ -89,8 +89,8 @@ namespace Arch.ILS.EconomicModel
         //public decimal Rate { get; set; }
         //public int PremiumFreq { get; set; }
         //public int AdjustmentBaseType { get; set; }
-        //public int LayerType { get; set; }
-        //public int FHCFBand { get; set; }
+        public LayerType LayerType { get; set; }
+        //public RevoFHCFBandType FHCFBand { get; set; }
         //public DateTime CreateDate { get; set; }
         //public string CreateUser { get; set; }
         //public DateTime ModifyDate { get; set; }
@@ -101,7 +101,7 @@ namespace Arch.ILS.EconomicModel
         //public decimal? ERCQuote { get; set; }
         //public string DeclineReason { get; set; }
         //public decimal InuringLimit { get; set; }
-        //public decimal RiskRetention { get; set; }
+        public decimal RiskRetention { get; set; }
         //public decimal ReinsurerExpenses { get; set; }
         //public int LayerCategory { get; set; }
         //public string LayerCatalog { get; set; }

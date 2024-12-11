@@ -52,9 +52,9 @@ namespace Arch.ILS.EconomicModel
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IEnumerable<RevoLayerYeltEntry> GetRevoLayerYeltEntries(int lossAnalysisId, int layerId)
+        public IEnumerable<RevoLayerYeltEntry> GetRevoLayerYeltEntries(int lossAnalysisId, int layerId, bool modelledOnly = true)
         {
-            using (var reader = _repository.ExecuteReaderSql(string.Format(GET_MODELLED_LAYER_YELT_QUERY, lossAnalysisId, layerId)))
+            using (var reader = _repository.ExecuteReaderSql(string.Format(modelledOnly ? GET_MODELLED_LAYER_YELT_QUERY : GET_ALL_LAYER_YELT_QUERY, lossAnalysisId, layerId)))
             {
                 while (reader.Read())
                 {
@@ -129,6 +129,17 @@ namespace Arch.ILS.EconomicModel
  WHERE LossAnalysisId = {0}
    AND LayerId  = {1}
    AND LossType = 1";
+
+        private const string GET_ALL_LAYER_YELT_QUERY = @"SELECT Year 
+     , EventId
+     , Peril
+     , Day
+     , LossPct
+     , RP
+     , RB
+  FROM dbo.LayerYelt
+ WHERE LossAnalysisId = {0}
+   AND LayerId  = {1}";
 
         private const string GET_MODELLED_LAYER_YELT_QUERY_BY_PARTITION = @"SELECT Year 
      , EventId

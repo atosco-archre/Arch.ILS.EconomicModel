@@ -16,14 +16,14 @@ namespace Arch.ILS.EconomicModel.Console
     {
         public static unsafe void Main(string[] args)
         {
-            ExportRetroLayerCessions(@"C:\Data\RetroAllocations LOD Resets.csv", ResetType.LOD);
+            //ExportRetroLayerCessions(@"C:\Data\RetroAllocations LOD Resets.csv", ResetType.LOD);
             //ExportRetroCessionMetrics(@"C:\Data\RetroMetrics_All.csv", new DateTime(2024, 9, 30), ResetType.RAD, true, retroIdFilter: /*new HashSet<int> { 274 }*/null);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_BoundFx.csv", new DateTime(2024, 9, 30), true);
             //ExportPremiumByRetroProfile(@"C:\Data\RetroProfilePremiums_20240930Fx.csv", new DateTime(2024, 9, 30), false);
             //SetPortfolioLayerCession();
 
             //ProcessLayerYelts();
-            //ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
+            ProcessRetroLayerYelts(new HashSet<int> { 317/*274*/ }, RevoLossViewType.StressedView, ViewType.Projected);
             //ProcessPortfolioRetroLayerYelts(new HashSet<(int portfolioId, int retroId)> { (1003, 274)/*, (1003, 317)*//*, (839,  247)*/ }, RevoLossViewType.StressedView, ViewType.InForce);
             //UploadRetroYelts(new HashSet<int> { 274 });
         }
@@ -32,10 +32,6 @@ namespace Arch.ILS.EconomicModel.Console
         {
             /*Authentication*/
             RevoSnowflakeRepository revoRepository = GetRevoSnowflakeRepository();
-            RevoRepositoryTracker revoRepositoryTracker = new RevoRepositoryTracker(revoRepository);
-            revoRepositoryTracker.Initialise();
-            revoRepositoryTracker.ScheduleSynchronisation();
-            System.Console.ReadLine();
             //var retroAllocations = revoRepository.GetRetroAllocations().Result;
             //var spInsurers = revoRepository.GetSPInsurers().Result;
             //var retroprograms = revoRepository.GetRetroPrograms().Result;
@@ -46,7 +42,10 @@ namespace Arch.ILS.EconomicModel.Console
             //var retroInitialCessions = revoRepository.GetRetroInitialCessions().Result.ToList();
             //var investorResetCessions = revoRepository.GetInvestorResetCessions().Result.ToList();
             //var investorInitialCessions = revoRepository.GetInvestorInitialCessions().Result.ToList();
-            var retroAllocationView = revoRepository.GetRetroCessionView(resetType).Result;
+            RevoRepositoryTracker revoRepositoryTracker = new RevoRepositoryTracker(revoRepository);
+            revoRepositoryTracker.Initialise([ResetType.RAD]);
+            //revoRepositoryTracker.ScheduleSynchronisation();
+            var retroAllocationView = revoRepositoryTracker.LatestRetroCessions[ResetType.RAD];
             var levelLayerCessions = retroAllocationView.GetLevelLayerCessions();
             var layerDetails = revoRepository.GetLayerDetails().Result;
             var retroPrograms = revoRepository.GetRetroPrograms().Result;

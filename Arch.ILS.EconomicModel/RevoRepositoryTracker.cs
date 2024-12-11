@@ -1,5 +1,6 @@
 ﻿
 using Arch.ILS.EconomicModel.Repositories;
+using System.Collections.Generic;
 
 namespace Arch.ILS.EconomicModel
 {
@@ -16,26 +17,32 @@ namespace Arch.ILS.EconomicModel
         {
             _revoRepository = revoRepository;
             _retroCessionViewTableLatestRowVersion = new Dictionary<RevoDataTable, long>();
+            LatestRetroCessions = new Dictionary<ResetType, RetroCessions>();
         }
 
-        public RetroCessions LatestRetroCessions { get; private set; }
+        public Dictionary<ResetType, RetroCessions> LatestRetroCessions { get; private set; }
 
-        public Task Initialise()
+        public Task Initialise(HashSet<ResetType> resetTypes)
         {
             return Task.Factory.StartNew(() =>
             {
                 InitialiseRetroCessionViewTracker();
+                foreach(ResetType resetType in resetTypes)
+                    LatestRetroCessions[resetType] = _revoRepository.GetRetroCessionView(resetType).Result;
             });
         }
 
-        public void ScheduleSynchronisation(int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
+        public void ScheduleSynchronisation(HashSet<ResetType> resetTypes, int dueTimeInMilliseconds = DEFAULT_TIMER_DUETIME_IN_MILLISECONDS, int periodInMilliseconds = DEFAULT_TIMER_PERIOD_IN_MILLISECONDS)
         {
             if (_timer != null)
             {
                 _timer?.Change(Timeout.Infinite, Timeout.Infinite);
                 _timer?.Dispose();
             }
-            _timer = new Timer((obj) => { Synchronise(); }, null, dueTimeInMilliseconds, periodInMilliseconds);
+            _timer = new Timer((obj) => { 
+                    HashSet<ResetType> resets = (HashSet<ResetType>)obj; 
+                    Synchronise(resets); 
+                }, resetTypes, dueTimeInMilliseconds, periodInMilliseconds);
         }
 
         public void CancelSchedule()
@@ -48,13 +55,19 @@ namespace Arch.ILS.EconomicModel
             }
         }
 
-        public Task Synchronise()
+        public Task Synchronise(HashSet<ResetType> resetTypes)
         {
             return Task.Factory.StartNew(() =>
             {
                 if (RetroCessionViewChanged())
                 {
-                    LatestRetroCessions = _revoRepository.GetRetroCessionView().Result;
+                    Dictionary<ResetType, Task<RetroCessions>> resetTypeRetroCessionsTasks = new Dictionary<ResetType, Task<RetroCessions>>();
+                    foreach (ResetType resetType in resetTypes)
+                        resetTypeRetroCessionsTasks[resetType] = _revoRepository.GetRetroCessionView(resetType);
+
+                    Task.WaitAll(resetTypeRetroCessionsTasks.Values.ToArray());
+                    foreach (var resetTypeRetroCessionsTask in resetTypeRetroCessionsTasks)
+                        LatestRetroCessions[resetTypeRetroCessionsTask.Key] = resetTypeRetroCessionsTask.Value.Result;
                 }
                
             });

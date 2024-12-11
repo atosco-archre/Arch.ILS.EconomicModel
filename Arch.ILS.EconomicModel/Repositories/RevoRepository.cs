@@ -57,15 +57,15 @@ namespace Arch.ILS.EconomicModel
                             //ReinstCount = reader.GetInt32(++index),
                             Placement = reader.GetDecimal(++index),
                             OccLimit = reader.GetDecimal(++index),
-                            //OccRetention = reader.GetDecimal(++index),
+                            OccRetention = reader.GetDecimal(++index),
                             //CascadeRetention = reader.GetDecimal(++index),
                             //AAD = reader.GetDecimal(++index),
                             //Var1Retention = reader.GetDecimal(++index),
                             //Var2Retention = reader.GetDecimal(++index),
                             AggLimit = reader.GetDecimal(++index),
-                            //AggRetention = reader.GetDecimal(++index),
-                            //Franchise = reader.GetDecimal(++index),
-                            //FranchiseReverse = reader.GetDecimal(++index),
+                            AggRetention = reader.GetDecimal(++index),
+                            Franchise = reader.GetDecimal(++index),
+                            FranchiseReverse = reader.GetDecimal(++index),
                             RiskLimit = reader.GetDecimal(++index),
                             Inception = reader.GetDateTime(++index),
                             UWYear = reader.GetInt32(++index),
@@ -134,8 +134,8 @@ namespace Arch.ILS.EconomicModel
                             //Rate = reader.GetDecimal(++index),
                             //PremiumFreq = reader.GetInt32(++index),
                             //AdjustmentBaseType = reader.GetInt32(++index),
-                            //LayerType = reader.GetInt32(++index),
-                            //FHCFBand = reader.GetInt32(++index),
+                            LayerType = (LayerType)reader.GetInt16(++index),
+                            //FHCFBand = (RevoFHCFBandType)reader.GetInt16(++index),
                             //CreateDate = reader.GetDateTime(++index),
                             //CreateUser = reader.IsDBNull(++index) ? null : reader.GetString(index),
                             //ModifyDate = reader.GetDateTime(++index),
@@ -146,7 +146,7 @@ namespace Arch.ILS.EconomicModel
                             //ERCQuote = reader.IsDBNull(++index) ? null : reader.GetDecimal(index),
                             //DeclineReason = reader.IsDBNull(++index) ? null : reader.GetString(index),
                             //InuringLimit = reader.GetDecimal(++index),
-                            //RiskRetention = reader.GetDecimal(++index),
+                            RiskRetention = reader.GetDecimal(++index),
                             //ReinsurerExpenses = reader.GetDecimal(++index),
                             //LayerCategory = reader.GetInt32(++index),
                             //LayerCatalog = reader.IsDBNull(++index) ? null : reader.GetString(index),
@@ -1210,7 +1210,97 @@ namespace Arch.ILS.EconomicModel
             });
         }
 
+        public Task<IEnumerable<LayerLossAnalysisExtended>> GetLayerLossAnalysesExtended()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return GetLayerLossAnalysesExtended(Translate(GET_LAYER_LOSS_ANALYSES_EXTENDED));
+            });
+        }
+
+        public Task<IEnumerable<LayerLossAnalysisExtended>> GetLayerLossAnalysesExtended(long afterRowVersion)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return GetLayerLossAnalysesExtended(Translate(string.Format(GET_LAYER_LOSS_ANALYSES_EXTENDED_INCREMENTAL, afterRowVersion)));
+            });
+        }
+
+        private IEnumerable<LayerLossAnalysisExtended> GetLayerLossAnalysesExtended(string query)
+        {
+            using (var reader = _repository.ExecuteReaderSql(query))
+            {
+                while (reader.Read())
+                {
+                    int index = 0;
+                    yield return new LayerLossAnalysisExtended
+                    {
+                        LossAnalysisId = reader.GetInt32(index),
+                        LayerId = reader.GetInt32(++index),
+                        LossView = (RevoLossViewType)reader.GetInt32(++index),
+                        RowVersion = reader.GetInt64(++index),
+                        GUAnalysisId = reader.IsDBNull(++index) ? null : reader.GetInt32(index),
+                        PerilEQ = reader.GetDouble(++index),
+                        PerilWS = reader.GetDouble(++index),
+                        PerilCS = reader.GetDouble(++index),
+                        PerilWT = reader.GetDouble(++index),
+                        PerilFL = reader.GetDouble(++index),
+                        PerilWF = reader.GetDouble(++index),
+                        GrowthEQ = reader.GetDouble(++index),
+                        GrowthWS = reader.GetDouble(++index),
+                        GrowthCS = reader.GetDouble(++index),
+                        GrowthWT = reader.GetDouble(++index),
+                        GrowthFL = reader.GetDouble(++index),
+                        GrowthWF = reader.GetDouble(++index),
+                        LAEEQ = reader.GetDouble(++index),
+                        LAEWS = reader.GetDouble(++index),
+                        LAECS = reader.GetDouble(++index),
+                        LAEWT = reader.GetDouble(++index),
+                        LAEFL = reader.GetDouble(++index),
+                        LAEWF = reader.GetDouble(++index),
+                        Inflation = reader.GetDouble(++index),
+                        SocialEQ = reader.GetDouble(++index),
+                        SocialWS = reader.GetDouble(++index),
+                        SocialCS = reader.GetDouble(++index),
+                        SocialWT = reader.GetDouble(++index),
+                        SocialFL = reader.GetDouble(++index),
+                        SocialWF = reader.GetDouble(++index),
+                        CedentEQ = reader.GetDouble(++index),
+                        CedentWS = reader.GetDouble(++index),
+                        CedentCS = reader.GetDouble(++index),
+                        CedentWT = reader.GetDouble(++index),
+                        CedentFL = reader.GetDouble(++index),
+                        CedentWF = reader.GetDouble(++index),
+                    };
+                }
+            }
+        }
+
         #endregion Layer Loss Analyses
+
+        #region GU Analyses
+
+        public Task<IEnumerable<RevoSubmissionGUAnalysis>> GetSubmissionGUAnalyses()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(GET_SUBMISSION_GU_ANALYSES)).GetObjects<RevoSubmissionGUAnalysis>();
+            });
+        }
+
+        #endregion GU Analyses
+
+        #region Layer Dependencies
+
+        public Task<IEnumerable<RevoPXSection>> GetPXSections()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return _repository.ExecuteReaderSql(Translate(GET_PX_SECTIONS)).GetObjects<RevoPXSection>();
+            });
+        }
+
+        #endregion Layer Dependencies
 
         #region Change Tracker
 
@@ -1278,15 +1368,15 @@ namespace Arch.ILS.EconomicModel
       --,ReinstCount
       ,Placement
       ,OccLimit
-      --,OccRetention
+     ,OccRetention
       --,CascadeRetention
       --,AAD
       --,Var1Retention
       --,Var2Retention
       ,AggLimit
-      --,AggRetention
-      --,Franchise
-      --,FranchiseReverse
+      ,AggRetention
+      ,Franchise
+      ,FranchiseReverse
       ,RiskLimit
       ,Inception
       ,UWYear
@@ -1355,7 +1445,7 @@ namespace Arch.ILS.EconomicModel
       --,Rate
       --,PremiumFreq
       --,AdjustmentBaseType
-      --,LayerType
+      ,LayerType
       --,FHCFBand
       --,CreateDate
       --,CreateUser
@@ -1367,7 +1457,7 @@ namespace Arch.ILS.EconomicModel
       --,ERCQuote
       --,DeclineReason
       --,InuringLimit
-      --,RiskRetention
+      ,RiskRetention
       --,ReinsurerExpenses
       --,LayerCategory
       --,LayerCatalog
@@ -1892,6 +1982,71 @@ namespace Arch.ILS.EconomicModel
    AND L.LossView IN (1, 10, 3, 30, 4)";
 
         private const string GET_LAYER_LOSS_ANALYSES_INCREMENTAL = GET_LAYER_LOSS_ANALYSES + " AND CONVERT(BIGINT, A.RowVersion) > {0}";
+
+        private const string GET_LAYER_LOSS_ANALYSES_EXTENDED = @"SELECT A.LossAnalysisId
+     , A.LayerId
+     , L.LossView
+     , CONVERT(BIGINT, A.RowVersion) AS RowVersion
+     , IFNULL(A.GUAnalysisId, L.GUAnalysisId) AS GUAnalysisId
+     , A.PerilEQ
+     , A.PerilWS
+     , A.PerilCS
+     , A.PerilWT
+     , A.PerilFL
+     , A.PerilWF
+     , A.GrowthEQ
+     , A.GrowthWS
+     , A.GrowthCS
+     , A.GrowthWT
+     , A.GrowthFL
+     , A.GrowthWF
+     , A.LAEEQ
+     , A.LAEWS
+     , A.LAECS
+     , A.LAEWT
+     , A.LAEFL
+     , A.LAEWF
+     , A.Inflation
+     , A.SocialEQ
+     , A.SocialWS
+     , A.SocialCS
+     , A.SocialWT
+     , A.SocialFL
+     , A.SocialWF
+     , A.CedentEQ
+     , A.CedentWS
+     , A.CedentCS
+     , A.CedentWT
+     , A.CedentFL
+     , A.CedentWF
+  FROM dbo.LayerLossAnalysis A
+ INNER JOIN dbo.LossAnalysis L
+    ON L.LossAnalysisId = A.LossAnalysisId
+ WHERE A.IsActive = 1
+   AND A.IsDeleted = 0
+   AND L.IsActive = 1
+   AND L.IsDeleted = 0
+   AND L.LossView IN (1, 10, 3, 30, 4)";
+
+        private const string GET_LAYER_LOSS_ANALYSES_EXTENDED_INCREMENTAL = GET_LAYER_LOSS_ANALYSES_EXTENDED + " AND CONVERT(BIGINT, A.RowVersion) > {0}";
+
+        private const string GET_SUBMISSION_GU_ANALYSES = @"SELECT GUAnalysisId
+     , SubmissionId
+     , FXRate
+     , FXDate
+     , CONVERT(BIGINT, RowVersion) AS RowVersion
+  FROM dbo.SubmissionGUAnalysis
+ WHERE IsActive = 1
+   AND IsDeleted = 0";
+
+        private const string GET_PX_SECTIONS = @"SELECT
+       LayerId
+     , PXLayerId
+     , YLTRollup
+     , CONVERT(BIGINT, RowVersion) AS RowVersion 
+  FROM dbo.PXSection
+ WHERE IsActive = 1
+   AND IsDeleted = 0  ";
 
         private const string GET_RETRO_LAYERS = @"SELECT A.LayerId, SI.RetroProgramId, MAX(CONVERT(BIGINT, A.RowVersion)) AS RowVersion 
   FROM dbo.retroallocation A

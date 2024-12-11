@@ -9,6 +9,8 @@ namespace Arch.ILS.EconomicModel
 
         Task<RevoLayerDayYeltVectorised2> GetLayerDayYeltVectorised(in int lossAnalysisId, in int layerId, int partitionCount);
 
+        IEnumerable<RevoLayerYeltEntry> GetRevoLayerYeltEntries(int lossAnalysisId, int layerId, bool modelledOnly = true);
+
         #endregion Methods
     }
 }

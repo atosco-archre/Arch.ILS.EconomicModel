@@ -17,6 +17,8 @@ namespace Arch.ILS.EconomicModel
 
         Task<IDictionary<int, Submission>> GetSubmissions();
 
+        Task<IEnumerable<RevoPXSection>> GetPXSections();
+
         #endregion LayerInfo
     }
 }

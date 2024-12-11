@@ -25,13 +25,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LargeLoss.LayeringService.C
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Arch.ILS.EconomicModel.Historical.Database", "Arch.ILS.EconomicModel.Historical.Database\Arch.ILS.EconomicModel.Historical.Database.sqlproj", "{A2A62697-11C5-4412-B3A3-8A1DC3071C4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arch.ILS.EconomicModel.UnitTest", "Arch.ILS.EconomicModel.UnitTest\Arch.ILS.EconomicModel.UnitTest.csproj", "{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.EconomicModel.UnitTest", "Arch.ILS.EconomicModel.UnitTest\Arch.ILS.EconomicModel.UnitTest.csproj", "{FFDB7F7E-8A0E-43D4-90D2-04BD7F0030D6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core.Sql", "..\Studio.Core\Studio.Core.Sql\Studio.Core.Sql.csproj", "{0F3D3606-2F77-43B2-B2A6-59F4C5580FE2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core", "..\Studio.Core\Studio.Core\Studio.Core.csproj", "{85713DC9-C62D-478C-A2AD-C70AA200F602}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arch.ILS.IntelMKL", "..\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL\Arch.ILS.IntelMKL.csproj", "{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arch.ILS.EconomicModel.Stochastic", "Arch.ILS.EconomicModel.Stochastic\Arch.ILS.EconomicModel.Stochastic.csproj", "{F891F1B7-E4E4-4064-B40B-0F9142E10F55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arch.ILS.EconomicModel.Stochastic.Console", "Arch.ILS.EconomicModel.Stochastic.Console\Arch.ILS.EconomicModel.Stochastic.Console.csproj", "{88E77058-D0A2-4D75-ACE3-B35CF2E31939}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "..\archre2\LargeLoss.LayeringService\Service\Service.csproj", "{8395EB1B-A553-4970-9AD4-BF3E972A7270}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +105,18 @@ Global
 		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B07F400-29F5-4BC8-ABA9-F9630E094FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F891F1B7-E4E4-4064-B40B-0F9142E10F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F891F1B7-E4E4-4064-B40B-0F9142E10F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F891F1B7-E4E4-4064-B40B-0F9142E10F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F891F1B7-E4E4-4064-B40B-0F9142E10F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88E77058-D0A2-4D75-ACE3-B35CF2E31939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88E77058-D0A2-4D75-ACE3-B35CF2E31939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88E77058-D0A2-4D75-ACE3-B35CF2E31939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88E77058-D0A2-4D75-ACE3-B35CF2E31939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8395EB1B-A553-4970-9AD4-BF3E972A7270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8395EB1B-A553-4970-9AD4-BF3E972A7270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8395EB1B-A553-4970-9AD4-BF3E972A7270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8395EB1B-A553-4970-9AD4-BF3E972A7270}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

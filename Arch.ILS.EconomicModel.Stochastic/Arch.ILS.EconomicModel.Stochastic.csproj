@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine\Arch.ILS.DependencyEngine.csproj" />
+    <ProjectReference Include="..\..\Arch.ILS.Snowflake\Arch.ILS.Snowflake\Arch.ILS.Snowflake.csproj" />
+    <ProjectReference Include="..\..\archre2\LargeLoss.LayeringService\Service\Service.csproj" />
+    <ProjectReference Include="..\Arch.ILS.EconomicModel\Arch.ILS.EconomicModel.csproj" />
+  </ItemGroup>
+
+</Project>
