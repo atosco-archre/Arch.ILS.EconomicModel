@@ -1,13 +1,9 @@
 ﻿
-using Amazon.Runtime.Internal.Transform;
+using System.Text;
+
 using Arch.ILS.DependencyEngine;
-using Microsoft.Extensions.Azure;
-using Mono.Unix;
 using Service.Calculation;
 using Service.DTO;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Text;
 
 namespace Arch.ILS.EconomicModel.Stochastic
 {
@@ -37,7 +33,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository = mixedSnowflakeRepository;
         }
 
-        public void GetConditionYelt(bool applyErosion, int calculationId, string name, int retroProgramId, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes)
+        public void GetConditionYelt(bool applyErosion, int calculationId, string name, int retroProgramId, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, HashSet<int> nonGULossBasedLayers = null)
         {
             var layersTask = _revoRepository.GetLayerDetails();
             var submissionsTask = _revoRepository.GetSubmissions();
@@ -71,6 +67,8 @@ namespace Arch.ILS.EconomicModel.Stochastic
                     .GroupBy(gg => gg.LossView)
                     .ToDictionary(kk => kk.Key, vv => vv.OrderByDescending(o => o.RowVersion).ToList()));
 
+            bool useLayerLossForNonGULossBasedLayers = nonGULossBasedLayers != null;
+
             foreach (RevoLossViewType lossViewType in revoLossViewTypes)
             {
 #if DEBUG
@@ -82,36 +80,6 @@ namespace Arch.ILS.EconomicModel.Stochastic
                     try
                     {
                         var layerGroup = layerGroups[i];
-                        // if(layerGroup.Contai)
-
-                        //HashSet<int> h = new HashSet<int>
-                        //{
-                        //    //136866,
-                        //    //137821,//x
-                        //    141578,
-                        //    //144674,//x
-                        //    //145275,//x
-                        //    //145415,
-                        //    //146100,
-                        //    //147252,
-                        //    //149033,//x
-                        //    //153113,
-                        //    //153687,
-                        //    //157772,//small diff
-                        //    //158305,//x
-                        //    //158306,//x
-                        //    //159513,
-                        //    //159514
-                        //};
-
-                        //if (!h.Intersect(layerGroup).Any())
-                        //    continue;
-
-                        //if(!layerGroup.Contains(143367))
-                        //{
-                        //    continue;
-                        //}
-
                         Dictionary<int, LayerLossAnalysisExtended> layerLossAnalyses = new Dictionary<int, LayerLossAnalysisExtended>();
 
                         /*Handle cases where non-modelled layer loss cannot be found in the Ground-up modelling*/
@@ -185,16 +153,10 @@ namespace Arch.ILS.EconomicModel.Stochastic
                             HashSet<int> exhaustedLayers = new HashSet<int>();
                             foreach (var layerId in sortedDependencies)
                             {
-                                /**1. First model the layer only with layers it depends on (not layers that depend on it) so that inuring or sources losses to the GU losses are correctly calculated and without agg terms**/
-                                List<DtoLayerStcInput> occLayers = new();
-                                List<DtoLayeringStcInput> occLayering = new(guYelts[layerId]);
-                                List<DtoLayeringSection> occSections = new();
-                                DtoLayeringStcRequest occRequest = new(true, true, occLayering, occLayers, occSections);
                                 LayerDetail layerDetail = layers[layerId];
-                                DateTime inceptionDate = applyErosion ? (quarterEndDate > layerDetail.Inception ? quarterEndDate : layerDetail.Inception)  : layerDetail.Inception;
+                                DateTime inceptionDate = applyErosion ? (quarterEndDate > layerDetail.Inception ? quarterEndDate : layerDetail.Inception) : layerDetail.Inception;
                                 DateTime expirationDate = layerDetail.Expiration;
-
-                                if(inceptionDate > expirationDate)
+                                if (inceptionDate > expirationDate)
                                 {
                                     string message = $"No valid in-force period for layer {layerId} - LayerInception {layerDetail.Inception} - LayerExpiration {layerDetail.Expiration} - Quarter End {quarterEndDate}";
                                     Console.WriteLine($"{i + 1} / {layerGroups.Length} - {message}");
@@ -202,126 +164,10 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     continue;
                                 }
 
-                                /*Layer*/
-                                occLayers.Add(new DtoLayerStcInput
+                                if (useLayerLossForNonGULossBasedLayers && nonGULossBasedLayers.Contains(layerId))
                                 {
-                                    LayerId = layerId,
-                                    OccLimit = GetOccLimit(layerDetail),
-                                    OccRetention = GetOccRetention(layerDetail),
-                                    AggLimit = 0,//layerDetail.AggLimit,
-                                    AggRetention = 0,//layerDetail.AggRetention,
-                                    Franchise = layerDetail.Franchise,
-                                    FranchiseReverse = layerDetail.FranchiseReverse,
-                                    Placement = decimal.One,//layerDetail.Placement,
-                                    IsFHCF = layerDetail.LayerType == LayerType.FHCF,
-                                    Currency = submissions[layerDetail.SubmissionId].Currency,
-                                    Premium = 0,
-                                    Reinstatements = null
-                                });
-
-                                /*Sections*/
-                                HashSet<DtoLayeringSection> occRequestSections = new HashSet<DtoLayeringSection>();
-                                if (pxSectionsByLayerId.TryGetValue(layerId, out var pxSections))
-                                {
-                                    foreach (var section in pxSections)
-                                    {
-                                        occRequestSections.Add(new DtoLayeringSection
-                                        {
-                                            LayerId = section.LayerId,
-                                            SectionId = section.PXLayerId,
-                                            RollUpType = (Service.Enums.ERollUpType)(byte)section.Rollup,
-                                            FXRateToParent = (decimal)section.FXToParent
-                                        });
-
-                                        var sectionDetail = layers[section.PXLayerId];
-                                        occRequest.Layers.Add(new DtoLayerStcInput
-                                        {
-                                            LayerId = section.PXLayerId,
-                                            OccLimit = decimal.MaxValue,
-                                            OccRetention = 0,//sectionLayeringOutput.OccRetention,
-                                            AggLimit = 0,//sectionDetail.AggLimit,
-                                            AggRetention = 0,//sectionDetail.AggRetention,
-                                            Franchise = 0,
-                                            FranchiseReverse = 0,
-                                            Placement = decimal.One,//sectionDetail.Placement,
-                                            IsFHCF = sectionDetail.LayerType == LayerType.FHCF,
-                                            Currency = submissions[sectionDetail.SubmissionId].Currency,
-                                            Premium = 0,
-                                            InceptionDate =  inceptionDate,
-                                            ExpirationDate = expirationDate,
-                                            Reinstatements = null
-                                        });
-
-                                        var sectionLayeringOutput = layeringOutputs[section.PXLayerId];
-                                        foreach (var entry in sectionLayeringOutput)
-                                        {
-                                            occLayering.Add(new DtoLayeringStcInput
-                                            {
-                                                Year = entry.Year,
-                                                Day = entry.Day,
-                                                Peril = entry.Peril.ToString(),
-                                                EventId = entry.EventId,
-                                                LayerId = entry.LayerId,
-                                                GULossInLayerCurrency = entry.LayerLoss100Pct ?? decimal.Zero,
-                                                LAE = decimal.One
-                                            });
-                                        }
-                                    }
-
-                                    occSections.AddRange(occRequestSections);
-                                }
-                                LayeringEngine occLayeringEngine = new LayeringEngine();
-                                DtoLayeringStcResponse occResponse = occLayeringEngine.Compute(occRequest);
-
-                                /**2. Combine response from Layer Occurrence losses obtained from GU losses with the non-modelled layer losses and aggregate them together**/
-                                List<DtoLayerStcInput> aggLayers = new();
-                                List<DtoLayeringStcInput> aggLayering = new();
-                                List<DtoLayeringSection> aggSections = new();
-                                DtoLayeringStcRequest aggRequest = new(true, true, aggLayering, aggLayers, aggSections);
-
-                                /*Layering*/
-                                foreach (var entry in occResponse.Layers.Where(x => x.LayerId == layerId))
-                                {
-                                    if (entry.LayerLoss100Pct != null && entry.LayerLoss100Pct != decimal.Zero)
-                                        aggLayering.Add(new DtoLayeringStcInput
-                                        {
-                                            Year = entry.Year,
-                                            Day = entry.Day,
-                                            Peril = entry.Peril.ToString(),
-                                            EventId = entry.EventId,
-                                            LayerId = entry.LayerId,
-                                            GULossInLayerCurrency = (decimal)entry.LayerLoss100Pct,
-                                            LAE = decimal.One
-                                        });
-                                }
-
-                                var missingLayerPerils = layerOnlyPerils[layerId];
-                                decimal occLimit = GetOccLimit(layerDetail);
-                                foreach (var entry in originalLayerYelts[layerId])
-                                {
-                                    if (missingLayerPerils.Contains(entry.PerilId))
-                                    {
-                                        aggLayering.Add(new DtoLayeringStcInput
-                                        {
-                                            Year = entry.Year,
-                                            Day = entry.Day,
-                                            Peril = ((RevoPeril)entry.PerilId).ToString(),
-                                            EventId = entry.EventId,
-                                            LayerId = layerId,
-                                            GULossInLayerCurrency = (decimal)entry.LossPct * occLimit,
-                                            LAE = decimal.One
-                                        });
-                                    }
-                                }
-
-                                /*Layer*/
-                                double erosion = 0;
-                                bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
-                                decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
-                                if (remainingLimit > 0)
-                                {
-                                    decimal layerOccLimit = GetOccLimit(layerDetail);
-                                    decimal premium = layerDetail.Placement == decimal.Zero ? decimal.Zero : layerDetail.Premium / layerDetail.Placement;
+                                    double erosion = 0;
+                                    bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
                                     var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
                                         ? layerReinstements.Select(r => new DtoReinstatement
                                         {
@@ -332,35 +178,185 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                             BrokeragePercentage = r.BrokeragePercentage
                                         }).ToArray()
                                         : null;
-                                    if (layerApplyErosion && layerReinstatements != null)
-                                        layerReinstatements = Reinstatements.GetErodedReinstatement(layerReinstatements, layerOccLimit, premium, (decimal)erosion);
 
-                                    aggLayers.Add(new DtoLayerStcInput
+                                    Submission submission = submissions[layerDetail.SubmissionId];
+                                    bool processed = ApplyConditionalTermsOnLayerLosses(submission, layerDetail, in inceptionDate, in expirationDate, in layerApplyErosion, in erosion, originalLayerYelts[layerId], layerReinstatements, out DtoLayeringStcRequest aggRequest);
+                                    if (!processed)
+                                        exhaustedLayers.Add(layerId);
+                                    else
+                                    {
+                                        LayeringEngine aggLayeringEngine = new LayeringEngine();
+                                        DtoLayeringStcResponse aggResponse = aggLayeringEngine.Compute(aggRequest);
+                                        layeringOutputs.Add(layerId, aggResponse.Layers);
+                                    }
+                                }
+                                else
+                                {
+                                    /**1. First model the layer only with layers it depends on (not layers that depend on it) so that inuring or sources losses to the GU losses are correctly calculated and without agg terms**/
+                                    List<DtoLayerStcInput> occLayers = new();
+                                    List<DtoLayeringStcInput> occLayering = new(guYelts[layerId]);
+                                    List<DtoLayeringSection> occSections = new();
+                                    DtoLayeringStcRequest occRequest = new(true, true, occLayering, occLayers, occSections);                                   
+
+                                    /*Layer*/
+                                    occLayers.Add(new DtoLayerStcInput
                                     {
                                         LayerId = layerId,
-                                        OccLimit = layerOccLimit,
-                                        OccRetention = 0,
-                                        AggLimit = remainingLimit,
-                                        AggRetention = layerApplyErosion && erosion > 0 ? 0 : layerDetail.AggRetention,
+                                        OccLimit = GetOccLimit(layerDetail),
+                                        OccRetention = GetOccRetention(layerDetail),
+                                        AggLimit = 0,//layerDetail.AggLimit,
+                                        AggRetention = 0,//layerDetail.AggRetention,
                                         Franchise = layerDetail.Franchise,
                                         FranchiseReverse = layerDetail.FranchiseReverse,
-                                        Placement = layerDetail.Placement,
+                                        Placement = decimal.One,//layerDetail.Placement,
                                         IsFHCF = layerDetail.LayerType == LayerType.FHCF,
                                         Currency = submissions[layerDetail.SubmissionId].Currency,
-                                        Premium = premium,
-                                        InceptionDate = inceptionDate,
-                                        ExpirationDate = expirationDate,
-                                        Reinstatements = layerReinstatements
+                                        Premium = 0,
+                                        Reinstatements = null
                                     });
 
-                                    /*Sections */
-                                    //No section needed
-                                    LayeringEngine aggLayeringEngine = new LayeringEngine();
-                                    DtoLayeringStcResponse aggResponse = aggLayeringEngine.Compute(aggRequest);
-                                    layeringOutputs.Add(layerId, aggResponse.Layers);
-                                }
-                                else exhaustedLayers.Add(layerId);
+                                    /*Sections*/
+                                    HashSet<DtoLayeringSection> occRequestSections = new HashSet<DtoLayeringSection>();
+                                    if (pxSectionsByLayerId.TryGetValue(layerId, out var pxSections))
+                                    {
+                                        foreach (var section in pxSections)
+                                        {
+                                            occRequestSections.Add(new DtoLayeringSection
+                                            {
+                                                LayerId = section.LayerId,
+                                                SectionId = section.PXLayerId,
+                                                RollUpType = (Service.Enums.ERollUpType)(byte)section.Rollup,
+                                                FXRateToParent = (decimal)section.FXToParent
+                                            });
 
+                                            var sectionDetail = layers[section.PXLayerId];
+                                            occRequest.Layers.Add(new DtoLayerStcInput
+                                            {
+                                                LayerId = section.PXLayerId,
+                                                OccLimit = decimal.MaxValue,
+                                                OccRetention = 0,//sectionLayeringOutput.OccRetention,
+                                                AggLimit = 0,//sectionDetail.AggLimit,
+                                                AggRetention = 0,//sectionDetail.AggRetention,
+                                                Franchise = 0,
+                                                FranchiseReverse = 0,
+                                                Placement = decimal.One,//sectionDetail.Placement,
+                                                IsFHCF = sectionDetail.LayerType == LayerType.FHCF,
+                                                Currency = submissions[sectionDetail.SubmissionId].Currency,
+                                                Premium = 0,
+                                                InceptionDate = inceptionDate,
+                                                ExpirationDate = expirationDate,
+                                                Reinstatements = null
+                                            });
+
+                                            var sectionLayeringOutput = layeringOutputs[section.PXLayerId];
+                                            foreach (var entry in sectionLayeringOutput)
+                                            {
+                                                occLayering.Add(new DtoLayeringStcInput
+                                                {
+                                                    Year = entry.Year,
+                                                    Day = entry.Day,
+                                                    Peril = entry.Peril.ToString(),
+                                                    EventId = entry.EventId,
+                                                    LayerId = entry.LayerId,
+                                                    GULossInLayerCurrency = entry.LayerLoss100Pct ?? decimal.Zero,
+                                                    LAE = decimal.One
+                                                });
+                                            }
+                                        }
+
+                                        occSections.AddRange(occRequestSections);
+                                    }
+                                    LayeringEngine occLayeringEngine = new LayeringEngine();
+                                    DtoLayeringStcResponse occResponse = occLayeringEngine.Compute(occRequest);
+
+                                    /**2. Combine response from Layer Occurrence losses obtained from GU losses with the non-modelled layer losses and aggregate them together**/
+                                    List<DtoLayerStcInput> aggLayers = new();
+                                    List<DtoLayeringStcInput> aggLayering = new();
+                                    List<DtoLayeringSection> aggSections = new();
+                                    DtoLayeringStcRequest aggRequest = new(true, true, aggLayering, aggLayers, aggSections);
+
+                                    /*Layering*/
+                                    foreach (var entry in occResponse.Layers.Where(x => x.LayerId == layerId))
+                                    {
+                                        if (entry.LayerLoss100Pct != null && entry.LayerLoss100Pct != decimal.Zero)
+                                            aggLayering.Add(new DtoLayeringStcInput
+                                            {
+                                                Year = entry.Year,
+                                                Day = entry.Day,
+                                                Peril = entry.Peril.ToString(),
+                                                EventId = entry.EventId,
+                                                LayerId = entry.LayerId,
+                                                GULossInLayerCurrency = (decimal)entry.LayerLoss100Pct,
+                                                LAE = decimal.One
+                                            });
+                                    }
+
+                                    var missingLayerPerils = layerOnlyPerils[layerId];
+                                    decimal occLimit = GetOccLimit(layerDetail);
+                                    foreach (var entry in originalLayerYelts[layerId])
+                                    {
+                                        if (missingLayerPerils.Contains(entry.PerilId))
+                                        {
+                                            aggLayering.Add(new DtoLayeringStcInput
+                                            {
+                                                Year = entry.Year,
+                                                Day = entry.Day,
+                                                Peril = ((RevoPeril)entry.PerilId).ToString(),
+                                                EventId = entry.EventId,
+                                                LayerId = layerId,
+                                                GULossInLayerCurrency = (decimal)entry.LossPct * occLimit,
+                                                LAE = decimal.One
+                                            });
+                                        }
+                                    }
+
+                                    /*Layer*/
+                                    double erosion = 0;
+                                    bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
+                                    decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
+                                    if (remainingLimit > 0)
+                                    {
+                                        decimal layerOccLimit = GetOccLimit(layerDetail);
+                                        decimal premium = layerDetail.Placement == decimal.Zero ? decimal.Zero : layerDetail.Premium / layerDetail.Placement;
+                                        var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
+                                            ? layerReinstements.Select(r => new DtoReinstatement
+                                            {
+                                                ReinstatementId = r.ReinstatementId,
+                                                ReinstatementOrder = r.ReinstatementOrder,
+                                                Quantity = r.Quantity,
+                                                PremiumShare = r.PremiumShare,
+                                                BrokeragePercentage = r.BrokeragePercentage
+                                            }).ToArray()
+                                            : null;
+                                        if (layerApplyErosion && layerReinstatements != null)
+                                            layerReinstatements = Reinstatements.GetErodedReinstatement(layerReinstatements, layerOccLimit, premium, (decimal)erosion);
+
+                                        aggLayers.Add(new DtoLayerStcInput
+                                        {
+                                            LayerId = layerId,
+                                            OccLimit = layerOccLimit,
+                                            OccRetention = 0,
+                                            AggLimit = remainingLimit,
+                                            AggRetention = layerApplyErosion && erosion > 0 ? 0 : layerDetail.AggRetention,
+                                            Franchise = layerDetail.Franchise,
+                                            FranchiseReverse = layerDetail.FranchiseReverse,
+                                            Placement = layerDetail.Placement,
+                                            IsFHCF = layerDetail.LayerType == LayerType.FHCF,
+                                            Currency = submissions[layerDetail.SubmissionId].Currency,
+                                            Premium = premium,
+                                            InceptionDate = inceptionDate,
+                                            ExpirationDate = expirationDate,
+                                            Reinstatements = layerReinstatements
+                                        });
+
+                                        /*Sections */
+                                        //No section needed
+                                        LayeringEngine aggLayeringEngine = new LayeringEngine();
+                                        DtoLayeringStcResponse aggResponse = aggLayeringEngine.Compute(aggRequest);
+                                        layeringOutputs.Add(layerId, aggResponse.Layers);
+                                    }
+                                    else exhaustedLayers.Add(layerId);
+                                }                                
                             }
                             HashSet<int> selectedLayerIds = new HashSet<int>(retroLayerIds.Intersect(layeringOutputs.Keys));
                             foreach (int selectedLayerId in selectedLayerIds)
@@ -431,70 +427,86 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                 double erosion = 0;
                                 bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
                                 decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
+                                var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
+                                    ? layerReinstements.Select(r => new DtoReinstatement
+                                    {
+                                        ReinstatementId = r.ReinstatementId,
+                                        ReinstatementOrder = r.ReinstatementOrder,
+                                        Quantity = r.Quantity,
+                                        PremiumShare = r.PremiumShare,
+                                        BrokeragePercentage = r.BrokeragePercentage
+                                    }).ToArray()
+                                    : null;
                                 if (remainingLimit > 0)
                                 {
-                                    decimal layerOccLimit = GetOccLimit(layerDetail);
-                                    decimal premium = layerDetail.Placement == decimal.Zero ? decimal.Zero : layerDetail.Premium / layerDetail.Placement;
-                                    var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
-                                                ? layerReinstements.Select(r => new DtoReinstatement
-                                                {
-                                                    ReinstatementId = r.ReinstatementId,
-                                                    ReinstatementOrder = r.ReinstatementOrder,
-                                                    Quantity = r.Quantity,
-                                                    PremiumShare = r.PremiumShare,
-                                                    BrokeragePercentage = r.BrokeragePercentage
-                                                }).ToArray()
-                                                : null;
-                                    if (layerApplyErosion && layerReinstatements != null)
-                                        layerReinstatements = Reinstatements.GetErodedReinstatement(layerReinstatements, layerOccLimit, premium, (decimal)erosion);
-
-                                    request.Layers.Add(new DtoLayerStcInput
+                                    if (useLayerLossForNonGULossBasedLayers && nonGULossBasedLayers.Contains(layerId))
                                     {
-                                        LayerId = layerId,
-                                        OccLimit = layerOccLimit,
-                                        OccRetention = GetOccRetention(layerDetail),
-                                        AggLimit = remainingLimit,
-                                        AggRetention = layerApplyErosion && erosion > 0 ? 0 : layerDetail.AggRetention,
-                                        Franchise = layerDetail.Franchise,
-                                        FranchiseReverse = layerDetail.FranchiseReverse,
-                                        Placement = layerDetail.Placement,
-                                        IsFHCF = layerDetail.LayerType == LayerType.FHCF,
-                                        Currency = submissions[layerDetail.SubmissionId].Currency,
-                                        Premium = premium,
-                                        InceptionDate = inceptionDate,
-                                        ExpirationDate = expirationDate,
-                                        Reinstatements = layerReinstatements
-                                    });
-
-                                    /*Sections*/
-                                    if (pxSectionsByLayerId.TryGetValue(layerId, out var pxSections))
-                                    {
-                                        foreach (var section in pxSections)
-                                            sections.Add(new DtoLayeringSection
-                                            {
-                                                LayerId = section.LayerId,
-                                                SectionId = section.PXLayerId,
-                                                RollUpType = (Service.Enums.ERollUpType)(byte)section.Rollup,
-                                                FXRateToParent = (decimal)section.FXToParent
-                                            });
-                                    }
-
-                                    /*Layering Input*/
-                                    LayerLossAnalysisExtended latestLossAnalysis = layerLossAnalyses[layerId];
-                                    int guAnalysisId = (int)latestLossAnalysis.GUAnalysisId;
-                                    foreach (var entry in _revoGULossRepository.GetRevoGUYelt(guAnalysisId).Result)
-                                    {
-                                        request.LayerEvents.Add(new DtoLayeringStcInput
+                                        Submission submission = submissions[layerDetail.SubmissionId];
+                                        bool processed = ApplyConditionalTermsOnLayerLosses(submission, layerDetail, in inceptionDate, in expirationDate, in layerApplyErosion, in erosion, originalLayerYelts[layerId], layerReinstatements, out DtoLayeringStcRequest aggRequest);
+                                        if (!processed)
+                                            exhaustedLayers.Add(layerId);
+                                        else
                                         {
-                                            Year = entry.Year,
-                                            Day = entry.Day,
-                                            Peril = entry.Peril.ToString(),
-                                            EventId = entry.EventId,
+                                            request.Layers.AddRange(aggRequest.Layers);
+                                            request.LayerEvents.AddRange(aggRequest.LayerEvents);
+                                            request.Sections.AddRange(aggRequest.Sections);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        decimal layerOccLimit = GetOccLimit(layerDetail);
+                                        decimal premium = layerDetail.Placement == decimal.Zero ? decimal.Zero : layerDetail.Premium / layerDetail.Placement;
+                                        if (layerApplyErosion && layerReinstatements != null)
+                                            layerReinstatements = Reinstatements.GetErodedReinstatement(layerReinstatements, layerOccLimit, premium, (decimal)erosion);
+
+                                        request.Layers.Add(new DtoLayerStcInput
+                                        {
                                             LayerId = layerId,
-                                            GULossInLayerCurrency = (decimal)(entry.Loss * latestLossAnalysis.GetTotalLoadxLAE(entry.Peril)
-                                                * (submissionGUAnalyses.TryGetValue((layerDetail.SubmissionId, guAnalysisId), out var submissionGUAnalysis) ? submissionGUAnalysis.FXRate : 1.0)),
-                                            LAE = (decimal)latestLossAnalysis.GetLAELoad(entry.Peril)
+                                            OccLimit = layerOccLimit,
+                                            OccRetention = GetOccRetention(layerDetail),
+                                            AggLimit = remainingLimit,
+                                            AggRetention = layerApplyErosion && erosion > 0 ? 0 : layerDetail.AggRetention,
+                                            Franchise = layerDetail.Franchise,
+                                            FranchiseReverse = layerDetail.FranchiseReverse,
+                                            Placement = layerDetail.Placement,
+                                            IsFHCF = layerDetail.LayerType == LayerType.FHCF,
+                                            Currency = submissions[layerDetail.SubmissionId].Currency,
+                                            Premium = premium,
+                                            InceptionDate = inceptionDate,
+                                            ExpirationDate = expirationDate,
+                                            Reinstatements = layerReinstatements
                                         });
+
+                                        /*Sections*/
+                                        if (pxSectionsByLayerId.TryGetValue(layerId, out var pxSections))
+                                        {
+                                            foreach (var section in pxSections)
+                                                sections.Add(new DtoLayeringSection
+                                                {
+                                                    LayerId = section.LayerId,
+                                                    SectionId = section.PXLayerId,
+                                                    RollUpType = (Service.Enums.ERollUpType)(byte)section.Rollup,
+                                                    FXRateToParent = (decimal)section.FXToParent
+                                                });
+                                        }
+
+                                        /*Layering Input*/
+                                        LayerLossAnalysisExtended latestLossAnalysis = layerLossAnalyses[layerId];
+                                        int guAnalysisId = (int)latestLossAnalysis.GUAnalysisId;
+                                        foreach (var entry in _revoGULossRepository.GetRevoGUYelt(guAnalysisId).Result)
+                                        {
+                                            request.LayerEvents.Add(new DtoLayeringStcInput
+                                            {
+                                                Year = entry.Year,
+                                                Day = entry.Day,
+                                                Peril = entry.Peril.ToString(),
+                                                EventId = entry.EventId,
+                                                LayerId = layerId,
+                                                GULossInLayerCurrency = (decimal)(entry.Loss * latestLossAnalysis.GetTotalLoadxLAE(entry.Peril)
+                                                    * (submissionGUAnalyses.TryGetValue((layerDetail.SubmissionId, guAnalysisId), out var submissionGUAnalysis) ? submissionGUAnalysis.FXRate : 1.0)),
+                                                LAE = (decimal)latestLossAnalysis.GetLAELoad(entry.Peril)
+                                            });
+                                        }
                                     }
                                 }
                                 else exhaustedLayers.Add(layerId);
@@ -559,6 +571,64 @@ namespace Arch.ILS.EconomicModel.Stochastic
 #endif
                 simulationLog.Export(Path.Combine(applyErosion ? EXPORT_EROSION_FOLDER : EXPORT_FOLDER, string.Format(LOG_FORMAT, calculationId, acctGPeriod, asAtDate.ToString("yyyy-MM-dd"))));
             }
+        }
+
+        private bool ApplyConditionalTermsOnLayerLosses(Submission submission, LayerDetail layerDetail, in DateTime inceptionDate, in DateTime expirationDate, in bool layerApplyErosion, in double erosion, List<RevoLayerYeltEntry> layerEntries, DtoReinstatement[] layerReinstatements, out DtoLayeringStcRequest aggRequest)
+        {
+            int layerId = layerDetail.LayerId;
+            List<DtoLayerStcInput> aggLayers = new();
+            List<DtoLayeringStcInput> aggLayering = new();
+            List<DtoLayeringSection> aggSections = new();
+            aggRequest = new(true, true, aggLayering, aggLayers, aggSections);
+
+            /*Layering*/
+            decimal occLimit = GetOccLimit(layerDetail);
+            foreach (var entry in layerEntries)
+            {
+                aggLayering.Add(new DtoLayeringStcInput
+                {
+                    Year = entry.Year,
+                    Day = entry.Day,
+                    Peril = ((RevoPeril)entry.PerilId).ToString(),
+                    EventId = entry.EventId,
+                    LayerId = layerId,
+                    GULossInLayerCurrency = (decimal)entry.LossPct * occLimit,
+                    LAE = decimal.One
+                });
+            }
+
+            /*Layer*/
+            decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
+            if (remainingLimit > 0)
+            {
+                decimal layerOccLimit = GetOccLimit(layerDetail);
+                decimal premium = layerDetail.Placement == decimal.Zero ? decimal.Zero : layerDetail.Premium / layerDetail.Placement;
+                if (layerApplyErosion && layerReinstatements != null)
+                    layerReinstatements = Reinstatements.GetErodedReinstatement(layerReinstatements, layerOccLimit, premium, (decimal)erosion);
+
+                aggLayers.Add(new DtoLayerStcInput
+                {
+                    LayerId = layerId,
+                    OccLimit = layerOccLimit,
+                    OccRetention = 0,
+                    AggLimit = remainingLimit,
+                    AggRetention = 0,//AggRetention already applied
+                    Franchise = 0,
+                    FranchiseReverse = 0,
+                    Placement = layerDetail.Placement,
+                    IsFHCF = layerDetail.LayerType == LayerType.FHCF,
+                    Currency = submission.Currency,
+                    Premium = premium,
+                    InceptionDate = inceptionDate,
+                    ExpirationDate = expirationDate,
+                    Reinstatements = layerReinstatements
+                });
+
+                /*Sections */
+                //No section needed
+                return true;
+            }
+            else return false;
         }
 
         private static decimal GetOccLimit(LayerDetail layerDetail)

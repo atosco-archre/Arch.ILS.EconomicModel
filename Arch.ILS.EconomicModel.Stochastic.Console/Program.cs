@@ -13,7 +13,20 @@ namespace Arch.ILS.EconomicModel.Stochastic.Console
             IMixedRepository mixedRepository = new MixedSnowflakeRepository(new SnowflakeConnectionStrings().RevoBermudaConnectionString);
 
             SimulationFactory simulationFactory = new SimulationFactory(revoRepository, revoLayerLossRepository, revoGULossRepository, actuarialStochasticRepository, mixedRepository);
-            simulationFactory.GetConditionYelt(false, 1, "Retro 251 - Actual ITD 202409 - As At 2024-12-10 - Archview", 251, DateTime.Today, [RevoLossViewType.ArchView]);
+            HashSet<int> nonGULossBasedLayers = new HashSet<int>
+            {
+                136866,
+                138466,
+                138564,
+                141578,
+                145415,
+                145927,
+                147252,
+                149525,
+                159513,
+                159514
+            };
+            simulationFactory.GetConditionYelt(false, 1, "Retro 251 - Actual ITD 202409 - As At 2024-12-10 - Archview", 251, DateTime.Today, [RevoLossViewType.ArchView], nonGULossBasedLayers);
         }
     }
 }
