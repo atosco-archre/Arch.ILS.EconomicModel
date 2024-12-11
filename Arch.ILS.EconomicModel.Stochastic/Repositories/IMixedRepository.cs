@@ -4,7 +4,17 @@ namespace Arch.ILS.EconomicModel.Stochastic
     public interface IMixedRepository
     {
         IEnumerable<LayerActualMetrics> GetRetroLayerActualITDMetrics(int retroProgramId, int acctGPeriod);
+        void AddCalculationHeader(in int calculationId, in string calculationName, in int acctGPeriod, in DateTime asAtDate);
+        void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension);
 
-        void BulkCopyRecalculatedYelt(string filePath);
+        void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension);
+
+        void BulkLoadRecalculatedYelt(in string filePath, in string fileNameWithExtension);
+
+        void BulkLoadConditionalYelt(in string filePath, in string fileNameWithExtension);
+
+        void BulkLoadRetroCessionMetrics(in string filePath, in string fileNameWithExtension);
+
+        void BulkLoadRetroLayerCessionMetrics(in string filePath, in string fileNameWithExtension);
     }
 }

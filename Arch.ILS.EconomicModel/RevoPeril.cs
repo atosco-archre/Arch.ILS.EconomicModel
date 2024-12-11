@@ -54,22 +54,13 @@ namespace Arch.ILS.EconomicModel
         WT = 15,
         
         [Description("Wind Storm")]
-        WS = 16,
-        
-        [Description("Collission")]
-        CO = 117,
+        WS = 16,       
         
         [Description("Attritional")]
         AT = 17,
         
         [Description("LargeLoss")]
         LL = 18,
-
-        [Description("Machinery Breakdown")]
-        MB = 118,
-
-        [Description("Contingent Business Interruption")]
-        CBI = 119,
 
         [Description("NonModel")]
         NM = 19,
@@ -80,5 +71,14 @@ namespace Arch.ILS.EconomicModel
         HU = 21,
         LR = 22,
         YY = 23,
+
+        [Description("Collission")]
+        CO = 117,
+
+        [Description("Machinery Breakdown")]
+        MB = 118,
+
+        [Description("Contingent Business Interruption")]
+        CBI = 119,
     }
 }

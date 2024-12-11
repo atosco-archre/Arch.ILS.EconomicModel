@@ -38,24 +38,24 @@ namespace Arch.ILS.EconomicModel
                 Parallel.ForEach(levelLayerCessions, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, layerCession =>
 #endif
                 {
-                    if(!retroIdFilter.Contains(layerCession.RetroProgramId))
+                    if (retroIdFilter != null && !retroIdFilter.Contains(layerCession.RetroProgramId))
 #if DEBUG
                         continue;
 #else
-                        return;
+                    return;
 #endif
                     if (!layerDetails.Result.TryGetValue(layerCession.LayerId, out var layerDetail))
 #if DEBUG
                         continue;
 #else
-                        return;
+                    return;
 #endif
 
-                        if (contractStatusesFilter != null && !contractStatusesFilter.Contains(layerDetail.Status))
+                    if (contractStatusesFilter != null && !contractStatusesFilter.Contains(layerDetail.Status))
 #if DEBUG
                         continue;
 #else
-                        return;
+                    return;
 #endif
                     /*if (layerDetail.Status != ContractStatus.Bound
                         && layerDetail.Status != ContractStatus.Signed
@@ -67,14 +67,21 @@ namespace Arch.ILS.EconomicModel
 #if DEBUG
                         continue;
 #else
-                        return;
+                    return;
 #endif
                     var fxRate = RevoHelper.GetFxRate(useBoundFx, currentFxDate, baseCurrency.ToString(), submission, layerDetail, fxRates.Result);
                     var retroProgram = retroPrograms.Result[layerCession.RetroProgramId];
 
                     if (!retroMetricsById.TryGetValue(retroProgram.RetroProgramId, out var retroMetrics))
                     {
-                        retroMetrics = new RetroMetrics(retroProgram.RetroProgramId) { DateLimits = new ConcurrentDictionary<DateTime, LimitMetrics>() };
+                        retroMetrics = new RetroMetrics(retroProgram.RetroProgramId)
+                        {
+                            RetroLevel = (byte)(retroProgram.RetroLevelType + 1),
+                            RetroProgramType = retroProgram.RetroProgramType,
+                            RetroInception = retroProgram.Inception,
+                            RetroExpiration = retroProgram.Expiration,
+                            DateLimits = new ConcurrentDictionary<DateTime, LimitMetrics>()
+                        };
                         retroMetricsById.TryAdd(retroProgram.RetroProgramId, retroMetrics);
                     }
 

@@ -10,8 +10,13 @@ namespace Arch.ILS.EconomicModel.Stochastic
         #region Variables
 
         private static readonly Regex _rowVersionToBigIntRegex;
+        private static object _bulkLoadLayerItdMetricsLock;
+        private static object _bulkLoadYeltOriginalLock;
+        private static object _bulkLoadYeltRecalculatedLock;
+        private static object _bulkLoadYeltConditionalLock;
+        private static object _bulkLoadRetroCessionLock;
+        private static object _bulkLoadRetroLayerCessionlLock;
         private readonly SnowflakeRepository _repository;
-        private object _bulkCopyLock;
 
         #endregion Variables
 
@@ -20,12 +25,17 @@ namespace Arch.ILS.EconomicModel.Stochastic
         static MixedSnowflakeRepository()
         {
             _rowVersionToBigIntRegex = new Regex("CAST\\s*\\(\\s*(?<Alias>[^\\s]+\\.)*ROWVERSION\\s* AS \\s*BIGINT\\s*\\)", RegexOptions.IgnoreCase);
+            _bulkLoadLayerItdMetricsLock = new object();
+            _bulkLoadYeltOriginalLock = new object();
+            _bulkLoadYeltRecalculatedLock = new object();
+            _bulkLoadYeltConditionalLock = new object();
+            _bulkLoadRetroCessionLock = new object();
+            _bulkLoadRetroLayerCessionlLock = new object();
         }
 
         public MixedSnowflakeRepository(string connectionSring)
         {
             _repository = new SnowflakeRepository(connectionSring);
-            _bulkCopyLock = new object();
         }
 
         #endregion Constructors
@@ -64,15 +74,65 @@ namespace Arch.ILS.EconomicModel.Stochastic
             }
         }
 
-        public void BulkCopyRecalculatedYelt(string filePath)
+        public void AddCalculationHeader(in int calculationId, in string calculationName, in int acctGPeriod, in DateTime asAtDate)
         {
-            lock(_bulkCopyLock)
+            _repository.ExecuteSql($"INSERT INTO ACTUARIAL_ILS_POC.STC.CALCULATION_HEADER VALUES({calculationId}, '{calculationName}', {acctGPeriod}, TO_TIMESTAMP('{asAtDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), TO_TIMESTAMP('{DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'))");
+        }
+
+        public void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension)
+        {
+            lock (_bulkLoadLayerItdMetricsLock)
             {
-                //_repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                //_repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_RECALCULATED\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILE_FORMAT = (TYPE = CSV) PARSE_HEADER = TRUE;");
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYER_ITD_METRICS\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
             }
         }
-        
+
+        public void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension)
+        {
+            lock (_bulkLoadYeltOriginalLock)
+            {
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_ORIGINAL\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+            }
+        }
+
+        public void BulkLoadRecalculatedYelt(in string filePath, in string fileNameWithExtension)
+        {
+            lock(_bulkLoadYeltRecalculatedLock)
+            {
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_RECALCULATED\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+            }
+        }
+
+        public void BulkLoadConditionalYelt(in string filePath, in string fileNameWithExtension)
+        {
+            lock (_bulkLoadYeltConditionalLock)
+            {
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_CONDITIONAL\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+            }
+        }
+
+        public void BulkLoadRetroCessionMetrics(in string filePath, in string fileNameWithExtension)
+        {
+            lock (_bulkLoadRetroCessionLock)
+            {
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"RETRO_CESSION\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+            }
+        }
+
+        public void BulkLoadRetroLayerCessionMetrics(in string filePath, in string fileNameWithExtension)
+        {
+            lock (_bulkLoadRetroLayerCessionlLock)
+            {
+                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
+                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"RETRO_LAYER_PERIOD_CESSION\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+            }
+        }
+
         #region Query Conversion
 
         private string Translate(in string sqlQuery)

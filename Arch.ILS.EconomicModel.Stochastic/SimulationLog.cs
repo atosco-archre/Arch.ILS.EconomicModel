@@ -31,8 +31,8 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
         public void Export(string logFilePath)
         {
-            using (FileStream fs = new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (StreamWriter sw = new StreamWriter(fs))
+            using (FileStream fs = new(logFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (StreamWriter sw = new(fs))
             {
                 sw.WriteLine("LOGLEVEL,LAYERID,ISRETROLAYER,MESSAGE");
                 foreach (var kv in _layerLogs.OrderBy(x => x.Key))

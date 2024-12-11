@@ -1235,7 +1235,8 @@ namespace Arch.ILS.EconomicModel
                     int index = 0;
                     yield return new LayerLossAnalysisExtended
                     {
-                        LossAnalysisId = reader.GetInt32(index),
+                        LayerLossAnalysisId = reader.GetInt32(index),
+                        LossAnalysisId = reader.GetInt32(++index),
                         LayerId = reader.GetInt32(++index),
                         LossView = (RevoLossViewType)reader.GetInt32(++index),
                         RowVersion = reader.GetInt64(++index),
@@ -1968,7 +1969,8 @@ namespace Arch.ILS.EconomicModel
  WHERE IsActive = 1
    AND IsDeleted = 0";
 
-        private const string GET_LAYER_LOSS_ANALYSES = @"SELECT A.LossAnalysisId
+        private const string GET_LAYER_LOSS_ANALYSES = @"SELECT A.LayerLossAnalysisId
+     , A.LossAnalysisId
      , A.LayerId
      , L.LossView
      , CONVERT(BIGINT, A.RowVersion) AS RowVersion
@@ -1983,7 +1985,8 @@ namespace Arch.ILS.EconomicModel
 
         private const string GET_LAYER_LOSS_ANALYSES_INCREMENTAL = GET_LAYER_LOSS_ANALYSES + " AND CONVERT(BIGINT, A.RowVersion) > {0}";
 
-        private const string GET_LAYER_LOSS_ANALYSES_EXTENDED = @"SELECT A.LossAnalysisId
+        private const string GET_LAYER_LOSS_ANALYSES_EXTENDED = @"SELECT A.LayerLossAnalysisId
+     , A.LossAnalysisId
      , A.LayerId
      , L.LossView
      , CONVERT(BIGINT, A.RowVersion) AS RowVersion

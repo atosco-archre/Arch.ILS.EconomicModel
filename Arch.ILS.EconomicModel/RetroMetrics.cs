@@ -9,6 +9,10 @@ namespace Arch.ILS.EconomicModel
         }
 
         public int RetroProgramId { get; }
+        public byte RetroLevel { get; set; }
+        public RetroProgramType RetroProgramType { get; set; }
+        public DateTime RetroInception { get; set; }
+        public DateTime RetroExpiration { get; set; }
         public decimal SubjectPremium { get; set; }
         public decimal SubjectPremiumPlaced{ get; set; }
         public decimal CededPremium { get; set; }

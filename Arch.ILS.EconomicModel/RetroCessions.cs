@@ -13,7 +13,6 @@ namespace Arch.ILS.EconomicModel
 
         public RetroCessions(IEnumerable<RetroLayerCession> portLayerCessions) 
         {
-
             _levelLayerRetroCessions = portLayerCessions
                 .GroupBy(portGroup => portGroup.RetroLevelType)
                 .ToDictionary(portRetroLevel => portRetroLevel.Key, portRetroLevelGroup => portRetroLevelGroup
