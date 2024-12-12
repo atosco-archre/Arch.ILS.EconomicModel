@@ -42,6 +42,22 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, conditionalCutoffDate, GetAcctGPeriod(asAtDate), asAtDate, in useBoundFx, in baseCurrency, in currentFXDate);
         }
 
+        public IList<LayerActualMetrics> ExportLayerActualITDMetrics(in bool applyErosion, in int calculationId, in int retroProgramId, in DateTime asAtDate, IList<LayerActualMetrics> layerActualMetrics = null)
+        {
+            int acctGPeriod = GetAcctGPeriod(asAtDate);
+            IList<LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics == null
+                ? _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(retroProgramId, acctGPeriod).ToList()
+                : layerActualMetrics;
+            if (applyErosion)
+            {
+                string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, calculationId, acctGPeriod, asAtDate.ToString("yyyyyMMdd")));
+                Export(layerItdMetricsFilePath, calculationId, retroLayerActualITDMetrics);
+                _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
+            }
+
+            return retroLayerActualITDMetrics;
+        }
+
         public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null, HashSet<int> nonGULossBasedLayers = null)
         {
             var layersTask = _revoRepository.GetLayerDetails();
@@ -51,18 +67,9 @@ namespace Arch.ILS.EconomicModel.Stochastic
             var submissionGUAnalysesTask = _revoRepository.GetSubmissionGUAnalyses();
             //DateTime quarterEndDate = GetQuarterEndDate(asAtDate);
             int acctGPeriod = GetAcctGPeriod(asAtDate);
-            Dictionary<int, LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics == null 
-                ? _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(retroProgramId, acctGPeriod).ToDictionary(x => x.LayerId)
-                : layerActualMetrics.ToDictionary(x => x.LayerId);
+            Dictionary<int, LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics.ToDictionary(x => x.LayerId);
             var layerActualLoss = retroLayerActualITDMetrics.ToDictionary(keySelector=> keySelector.Key, v => v.Value.UltLoss);
             var retroLayerIds = retroLayerActualITDMetrics.Keys.ToHashSet();
-            if (applyErosion)
-            {
-                string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, calculationId, acctGPeriod, asAtDate.ToString("yyyyyMMdd")));
-                Export(layerItdMetricsFilePath, calculationId, retroLayerActualITDMetrics.Values);
-                _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
-            }
-
             SimulationLog simulationLog = new();
             Task.WaitAll(layersTask, submissionsTask, reinstatementsTask, pxSectionsByLayerIdTask, submissionGUAnalysesTask);
             var layers = layersTask.Result;
