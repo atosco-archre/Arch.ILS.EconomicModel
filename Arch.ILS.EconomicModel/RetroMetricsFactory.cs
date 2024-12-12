@@ -128,7 +128,7 @@ namespace Arch.ILS.EconomicModel
 
                     retroLayerMetrics.Add(new RetroLayerMetrics(layerCession.RetroLevel, layerCession.RetroProgramId, retroProgram.RetroProgramType,
                         retroProgram.Inception, retroProgram.Expiration, layerCession.LayerId, layerDetail.Inception, layerDetail.Expiration, layerDetail.Status,
-                        layerCession.PeriodCession.StartInclusive, layerCession.PeriodCession.EndInclusive, depositPremium,
+                        layerCession.PeriodCession.StartInclusive, layerCession.PeriodCession.EndInclusive, (layerRetroPlacement?.Placement ?? decimal.One), depositPremium,
                         subjectPremium, subjectPremiumPlaced, cededPremium, depositLimit, subjectLimit, subjectLimitPlaced, cededLimit, layerCession.GrossCession, layerCession.PeriodCession.NetCession));
                 }
 #if !DEBUG
