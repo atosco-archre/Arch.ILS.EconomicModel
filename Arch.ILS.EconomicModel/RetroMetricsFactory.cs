@@ -86,12 +86,12 @@ namespace Arch.ILS.EconomicModel
                     }
 
                     decimal netToGrossCession = (layerCession.PeriodCession.NetCession == decimal.Zero ? decimal.Zero : layerCession.PeriodCession.NetCession / layerCession.GrossCession);
-                    decimal availablePremium = layerDetail.Premium
+                    decimal depositPremium = layerDetail.Premium
                         * (layerDetail.Placement == decimal.Zero ? decimal.Zero : 1 / layerDetail.Placement)
                         * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
                         * fxRate
-                        * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0))
-                        * (decimal)(((layerCession.PeriodCession.EndInclusive - layerCession.PeriodCession.StartInclusive).TotalDays + 1) / ((layerDetail.Expiration - layerDetail.Inception).TotalDays + 1));/*linear allocation of premium*/
+                        * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0));
+                     decimal availablePremium = depositPremium * (decimal)(((layerCession.PeriodCession.EndInclusive - layerCession.PeriodCession.StartInclusive).TotalDays + 1) / ((layerDetail.Expiration - layerDetail.Inception).TotalDays + 1));/*linear allocation of premium*/
                     decimal cededPremium = availablePremium * layerCession.PeriodCession.NetCession;
                     retroMetrics.CededPremium += cededPremium;
                     decimal subjectPremium = availablePremium * netToGrossCession;
@@ -102,13 +102,13 @@ namespace Arch.ILS.EconomicModel
                     retroMetrics.SubjectPremiumPlaced += subjectPremiumPlaced;
 
                     decimal limit100Pct = GetLimit100Pct(layerDetail);
-                    decimal availableLimit = limit100Pct
+                    decimal depositLimit = limit100Pct
                         * (layerDetail.SignedShare > decimal.Zero ? layerDetail.SignedShare : layerDetail.EstimatedShare)
                         * fxRate
                         * (submission.TranType == TranType.Ceded ? -1 : (submission.TranType == TranType.Assumed ? 1 : 0));
-                    decimal subjectLimit = availableLimit * netToGrossCession;
+                    decimal subjectLimit = depositLimit * netToGrossCession;
                     decimal subjectLimitPlaced = subjectLimit * (layerRetroPlacement?.Placement ?? decimal.One);
-                    decimal cededLimit = availableLimit * layerCession.PeriodCession.NetCession;
+                    decimal cededLimit = depositLimit * layerCession.PeriodCession.NetCession;
 
                     var currentDate = layerCession.PeriodCession.StartInclusive;
                     var dateLimits = retroMetrics.DateLimits;
@@ -128,8 +128,8 @@ namespace Arch.ILS.EconomicModel
 
                     retroLayerMetrics.Add(new RetroLayerMetrics(layerCession.RetroLevel, layerCession.RetroProgramId, retroProgram.RetroProgramType,
                         retroProgram.Inception, retroProgram.Expiration, layerCession.LayerId, layerDetail.Inception, layerDetail.Expiration, layerDetail.Status,
-                        layerCession.PeriodCession.StartInclusive, layerCession.PeriodCession.EndInclusive,
-                        subjectPremium, subjectPremiumPlaced, cededPremium, subjectLimit, subjectLimitPlaced, cededLimit, layerCession.GrossCession, layerCession.PeriodCession.NetCession));
+                        layerCession.PeriodCession.StartInclusive, layerCession.PeriodCession.EndInclusive, depositPremium,
+                        subjectPremium, subjectPremiumPlaced, cededPremium, depositLimit, subjectLimit, subjectLimitPlaced, cededLimit, layerCession.GrossCession, layerCession.PeriodCession.NetCession));
                 }
 #if !DEBUG
                 );
