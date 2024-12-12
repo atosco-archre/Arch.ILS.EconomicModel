@@ -14,10 +14,13 @@ namespace Arch.ILS.EconomicModel.Stochastic
         public RegisPerspectiveType PerspectiveType { get; set; }
         public string Currency { get; set; }
         public string Facility { get; set; }
+        public double ArchContractLimit { get; set; }
+        public double ArchAggLimit { get; set; }
+        public double Retention { get; set; }
+        //public double EP { get; set; }
         public double WP { get; set; }
         public double WPxRP { get; set; }
         public double RP { get; set; }
-        public double EP { get; set; }
         public double UltLoss { get; set; }
         public double LimitPctUsed { get; set; }
 
@@ -47,10 +50,12 @@ namespace Arch.ILS.EconomicModel.Stochastic
                         PerspectiveType = (RegisPerspectiveType)byte.Parse(cells[++index]),
                         Currency = cells[++index],
                         Facility = cells[++index],
+                        ArchContractLimit = double.Parse(cells[++index]),
+                        ArchAggLimit = double.Parse(cells[++index]),
+                        Retention = double.Parse(cells[++index]),
                         WP = double.Parse(cells[++index]),
                         WPxRP = double.Parse(cells[++index]),
-                        RP = double.Parse(cells[++index]),
-                        EP = double.Parse(cells[++index]),
+                        RP = double.Parse(cells[++index]),                        
                         UltLoss = double.Parse(cells[++index]),
                         LimitPctUsed = double.Parse(cells[++index])
                     };

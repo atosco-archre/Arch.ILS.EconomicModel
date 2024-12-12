@@ -37,9 +37,9 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository = mixedSnowflakeRepository;
         }
 
-        public void InitialiseCalculationExport(in int calculationId, in string calculationName, in DateTime asAtDate)
+        public void InitialiseCalculationExport(in int calculationId, in string calculationName, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
         {
-            _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, GetAcctGPeriod(asAtDate), asAtDate);
+            _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, GetAcctGPeriod(asAtDate), asAtDate, in useBoundFx, in baseCurrency, in currentFXDate);
         }
 
         public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null, HashSet<int> nonGULossBasedLayers = null)
@@ -712,10 +712,10 @@ namespace Arch.ILS.EconomicModel.Stochastic
             using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.WriteLine("CALCULATIONID,MASTERKEY,MASTERKEYFROM,LAYERID,SUBMISSIONID,ISMULTIYEAR,ISCANCELLABLE,UWYEAR,SEGMENT,PERSPECTIVETYPE,CURRENCY,FACILITY,WP,WPxRP,RP,EP,ULT_LOSS,LIMITPCTUSED");
+                sw.WriteLine("CALCULATIONID,MASTERKEY,MASTERKEYFROM,LAYERID,SUBMISSIONID,ISMULTIYEAR,ISCANCELLABLE,UWYEAR,SEGMENT,PERSPECTIVETYPE,CURRENCY,FACILITY,ARCHCONTRACTLIMIT,ARCHAGGLIMIT,RETENTION,WP,WPxRP,RP,EP,ULT_LOSS,LIMITPCTUSED");
                 foreach (LayerActualMetrics l in retroLayerActualITDMetrics)
                 {
-                    sw.WriteLine($"{calculationId},{l.MasterKey},{l.MasterKeyFrom},{l.LayerId},{l.SubmissionId},{l.IsMultiYear},{l.IsCancellable},{l.UWYear},{l.Segment},{l.PerspectiveType.ToString()},{l.Currency},{l.Facility},{l.WP},{l.WPxRP},{l.RP},{l.EP},{l.UltLoss},{l.LimitPctUsed}");
+                    sw.WriteLine($"{calculationId},{l.MasterKey},{l.MasterKeyFrom},{l.LayerId},{l.SubmissionId},{l.IsMultiYear},{l.IsCancellable},{l.UWYear},{l.Segment},{l.PerspectiveType.ToString()},{l.Currency},{l.Facility},{l.ArchContractLimit},{l.ArchAggLimit},{l.Retention},{l.WP},{l.WPxRP},{l.RP},{l.UltLoss},{l.LimitPctUsed}");
                 }
                 sw.Flush();
             }

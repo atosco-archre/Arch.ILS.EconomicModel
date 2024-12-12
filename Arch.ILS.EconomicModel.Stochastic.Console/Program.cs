@@ -38,9 +38,9 @@ namespace Arch.ILS.EconomicModel.Stochastic.Console
             DateTime conditionalDate = new DateTime(2024, 12, 1);
             DateTime asAtDate = DateTime.Now;
             /*Process*/
-            IList<LayerActualMetrics> layerActualMetrics = null;// LayerActualMetrics.LoadFromCsv("").ToList();
+            IList<LayerActualMetrics> layerActualMetrics = LayerActualMetrics.LoadFromCsv(@"C:\Data\LayerActualITDMetrics_20241211.csv").ToList();
             SimulationFactory simulationFactory = new SimulationFactory(revoRepository, revoLayerLossRepository, revoGULossRepository, actuarialStochasticRepository, mixedRepository);
-            simulationFactory.InitialiseCalculationExport(in calculationId, in calculationName, in asAtDate);
+            simulationFactory.InitialiseCalculationExport(in calculationId, in calculationName, in asAtDate, in useBoundFx, baseCurrency.ToString(), in currentFXDate);
             simulationFactory.ExportYelt(true, calculationId, retroProgramId, conditionalDate, asAtDate, lossViews, false, layerActualMetrics, nonGULossBasedLayers);
             simulationFactory.ExportYelt(false, calculationId, retroProgramId, conditionalDate, asAtDate, lossViews, true, layerActualMetrics, nonGULossBasedLayers);
             simulationFactory.ExportRetroLayerCessions(calculationId, resetType, asAtDate, currentFXDate, useBoundFx, baseCurrency);
