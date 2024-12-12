@@ -3,6 +3,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
 {
     public interface IMixedRepository
     {
+        IEnumerable<LayerActualQuarterMetrics> GetRetroLayerActualITDQuarterMetrics(int retroProgramId, int acctGPeriod);
         IEnumerable<LayerActualMetrics> GetRetroLayerActualITDMetrics(int retroProgramId, int acctGPeriod);
         void AddCalculationHeader(in int calculationId, in string calculationName, in int acctGPeriod, in DateTime asAtDate);
         void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension);

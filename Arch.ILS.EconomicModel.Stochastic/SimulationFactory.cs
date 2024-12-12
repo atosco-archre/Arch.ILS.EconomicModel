@@ -42,7 +42,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, GetAcctGPeriod(asAtDate), asAtDate);
         }
 
-        public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, HashSet<int> nonGULossBasedLayers = null)
+        public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null, HashSet<int> nonGULossBasedLayers = null)
         {
             var layersTask = _revoRepository.GetLayerDetails();
             var submissionsTask = _revoRepository.GetSubmissions();
@@ -51,13 +51,15 @@ namespace Arch.ILS.EconomicModel.Stochastic
             var submissionGUAnalysesTask = _revoRepository.GetSubmissionGUAnalyses();
             //DateTime quarterEndDate = GetQuarterEndDate(asAtDate);
             int acctGPeriod = GetAcctGPeriod(asAtDate);
-            List<LayerActualMetrics> retroLayerActualITDMetrics = _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(retroProgramId, acctGPeriod).ToList();
-            var layerActualLoss = retroLayerActualITDMetrics.GroupBy(x => x.LayerId).ToDictionary(k => k.Key, v => v.Select(vv => vv.UltimateLoss).Sum());
-            var retroLayerIds = retroLayerActualITDMetrics.Select(x => x.LayerId).ToHashSet();
+            Dictionary<int, LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics == null 
+                ? _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(retroProgramId, acctGPeriod).ToDictionary(x => x.LayerId)
+                : layerActualMetrics.ToDictionary(x => x.LayerId);
+            var layerActualLoss = retroLayerActualITDMetrics.ToDictionary(keySelector=> keySelector.Key, v => v.Value.UltLoss);
+            var retroLayerIds = retroLayerActualITDMetrics.Keys.ToHashSet();
             if (applyErosion)
             {
                 string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, calculationId, acctGPeriod, asAtDate.ToString("yyyyyMMdd")));
-                Export(layerItdMetricsFilePath, calculationId, retroLayerActualITDMetrics);
+                Export(layerItdMetricsFilePath, calculationId, retroLayerActualITDMetrics.Values);
                 _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
             }
 
@@ -705,15 +707,15 @@ namespace Arch.ILS.EconomicModel.Stochastic
             }
         }
 
-        private void Export(in string filePath, in int calculationId, List<LayerActualMetrics> retroLayerActualITDMetrics)
+        private void Export(in string filePath, in int calculationId, IEnumerable<LayerActualMetrics> retroLayerActualITDMetrics)
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.WriteLine("CALCULATIONID,MASTERKEY,MASTERKEYFROM,LAYERID,SUBMISSIONID,ISMULTIYEAR,ISCANCELLABLE,UWYEAR,ACCTGPERIOD,SEGMENT,PERSPECTIVETYPE,CURRENCY,FACILITY,WP,WPxRP,RP,EP,ULT_LOSS");
+                sw.WriteLine("CALCULATIONID,MASTERKEY,MASTERKEYFROM,LAYERID,SUBMISSIONID,ISMULTIYEAR,ISCANCELLABLE,UWYEAR,SEGMENT,PERSPECTIVETYPE,CURRENCY,FACILITY,WP,WPxRP,RP,EP,ULT_LOSS,LIMITPCTUSED");
                 foreach (LayerActualMetrics l in retroLayerActualITDMetrics)
                 {
-                    sw.WriteLine($"{calculationId},{l.MasterKey},{l.MasterKeyFrom},{l.LayerId},{l.SubmissionId},{l.IsMultiYear},{l.IsCancellable},{l.UWYear},{l.AcctGPeriod},{l.Segment},{l.PerspectiveType.ToString()},{l.Currency},{l.Facility},{l.WrittenPremium},{l.WrittenPremiumxReinstatementPremium},{l.ReinstatementPremium},{l.EarnedPremium},{l.UltimateLoss}");
+                    sw.WriteLine($"{calculationId},{l.MasterKey},{l.MasterKeyFrom},{l.LayerId},{l.SubmissionId},{l.IsMultiYear},{l.IsCancellable},{l.UWYear},{l.Segment},{l.PerspectiveType.ToString()},{l.Currency},{l.Facility},{l.WP},{l.WPxRP},{l.RP},{l.EP},{l.UltLoss},{l.LimitPctUsed}");
                 }
                 sw.Flush();
             }
