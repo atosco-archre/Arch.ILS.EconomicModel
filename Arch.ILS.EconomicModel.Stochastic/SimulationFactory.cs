@@ -37,9 +37,9 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository = mixedSnowflakeRepository;
         }
 
-        public void InitialiseCalculationExport(in int calculationId, in string calculationName, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
+        public void InitialiseCalculationExport(in int calculationId, in string calculationName, in DateTime conditionalCutoffDate, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
         {
-            _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, GetAcctGPeriod(asAtDate), asAtDate, in useBoundFx, in baseCurrency, in currentFXDate);
+            _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, conditionalCutoffDate, GetAcctGPeriod(asAtDate), asAtDate, in useBoundFx, in baseCurrency, in currentFXDate);
         }
 
         public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null, HashSet<int> nonGULossBasedLayers = null)

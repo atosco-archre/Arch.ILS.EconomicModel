@@ -111,9 +111,9 @@ namespace Arch.ILS.EconomicModel.Stochastic
             }
         }
 
-        public void AddCalculationHeader(in int calculationId, in string calculationName, in int acctGPeriod, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
+        public void AddCalculationHeader(in int calculationId, in string calculationName, in DateTime conditionalCutoffDate, in int acctGPeriod, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
         {
-            _repository.ExecuteSql($"INSERT INTO ACTUARIAL_ILS_POC.STC.CALCULATION_HEADER VALUES({calculationId}, '{calculationName}', {acctGPeriod}, TO_TIMESTAMP('{asAtDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {useBoundFx}, '{baseCurrency}', TO_TIMESTAMP('{currentFXDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), TO_TIMESTAMP('{DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'))");
+            _repository.ExecuteSql($"INSERT INTO ACTUARIAL_ILS_POC.STC.CALCULATION_HEADER VALUES({calculationId}, '{calculationName}', TO_TIMESTAMP('{conditionalCutoffDate.ToString("yyyy-MM-dd HH:mm:ss")}', {acctGPeriod}, TO_TIMESTAMP('{asAtDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {useBoundFx}, '{baseCurrency}', TO_TIMESTAMP('{currentFXDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), TO_TIMESTAMP('{DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'))");
         }
 
         public void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension)
