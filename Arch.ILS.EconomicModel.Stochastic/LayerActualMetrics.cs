@@ -17,7 +17,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
         public double ArchContractLimit { get; set; }
         public double ArchAggLimit { get; set; }
         public double Retention { get; set; }
-        //public double EP { get; set; }
+        public double EP { get; set; }
         public double WP { get; set; }
         public double WPxRP { get; set; }
         public double RP { get; set; }
