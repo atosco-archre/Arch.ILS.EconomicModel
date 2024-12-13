@@ -4,7 +4,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
     public record class ConditionalCalculationInputBase
     {
         public int CalculationId { get; set; }
-        public string CalculationName { get; set; }
+        public required string CalculationName { get; set; }
         public int RetroProgramId { get; set; }
         public DateTime ConditionalCutoffDate { get; set; }
         public ResetType ResetType { get; set; }
