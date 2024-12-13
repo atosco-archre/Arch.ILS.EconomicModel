@@ -37,36 +37,30 @@ namespace Arch.ILS.EconomicModel.Stochastic
             _mixedSnowflakeRepository = mixedSnowflakeRepository;
         }
 
-        public void InitialiseCalculationExport(in int calculationId, in string calculationName, in DateTime conditionalCutoffDate, in DateTime asAtDate, in bool useBoundFx, in string baseCurrency, in DateTime currentFXDate)
+        public void InitialiseCalculationExport(ConditionalCalculationInputBase input)
         {
-            _mixedSnowflakeRepository.AddCalculationHeader(calculationId, calculationName, conditionalCutoffDate, GetAcctGPeriod(asAtDate), asAtDate, in useBoundFx, in baseCurrency, in currentFXDate);
+            _mixedSnowflakeRepository.AddCalculationHeader(input);
         }
 
-        public IList<LayerActualMetrics> ExportLayerActualITDMetrics(in bool applyErosion, in int calculationId, in int retroProgramId, in DateTime asAtDate, IList<LayerActualMetrics> layerActualMetrics = null)
+        public IList<LayerActualMetrics> ExportLayerActualITDMetrics(ConditionalCalculationInputBase input, IList<LayerActualMetrics> layerActualMetrics = null)
         {
-            int acctGPeriod = GetAcctGPeriod(asAtDate);
             IList<LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics == null
-                ? _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(retroProgramId, acctGPeriod).ToList()
+                ? _mixedSnowflakeRepository.GetRetroLayerActualITDMetrics(input.RetroProgramId, input.AcctGPeriod).ToList()
                 : layerActualMetrics;
-            if (applyErosion)
-            {
-                string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, calculationId, acctGPeriod, asAtDate.ToString("yyyyyMMdd")));
-                Export(layerItdMetricsFilePath, calculationId, retroLayerActualITDMetrics);
-                _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
-            }
+            string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, input.CalculationId, input.AcctGPeriod, input.AsAtDate.ToString("yyyyyMMdd")));
+            Export(layerItdMetricsFilePath, input.CalculationId, retroLayerActualITDMetrics);
+            _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
 
             return retroLayerActualITDMetrics;
         }
 
-        public void ExportYelt(bool applyErosion, int calculationId, int retroProgramId, DateTime inputConditionalDate, DateTime asAtDate, HashSet<RevoLossViewType> revoLossViewTypes, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null, HashSet<int> nonGULossBasedLayers = null)
+        public void ExportYelt(ConditionalCalculationInput input, bool exportOriginalYelt, IList<LayerActualMetrics> layerActualMetrics = null)
         {
             var layersTask = _revoRepository.GetLayerDetails();
             var submissionsTask = _revoRepository.GetSubmissions();
             var reinstatementsTask = _revoRepository.GetLayerReinstatements();
             var pxSectionsByLayerIdTask = _revoRepository.GetPXSections();
             var submissionGUAnalysesTask = _revoRepository.GetSubmissionGUAnalyses();
-            //DateTime quarterEndDate = GetQuarterEndDate(asAtDate);
-            int acctGPeriod = GetAcctGPeriod(asAtDate);
             Dictionary<int, LayerActualMetrics> retroLayerActualITDMetrics = layerActualMetrics.ToDictionary(x => x.LayerId);
             var layerActualLoss = retroLayerActualITDMetrics.ToDictionary(keySelector=> keySelector.Key, v => v.Value.UltLoss);
             var retroLayerIds = retroLayerActualITDMetrics.Keys.ToHashSet();
@@ -84,15 +78,15 @@ namespace Arch.ILS.EconomicModel.Stochastic
             var layerGroups = layerGraph.GetIslands().Select(x => x.ToArray()).OrderBy(o => o[0]).ToArray();
 
             Dictionary<int, Dictionary<RevoLossViewType, List<LayerLossAnalysisExtended>>> lossAnalysesByLayerLossView = _revoRepository.GetLayerLossAnalysesExtended().Result
-                .Where(f => revoLossViewTypes.Contains(f.LossView) && f.GUAnalysisId != null)
+                .Where(f => input.LossViews.Contains(f.LossView) && f.GUAnalysisId != null)
                 .GroupBy(g => g.LayerId)
                 .ToDictionary(k => k.Key, v => v
                     .GroupBy(gg => gg.LossView)
                     .ToDictionary(kk => kk.Key, vv => vv.OrderByDescending(o => o.RowVersion).ToList()));
 
-            bool useLayerLossForNonGULossBasedLayers = nonGULossBasedLayers != null;
+            bool useLayerLossForNonGULossBasedLayers = input.NonGULossBasedLayers != null;
 
-            foreach (RevoLossViewType lossViewType in revoLossViewTypes)
+            foreach (RevoLossViewType lossViewType in input.LossViews)
             {
 #if DEBUG
                 for (int i = 0; i < layerGroups.Length; ++i)
@@ -177,7 +171,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                             foreach (var layerId in sortedDependencies)
                             {
                                 LayerDetail layerDetail = layers[layerId];
-                                DateTime conditionalInceptionDate = GetConditionalDate(applyErosion, inputConditionalDate, layerDetail);
+                                DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layerDetail);
                                 DateTime expirationDate = layerDetail.Expiration;
                                 if (conditionalInceptionDate > expirationDate)
                                 {
@@ -187,10 +181,10 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     continue;
                                 }
 
-                                if (useLayerLossForNonGULossBasedLayers && nonGULossBasedLayers.Contains(layerId))
+                                if (useLayerLossForNonGULossBasedLayers && input.NonGULossBasedLayers.Contains(layerId))
                                 {
                                     double erosion = 0;
-                                    bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
+                                    bool layerApplyErosion = input.ApplyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
                                     var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
                                         ? layerReinstements.Select(r => new DtoReinstatement
                                         {
@@ -335,7 +329,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
                                     /*Layer*/
                                     double erosion = 0;
-                                    bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
+                                    bool layerApplyErosion = input.ApplyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
                                     decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
                                     if (remainingLimit > 0)
                                     {
@@ -399,7 +393,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     var originalSumLossPct = originalLayerYelt.Select(x => x.LossPct).Sum();
                                     var originalCount = originalLayerYelt.Count();
                                     var recalculatedLayerYelt = layeringOutputs[selectedLayerId].Where(x => x.LayerLoss100Pct != 0).ToList();
-                                    var recalculatedSumLossPct = recalculatedLayerYelt.Select(x => x.LayerLoss100Pct / x.OccLimit).Sum();
+                                    var recalculatedSumLossPct = recalculatedLayerYelt.Select(x => (x.LayerLoss100Pct / x.OccLimit) ?? decimal.Zero).Sum();
                                     var recalculatedCount = recalculatedLayerYelt.Count();
                                     Reinstatement[] layerReinstements = null;
                                     reinstatements.TryGetValue(selectedLayerId, out layerReinstements);
@@ -409,31 +403,28 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
                                     //if (applyErosion || Math.Abs(originalSumLossPct - (double)(recalculatedSumLossPct ?? 0)) < 0.01*/)
                                     //{
-                                    string fileNameWithExtension = applyErosion ?
-                                        string.Format(LAYER_FILE_FORMAT_CONDITIONAL, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId) :
-                                        string.Format(LAYER_FILE_FORMAT_RECALCULATED, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
-                                    string filePath = Path.Combine(applyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, fileNameWithExtension);
-                                    DateTime conditionalInceptionDate = GetConditionalDate(applyErosion, inputConditionalDate, layer);
-                                    Export(filePath, calculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
-                                    if(applyErosion)
+                                    string fileNameWithExtension = input.ApplyErosion ?
+                                        string.Format(LAYER_FILE_FORMAT_CONDITIONAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId) :
+                                        string.Format(LAYER_FILE_FORMAT_RECALCULATED, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
+                                    string filePath = Path.Combine(input.ApplyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, fileNameWithExtension);
+                                    DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layer);
+                                    Export(filePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
+                                    if(input.ApplyErosion)
                                         _mixedSnowflakeRepository.BulkLoadConditionalYelt(filePath, fileNameWithExtension);
                                     else
                                         _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(filePath, fileNameWithExtension);
                                     if(exportOriginalYelt)
                                     {
-                                        string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
+                                        string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
                                         string originalYeltFilePath = Path.Combine(EXPORT_FOLDER_ORIGINAL, originalFileNameWithExtension);
-                                        Export(originalYeltFilePath, calculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
+                                        Export(originalYeltFilePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
                                         _mixedSnowflakeRepository.BulkLoadOriginalYelt(filePath, fileNameWithExtension);
                                     }
                                     //}
 
-                                    if(!applyErosion)
-                                    {
-                                        string message = $"LayerId {selectedLayerId}  - LossAnalysisId {layerLossAnalysis.LossAnalysisId} - Actual Sum LossPct {originalSumLossPct} vs recalculated {recalculatedSumLossPct} - Actual Count {originalCount} vs recalculated {recalculatedCount} - Dependencies Count: {layerGroup.Length} - GUAnalysisId:{layerLossAnalysis.GUAnalysisId} - LimitBasis: {layer.LimitBasis.ToString()} - LayerType: {layer.LayerType.ToString()} - OccLimit: {layer.OccLimit} - AggLimit: {layer.AggLimit} - RiskLimit:{layer.RiskLimit} - ReinsCount:{reinstCount}";
-                                        Console.WriteLine($"{i + 1}/{layerGroups.Length} - {message}");
-                                        simulationLog.Append(LogLevel.Warning, selectedLayerId, message, retroLayerIds.Contains(selectedLayerId));
-                                    }
+                                    string message = $"LayerId {selectedLayerId}  - LossAnalysisId {layerLossAnalysis.LossAnalysisId} - Actual Sum LossPct {originalSumLossPct} vs recalculated {recalculatedSumLossPct} - Actual Count {originalCount} vs recalculated {recalculatedCount} - Dependencies Count: {layerGroup.Length} - GUAnalysisId:{layerLossAnalysis.GUAnalysisId} - LimitBasis: {layer.LimitBasis.ToString()} - LayerType: {layer.LayerType.ToString()} - OccLimit: {layer.OccLimit} - AggLimit: {layer.AggLimit} - RiskLimit:{layer.RiskLimit} - ReinsCount:{reinstCount}";
+                                    Console.WriteLine($"{i + 1}/{layerGroups.Length} - {message}");
+                                    simulationLog.Append(Math.Abs((decimal)originalSumLossPct - recalculatedSumLossPct) > 0.01m ? LogLevel.Warning : LogLevel.Information, selectedLayerId, message, retroLayerIds.Contains(selectedLayerId));
                                 }
                             }
                         }
@@ -446,7 +437,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                             {
                                 int layerId = layerGroup[j];
                                 LayerDetail layerDetail = layers[layerId];
-                                DateTime conditionalInceptionDate = GetConditionalDate(applyErosion, inputConditionalDate, layerDetail);
+                                DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layerDetail);
                                 DateTime expirationDate = layerDetail.Expiration;
 
                                 if (conditionalInceptionDate > expirationDate)
@@ -459,7 +450,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
                                 /*Layer*/
                                 double erosion = 0;
-                                bool layerApplyErosion = applyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
+                                bool layerApplyErosion = input.ApplyErosion && layerActualLoss.TryGetValue(layerId, out erosion);
                                 decimal remainingLimit = Math.Max(layerDetail.AggLimit - (decimal)erosion, 0.0m);
                                 var layerReinstatements = reinstatements.TryGetValue(layerId, out var layerReinstements)
                                     ? layerReinstements.Select(r => new DtoReinstatement
@@ -473,7 +464,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     : null;
                                 if (remainingLimit > 0)
                                 {
-                                    if (useLayerLossForNonGULossBasedLayers && nonGULossBasedLayers.Contains(layerId))
+                                    if (useLayerLossForNonGULossBasedLayers && input.NonGULossBasedLayers.Contains(layerId))
                                     {
                                         Submission submission = submissions[layerDetail.SubmissionId];
                                         bool processed = ApplyConditionalTermsOnLayerLosses(submission, layerDetail, in conditionalInceptionDate, in expirationDate, in layerApplyErosion, in erosion, originalLayerYelts[layerId], layerReinstatements, out DtoLayeringStcRequest aggRequest);
@@ -566,7 +557,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     var originalSumLossPct = originalLayerYelt.Select(x => x.LossPct).Sum();
                                     var originalCount = originalLayerYelt.Count;
                                     var recalculatedLayerYelt = response.Layers.Where(x => x.LayerId == selectedLayerId && x.LayerLoss100Pct != 0).ToList();
-                                    var recalculatedSumLossPct = recalculatedLayerYelt.Select(x => x.LayerLoss100Pct / x.OccLimit).Sum();
+                                    var recalculatedSumLossPct = recalculatedLayerYelt.Select(x => (x.LayerLoss100Pct / x.OccLimit) ?? decimal.Zero).Sum();
                                     var recalculatedCount = recalculatedLayerYelt.Count;
                                     Reinstatement[] layerReinstements = null;
                                     reinstatements.TryGetValue(selectedLayerId, out layerReinstements);
@@ -576,28 +567,28 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
                                     //if (applyErosion || Math.Abs(originalSumLossPct - (double)(recalculatedSumLossPct ?? 0)) < 0.01)
                                     //{
-                                    string fileNameWithExtension = applyErosion ?
-                                        string.Format(LAYER_FILE_FORMAT_CONDITIONAL, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId) :
-                                        string.Format(LAYER_FILE_FORMAT_RECALCULATED, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
-                                    string filePath = Path.Combine(applyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, fileNameWithExtension);
-                                    DateTime conditionalInceptionDate = GetConditionalDate(applyErosion, inputConditionalDate, layer);
-                                    Export(filePath, calculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
-                                    if(applyErosion)
+                                    string fileNameWithExtension = input.ApplyErosion ?
+                                        string.Format(LAYER_FILE_FORMAT_CONDITIONAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId) :
+                                        string.Format(LAYER_FILE_FORMAT_RECALCULATED, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
+                                    string filePath = Path.Combine(input.ApplyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, fileNameWithExtension);
+                                    DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layer);
+                                    Export(filePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
+                                    if(input.ApplyErosion)
                                         _mixedSnowflakeRepository.BulkLoadConditionalYelt(filePath, fileNameWithExtension);
                                     else
                                         _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(filePath, fileNameWithExtension);
                                     if(exportOriginalYelt)
                                     {
-                                        string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, calculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
+                                        string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
                                         string originalYeltFilePath = Path.Combine(EXPORT_FOLDER_ORIGINAL, originalFileNameWithExtension);
-                                        Export(originalYeltFilePath, calculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
+                                        Export(originalYeltFilePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
                                         _mixedSnowflakeRepository.BulkLoadOriginalYelt(filePath, fileNameWithExtension);
                                     }
                                     //}
 
                                     string message = $"LayerId {selectedLayerId}  - LossAnalysisId {layerLossAnalysis.LossAnalysisId} - Actual Sum LossPct {originalSumLossPct} vs recalculated {recalculatedSumLossPct} - Actual Count {originalCount} vs recalculated {recalculatedCount} - Dependencies Count: {layerGroup.Length} - GUAnalysisId:{layerLossAnalysis.GUAnalysisId} - LimitBasis: {layer.LimitBasis.ToString()} - LayerType: {layer.LayerType.ToString()} - OccLimit: {layer.OccLimit} - AggLimit: {layer.AggLimit} - RiskLimit:{layer.RiskLimit} - ReinsCount:{reinstCount}";
                                     Console.WriteLine($"{i + 1} / {layerGroups.Length} - {message}");
-                                    simulationLog.Append(LogLevel.Warning, selectedLayerId, message, retroLayerIds.Contains(selectedLayerId));
+                                    simulationLog.Append(Math.Abs((decimal)originalSumLossPct - recalculatedSumLossPct) > 0.01m ? LogLevel.Warning : LogLevel.Information, selectedLayerId, message, retroLayerIds.Contains(selectedLayerId));
                                 }
                             }
                         }
@@ -615,8 +606,8 @@ namespace Arch.ILS.EconomicModel.Stochastic
 #if !DEBUG
                 );
 #endif                
-                simulationLog.Export(Path.Combine(applyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, 
-                    string.Format(applyErosion ? LOG_FORMAT_CONDITIONAL : LOG_FORMAT_RECALCULATED, calculationId, acctGPeriod, asAtDate.ToString("yyyy-MM-dd"))));
+                simulationLog.Export(Path.Combine(input.ApplyErosion ? EXPORT_FOLDER_CONDITIONAL : EXPORT_FOLDER_RECALCULATED, 
+                    string.Format(input.ApplyErosion ? LOG_FORMAT_CONDITIONAL : LOG_FORMAT_RECALCULATED, input.CalculationId, input.AcctGPeriod, input.AsAtDate.ToString("yyyy-MM-dd"))));
             }
         }
 
@@ -728,23 +719,18 @@ namespace Arch.ILS.EconomicModel.Stochastic
             }
         }
 
-        public static DateTime GetQuarterEndDate(in DateTime asAtDate)
-            => new DateTime((asAtDate.Month - 1) / 3 == 0 ? (asAtDate.Year - 1) : asAtDate.Year, (asAtDate.Month - 1) / 3 == 0 ? 12 : (asAtDate.Month - 1) / 3 * 3, 1).AddMonths(1).AddDays(-1);
 
-        public static int GetAcctGPeriod(in DateTime asAtDate) 
-            => (asAtDate.Month - 1) / 3 == 0 ? (asAtDate.Year - 1) * 100 + 12 : asAtDate.Year * 100 + (asAtDate.Month - 1) / 3 * 3;
-
-        public void ExportRetroLayerCessions(int calculationId, ResetType resetType, DateTime asAtDate, DateTime currentFxDate, bool useBoundFx = true, Currency baseCurrency = Currency.USD, HashSet<int> retroIdFilter = null)
+        public void ExportRetroLayerCessions(ConditionalCalculationInput input, HashSet<int> retroIdFilter = null)
         {            
             
             /*Authentication*/
             RetroMetricsFactory retroMetricsFactory = new RetroMetricsFactory(_revoRepository);
-            RetroSummaryMetrics retroSummaryMetrics = retroMetricsFactory.GetRetroMetrics(currentFxDate, resetType, useBoundFx, baseCurrency, retroIdFilter).Result;
+            RetroSummaryMetrics retroSummaryMetrics = retroMetricsFactory.GetRetroMetrics(input.CurrentFXDate, input.ResetType, input.UseBoundFx, input.BaseCurrency, retroIdFilter).Result;
 
             /*Retro Metrics*/
             Task retroTask = Task.Factory.StartNew(() =>
             {
-                string retroOutputFilePath = Path.Combine(EXPORT_FOLDER, string.Format(RETRO_CESSIONS_FORMAT, calculationId, resetType.ToString(), asAtDate.ToString("yyyyyMMdd")));
+                string retroOutputFilePath = Path.Combine(EXPORT_FOLDER, string.Format(RETRO_CESSIONS_FORMAT, input.CalculationId, input.ResetType.ToString(), input.AsAtDate.ToString("yyyyyMMdd")));
                 using (FileStream fs = new FileStream(retroOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -752,7 +738,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                     foreach (KeyValuePair<int, RetroMetrics> retroMetrics in retroSummaryMetrics.RetroMetricsByRetroProgramId.OrderBy(x => x.Key))
                     {
                         var limitMetrics = retroMetrics.Value.DateLimits.Values;
-                        sw.WriteLine($"{calculationId},{retroMetrics.Value.RetroLevel},{retroMetrics.Key},{retroMetrics.Value.RetroProgramType.ToString()},{resetType.ToString()},{retroMetrics.Value.RetroInception.ToString("yyyy-MM-dd")},{retroMetrics.Value.RetroExpiration.ToString("yyyy-MM-dd")},{baseCurrency},{retroMetrics.Value.SubjectPremium},{retroMetrics.Value.SubjectPremiumPlaced},{retroMetrics.Value.CededPremium},{limitMetrics.Select(x => x.SubjectLimit).Max()},{limitMetrics.Select(x => x.SubjectLimitPlaced).Max()},{limitMetrics.Select(x => x.CededLimit).Max()}");
+                        sw.WriteLine($"{input.CalculationId},{retroMetrics.Value.RetroLevel},{retroMetrics.Key},{retroMetrics.Value.RetroProgramType.ToString()},{input.ResetType.ToString()},{retroMetrics.Value.RetroInception.ToString("yyyy-MM-dd")},{retroMetrics.Value.RetroExpiration.ToString("yyyy-MM-dd")},{input.BaseCurrency.ToString()},{retroMetrics.Value.SubjectPremium},{retroMetrics.Value.SubjectPremiumPlaced},{retroMetrics.Value.CededPremium},{limitMetrics.Select(x => x.SubjectLimit).Max()},{limitMetrics.Select(x => x.SubjectLimitPlaced).Max()},{limitMetrics.Select(x => x.CededLimit).Max()}");
                     }
                     sw.Flush();
                 }
@@ -762,14 +748,14 @@ namespace Arch.ILS.EconomicModel.Stochastic
             /*Retro Layer Metrics*/
             Task retroLayerTask = Task.Factory.StartNew(() =>
             {
-                string retroLayerOutputFilePath = Path.Combine(EXPORT_FOLDER, string.Format(RETRO_LAYER_CESSIONS_FORMAT, calculationId, resetType.ToString(), asAtDate.ToString("yyyyyMMdd")));
+                string retroLayerOutputFilePath = Path.Combine(EXPORT_FOLDER, string.Format(RETRO_LAYER_CESSIONS_FORMAT, input.CalculationId, input.ResetType.ToString(), input.AsAtDate.ToString("yyyyyMMdd")));
                 using (FileStream fs = new FileStream(retroLayerOutputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
                     sw.WriteLine($"CALCULATIONID,RETROLEVEL,RETROPROGRAMID,RETROPROGRAMTYPE,RESETTYPE,RETROINCEPTION,RETROEXPIRATION,LAYERID,LAYERINCEPTION,LAYEREXPIRATION,LAYERSTATUS,CESSIONSTARTDATEINCLUSIVE,CESSIONENDDATEEXCLUSIVE,CURRENCY,RETROPLACEMENT,DEPOSITPREMIUM,SUBJECTPREMIUM,SUBJECTPREMIUMPLACED,CEDEDPREMIUM,DEPOSITLIMIT,SUBJECTLIMIT,SUBJECTLIMITPLACED,CEDEDLIMIT,GROSSCESSIONAFTERPLACEMENT,NETCESSION");
                     foreach (RetroLayerMetrics m in retroSummaryMetrics.RetroLayerMetrics)
                     {
-                        sw.WriteLine($"{calculationId},{m.RetroLevel},{m.RetroProgramid},{m.RetroProgramType.ToString()},{resetType.ToString()},{m.RetroInceptionDate.ToString("yyyy-MM-dd")},{m.RetroExpirationDate.ToString("yyyy-MM-dd")},{m.LayerId},{m.LayerInceptionDate.ToString("yyyy-MM-dd")},{m.LayerExpirationDate.ToString("yyyy-MM-dd")},{m.LayerStatus.ToString()},{m.StartDateInclusive.ToString("yyyy-MM-dd")},{m.EndDateInclusive.ToString("yyyy-MM-dd")},{baseCurrency},{m.RetroPlacement},{m.DepositPremium},{m.SubjectPremium},{m.SubjectPremiumPlaced},{m.CededPremium},{m.DepositLimit},{m.SubjectLimit},{m.SubjectLimitPlaced},{m.CededLimit},{m.GrossCessionAfterPlacement},{m.NetCession}");
+                        sw.WriteLine($"{input.CalculationId},{m.RetroLevel},{m.RetroProgramid},{m.RetroProgramType.ToString()},{input.ResetType.ToString()},{m.RetroInceptionDate.ToString("yyyy-MM-dd")},{m.RetroExpirationDate.ToString("yyyy-MM-dd")},{m.LayerId},{m.LayerInceptionDate.ToString("yyyy-MM-dd")},{m.LayerExpirationDate.ToString("yyyy-MM-dd")},{m.LayerStatus.ToString()},{m.StartDateInclusive.ToString("yyyy-MM-dd")},{m.EndDateInclusive.ToString("yyyy-MM-dd")},{input.BaseCurrency.ToString()},{m.RetroPlacement},{m.DepositPremium},{m.SubjectPremium},{m.SubjectPremiumPlaced},{m.CededPremium},{m.DepositLimit},{m.SubjectLimit},{m.SubjectLimitPlaced},{m.CededLimit},{m.GrossCessionAfterPlacement},{m.NetCession}");
                     }
                     sw.Flush();
                 }
