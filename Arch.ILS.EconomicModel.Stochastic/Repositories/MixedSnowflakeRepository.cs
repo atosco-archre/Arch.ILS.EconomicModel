@@ -7,6 +7,21 @@ namespace Arch.ILS.EconomicModel.Stochastic
 {
     public class MixedSnowflakeRepository : IMixedRepository
     {
+        #region Constants
+
+        private const string DATABASE_NAME = "ACTUARIAL_ILS_POC";
+        private const string SCHEMA_NAME = "STC";
+        private const string DATABASE_STAGE_NAME = "ACTUARIAL_ILS_POC_STC_STAGE";
+        private const string TABLE_CALCULATION_HEADER = "CALCULATION_HEADER";
+        private const string TABLE_LAYER_ITD_METRICS = "LAYER_ITD_METRICS";
+        private const string TABLE_LAYERYELT_ORIGINAL = "LAYERYELT_ORIGINAL";
+        private const string TABLE_LAYERYELT_RECALCULATED = "LAYERYELT_RECALCULATED";
+        private const string TABLE_LAYERYELT_CONDITIONAL = "LAYERYELT_CONDITIONAL";
+        private const string TABLE_RETRO_CESSION = "RETRO_CESSION";
+        private const string TABLE_RETRO_LAYER_PERIOD_CESSION = "RETRO_LAYER_PERIOD_CESSION";       
+
+        #endregion Constants
+
         #region Variables
 
         private static readonly Regex _rowVersionToBigIntRegex;
@@ -111,62 +126,54 @@ namespace Arch.ILS.EconomicModel.Stochastic
             }
         }
 
-        public void AddCalculationHeader(ConditionalCalculationInputBase input)
+        public int AddCalculationHeader(ConditionalCalculationInputBase input)
         {
-            _repository.ExecuteSql($"INSERT INTO ACTUARIAL_ILS_POC.STC.CALCULATION_HEADER VALUES({input.CalculationId}, '{input.CalculationName}', TO_TIMESTAMP('{input.ConditionalCutoffDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {input.AcctGPeriod}, TO_TIMESTAMP('{input.AsAtDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {input.UseBoundFx}, '{input.BaseCurrency.ToString()}', TO_TIMESTAMP('{input.CurrentFXDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), TO_TIMESTAMP('{DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'))");
+            input.CalculationId = GetNextCalculationHeader();
+            _repository.ExecuteSql($"INSERT INTO {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_CALCULATION_HEADER} VALUES({input.CalculationId}, '{input.CalculationName}', TO_TIMESTAMP('{input.ConditionalCutoffDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {input.AcctGPeriod}, TO_TIMESTAMP('{input.AsAtDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), {input.UseBoundFx}, '{input.BaseCurrency.ToString()}', TO_TIMESTAMP('{input.CurrentFXDate.ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'), TO_TIMESTAMP('{DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")}', 'YYYY-MM-DD HH:MI:SS'))");
+            return input.CalculationId;
+        }
+
+        private int GetNextCalculationHeader()
+        {
+            return 1 + (((int?)_repository.ExecuteScalar($"SELECT MAX(CALCULATIONID) FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_CALCULATION_HEADER};")) ?? 0);
         }
 
         public void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension)
         {
-            lock (_bulkLoadLayerItdMetricsLock)
-            {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYER_ITD_METRICS\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
-            }
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYER_ITD_METRICS, _bulkLoadLayerItdMetricsLock);
         }
 
         public void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension)
         {
-            lock (_bulkLoadYeltOriginalLock)
-            {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_ORIGINAL\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
-            }
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_ORIGINAL, _bulkLoadYeltOriginalLock);
         }
 
         public void BulkLoadRecalculatedYelt(in string filePath, in string fileNameWithExtension)
         {
-            lock(_bulkLoadYeltRecalculatedLock)
-            {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_RECALCULATED\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
-            }
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_RECALCULATED, _bulkLoadYeltRecalculatedLock);
         }
 
         public void BulkLoadConditionalYelt(in string filePath, in string fileNameWithExtension)
         {
-            lock (_bulkLoadYeltConditionalLock)
-            {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"LAYERYELT_CONDITIONAL\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
-            }
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_CONDITIONAL, _bulkLoadYeltConditionalLock);
         }
 
         public void BulkLoadRetroCessionMetrics(in string filePath, in string fileNameWithExtension)
         {
-            lock (_bulkLoadRetroCessionLock)
-            {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"RETRO_CESSION\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
-            }
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_RETRO_CESSION, _bulkLoadRetroCessionLock);
         }
 
         public void BulkLoadRetroLayerCessionMetrics(in string filePath, in string fileNameWithExtension)
         {
-            lock (_bulkLoadRetroLayerCessionlLock)
+            BulkLoadCsv(filePath, fileNameWithExtension, TABLE_RETRO_LAYER_PERIOD_CESSION, _bulkLoadRetroLayerCessionlLock);
+        }
+
+        public void BulkLoadCsv(in string filePath, in string fileNameWithExtension, in string tableName, in object tableLock)
+        {
+            lock (tableLock)
             {
-                _repository.ExecuteSql($"PUT file://{filePath} @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE;");
-                _repository.ExecuteSql($"COPY INTO \"ACTUARIAL_ILS_POC\".\"STC\".\"RETRO_LAYER_PERIOD_CESSION\" FROM @\"ACTUARIAL_ILS_POC\".\"STC\".ACTUARIAL_ILS_POC_STC_STAGE FILES = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
+                _repository.ExecuteSql($"PUT file://{filePath} @\"{DATABASE_NAME}\".\"{SCHEMA_NAME}\".{DATABASE_STAGE_NAME};");
+                _repository.ExecuteSql($"COPY INTO \"{DATABASE_NAME}\".\"{SCHEMA_NAME}\".\"{tableName}\" FROM @\"{DATABASE_NAME}\".\"{SCHEMA_NAME}\".{DATABASE_STAGE_NAME} = ('{fileNameWithExtension}.gz')  FILE_FORMAT = (TYPE = CSV SKIP_HEADER = 1) PURGE = TRUE;");
             }
         }
 

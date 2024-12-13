@@ -17,7 +17,6 @@ namespace Arch.ILS.EconomicModel.Stochastic.Console
             /*Input*/
             ConditionalCalculationInput inputWithErosion = new ConditionalCalculationInput
             {
-                CalculationId = 1,
                 CalculationName = "Retro 251 - Actual ITD 202409 - As At 2024-12-10 - Archview",
                 RetroProgramId = 251,
                 ApplyErosion = true,
@@ -41,11 +40,11 @@ namespace Arch.ILS.EconomicModel.Stochastic.Console
                     159513,
                     159514
                 }
-            };
-            ConditionalCalculationInput inputExcludingErosion = inputWithErosion with { ApplyErosion = false };
+            };            
             /*Process*/
             SimulationFactory simulationFactory = new SimulationFactory(revoRepository, revoLayerLossRepository, revoGULossRepository, actuarialStochasticRepository, mixedRepository);
-            simulationFactory.InitialiseCalculationExport(inputWithErosion);
+            simulationFactory.InitialiseCalculationExport(inputWithErosion);//Sets the CalculationId
+            ConditionalCalculationInput inputExcludingErosion = inputWithErosion with { ApplyErosion = false };
             IList<LayerActualMetrics> layerActualMetrics = simulationFactory.ExportLayerActualITDMetrics(inputWithErosion, LayerActualMetrics.LoadFromCsv(@"C:\Data\LayerActualITDMetrics_20241211.csv").ToList());
             simulationFactory.ExportYelt(inputWithErosion, !inputWithErosion.ApplyErosion, layerActualMetrics);
             simulationFactory.ExportYelt(inputExcludingErosion, !inputWithErosion.ApplyErosion, layerActualMetrics);

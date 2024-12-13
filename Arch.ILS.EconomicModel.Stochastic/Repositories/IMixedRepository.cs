@@ -5,7 +5,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
     {
         IEnumerable<LayerActualQuarterMetrics> GetRetroLayerActualITDQuarterMetrics(int retroProgramId, int acctGPeriod);
         IEnumerable<LayerActualMetrics> GetRetroLayerActualITDMetrics(int retroProgramId, int acctGPeriod);
-        void AddCalculationHeader(ConditionalCalculationInputBase input);
+        int AddCalculationHeader(ConditionalCalculationInputBase input);
         void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension);
 
         void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension);
