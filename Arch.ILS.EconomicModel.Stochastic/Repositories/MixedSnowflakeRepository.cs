@@ -136,7 +136,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
 
         private int GetNextCalculationHeader()
         {
-            return 1 + (((int?)_repository.ExecuteScalar($"SELECT MAX(CALCULATIONID) FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_CALCULATION_HEADER};")) ?? 0);
+            return (int)(1 + (((long?)_repository.ExecuteScalar($"SELECT MAX(CALCULATIONID) FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_CALCULATION_HEADER};")) ?? 0));
         }
 
         public void BulkLoadLayerItdMetrics(in int calculationId, in string filePath, in string fileNameWithExtension)
