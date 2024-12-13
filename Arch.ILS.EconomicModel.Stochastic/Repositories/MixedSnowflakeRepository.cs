@@ -1,4 +1,5 @@
 ﻿
+using System.Data;
 using System.Text.RegularExpressions;
 
 using Arch.ILS.Snowflake;
@@ -138,34 +139,78 @@ namespace Arch.ILS.EconomicModel.Stochastic
             return 1 + (((int?)_repository.ExecuteScalar($"SELECT MAX(CALCULATIONID) FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_CALCULATION_HEADER};")) ?? 0);
         }
 
-        public void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension)
+        public void BulkLoadLayerItdMetrics(in int calculationId, in string filePath, in string fileNameWithExtension)
         {
+            if (LayerItdMetricsExists(calculationId))
+                throw new Exception($"Attempt to insert entries into {TABLE_LAYER_ITD_METRICS} table for already imported CalculationId {calculationId}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYER_ITD_METRICS, _bulkLoadLayerItdMetricsLock);
         }
 
-        public void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension)
+        private bool LayerItdMetricsExists(in int calculationId)
         {
+            using (IDataReader reader = _repository.ExecuteReaderSql($"SELECT TOP 1 TRUE FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_LAYER_ITD_METRICS} WHERE CALCULATIONID = {calculationId};"))
+            {
+                return reader.Read();
+            }
+        }
+
+        public void BulkLoadOriginalYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension)
+        {
+            if (YeltExists(in calculationId, in layerId, in lossView, TABLE_LAYERYELT_ORIGINAL))
+                throw new Exception($"Attempt to insert entries into {TABLE_LAYERYELT_ORIGINAL} table for already imported CalculationId {calculationId} - LayerId {layerId} - LossView {lossView}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_ORIGINAL, _bulkLoadYeltOriginalLock);
         }
 
-        public void BulkLoadRecalculatedYelt(in string filePath, in string fileNameWithExtension)
+        public void BulkLoadRecalculatedYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension)
         {
+            if (YeltExists(in calculationId, in layerId, in lossView, TABLE_LAYERYELT_RECALCULATED))
+                throw new Exception($"Attempt to insert entries into {TABLE_LAYERYELT_RECALCULATED} table for already imported CalculationId {calculationId} - LayerId {layerId} - LossView {lossView}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_RECALCULATED, _bulkLoadYeltRecalculatedLock);
         }
 
-        public void BulkLoadConditionalYelt(in string filePath, in string fileNameWithExtension)
+        public void BulkLoadConditionalYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension)
         {
+            if (YeltExists(in calculationId, in layerId, in lossView, TABLE_LAYERYELT_CONDITIONAL))
+                throw new Exception($"Attempt to insert entries into {TABLE_LAYERYELT_CONDITIONAL} table for already imported CalculationId {calculationId} - LayerId {layerId} - LossView {lossView}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_LAYERYELT_CONDITIONAL, _bulkLoadYeltConditionalLock);
         }
 
-        public void BulkLoadRetroCessionMetrics(in string filePath, in string fileNameWithExtension)
+        private bool YeltExists(in int calculationId, in int layerId, in RevoLossViewType lossView, string tableName)
         {
+            using (IDataReader reader = _repository.ExecuteReaderSql($"SELECT TOP 1 TRUE FROM {DATABASE_NAME}.{SCHEMA_NAME}.{tableName} WHERE CALCULATIONID = {calculationId} AND LAYERID = {layerId} AND LOSSVIEW = '{lossView.ToString()}';"))
+            {
+                return reader.Read();
+            }
+        }
+
+        public void BulkLoadRetroCessionMetrics(in int calculationId, in string filePath, in string fileNameWithExtension)
+        {
+            if (RetroCessionMetricsExists(calculationId))
+                throw new Exception($"Attempt to insert entries into {TABLE_RETRO_CESSION} table for already imported CalculationId {calculationId}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_RETRO_CESSION, _bulkLoadRetroCessionLock);
         }
 
-        public void BulkLoadRetroLayerCessionMetrics(in string filePath, in string fileNameWithExtension)
+        private bool RetroCessionMetricsExists(in int calculationId)
         {
+            using (IDataReader reader = _repository.ExecuteReaderSql($"SELECT TOP 1 TRUE FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_RETRO_CESSION} WHERE CALCULATIONID = {calculationId};"))
+            {
+                return reader.Read();
+            }
+        }
+
+        public void BulkLoadRetroLayerCessionMetrics(in int calculationId, in string filePath, in string fileNameWithExtension)
+        {
+            if (RetroLayerCessionMetricsExists(calculationId))
+                throw new Exception($"Attempt to insert entries into {TABLE_RETRO_LAYER_PERIOD_CESSION} table for already imported CalculationId {calculationId}.");
             BulkLoadCsv(filePath, fileNameWithExtension, TABLE_RETRO_LAYER_PERIOD_CESSION, _bulkLoadRetroLayerCessionlLock);
+        }
+
+        private bool RetroLayerCessionMetricsExists(in int calculationId)
+        {
+            using (IDataReader reader = _repository.ExecuteReaderSql($"SELECT TOP 1 TRUE FROM {DATABASE_NAME}.{SCHEMA_NAME}.{TABLE_RETRO_LAYER_PERIOD_CESSION} WHERE CALCULATIONID = {calculationId};"))
+            {
+                return reader.Read();
+            }
         }
 
         public void BulkLoadCsv(in string filePath, in string fileNameWithExtension, in string tableName, in object tableLock)

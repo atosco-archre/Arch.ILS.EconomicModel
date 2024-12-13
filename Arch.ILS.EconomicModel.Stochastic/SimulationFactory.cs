@@ -49,7 +49,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                 : layerActualMetrics;
             string layerItdMetricsFilePath = Path.Combine(EXPORT_FOLDER_CONDITIONAL, string.Format(RETRO_REGIS_IBNR_ASSUMED_FORMAT, input.CalculationId, input.AcctGPeriod, input.AsAtDate.ToString("yyyyyMMdd")));
             Export(layerItdMetricsFilePath, input.CalculationId, retroLayerActualITDMetrics);
-            _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
+            _mixedSnowflakeRepository.BulkLoadLayerItdMetrics(input.CalculationId, layerItdMetricsFilePath, Path.GetFileName(layerItdMetricsFilePath));
 
             return retroLayerActualITDMetrics;
         }
@@ -410,15 +410,15 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layer);
                                     Export(filePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
                                     if(input.ApplyErosion)
-                                        _mixedSnowflakeRepository.BulkLoadConditionalYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadConditionalYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     else
-                                        _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     if(exportOriginalYelt)
                                     {
                                         string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
                                         string originalYeltFilePath = Path.Combine(EXPORT_FOLDER_ORIGINAL, originalFileNameWithExtension);
                                         Export(originalYeltFilePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
-                                        _mixedSnowflakeRepository.BulkLoadOriginalYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadOriginalYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     }
                                     //}
 
@@ -574,15 +574,15 @@ namespace Arch.ILS.EconomicModel.Stochastic
                                     DateTime conditionalInceptionDate = GetConditionalDate(input.ApplyErosion, input.ConditionalCutoffDate, layer);
                                     Export(filePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
                                     if(input.ApplyErosion)
-                                        _mixedSnowflakeRepository.BulkLoadConditionalYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadConditionalYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     else
-                                        _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadRecalculatedYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     if(exportOriginalYelt)
                                     {
                                         string originalFileNameWithExtension = string.Format(LAYER_FILE_FORMAT_ORIGINAL, input.CalculationId, layer.LayerId, layerLossAnalysis.LossAnalysisId, layerLossAnalysis.GUAnalysisId);
                                         string originalYeltFilePath = Path.Combine(EXPORT_FOLDER_ORIGINAL, originalFileNameWithExtension);
                                         Export(originalYeltFilePath, input.CalculationId, conditionalInceptionDate, layer, layerLossAnalysis, recalculatedLayerYelt);
-                                        _mixedSnowflakeRepository.BulkLoadOriginalYelt(filePath, fileNameWithExtension);
+                                        _mixedSnowflakeRepository.BulkLoadOriginalYelt(input.CalculationId, layer.LayerId, lossViewType, filePath, fileNameWithExtension);
                                     }
                                     //}
 
@@ -742,7 +742,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                     }
                     sw.Flush();
                 }
-                _mixedSnowflakeRepository.BulkLoadRetroCessionMetrics(retroOutputFilePath, Path.GetFileName(retroOutputFilePath));
+                _mixedSnowflakeRepository.BulkLoadRetroCessionMetrics(input.CalculationId, retroOutputFilePath, Path.GetFileName(retroOutputFilePath));
             });
 
             /*Retro Layer Metrics*/
@@ -759,7 +759,7 @@ namespace Arch.ILS.EconomicModel.Stochastic
                     }
                     sw.Flush();
                 }
-                _mixedSnowflakeRepository.BulkLoadRetroLayerCessionMetrics(retroLayerOutputFilePath, Path.GetFileName(retroLayerOutputFilePath));
+                _mixedSnowflakeRepository.BulkLoadRetroLayerCessionMetrics(input.CalculationId, retroLayerOutputFilePath, Path.GetFileName(retroLayerOutputFilePath));
             });
 
             Task.WaitAll(retroTask, retroLayerTask);

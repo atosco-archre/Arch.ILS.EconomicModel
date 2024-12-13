@@ -6,16 +6,16 @@ namespace Arch.ILS.EconomicModel.Stochastic
         IEnumerable<LayerActualQuarterMetrics> GetRetroLayerActualITDQuarterMetrics(int retroProgramId, int acctGPeriod);
         IEnumerable<LayerActualMetrics> GetRetroLayerActualITDMetrics(int retroProgramId, int acctGPeriod);
         int AddCalculationHeader(ConditionalCalculationInputBase input);
-        void BulkLoadLayerItdMetrics(in string filePath, in string fileNameWithExtension);
+        void BulkLoadLayerItdMetrics(in int calculationId, in string filePath, in string fileNameWithExtension);
 
-        void BulkLoadOriginalYelt(in string filePath, in string fileNameWithExtension);
+        void BulkLoadOriginalYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension);
 
-        void BulkLoadRecalculatedYelt(in string filePath, in string fileNameWithExtension);
+        void BulkLoadRecalculatedYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension);
 
-        void BulkLoadConditionalYelt(in string filePath, in string fileNameWithExtension);
+        void BulkLoadConditionalYelt(in int calculationId, in int layerId, in RevoLossViewType lossView, in string filePath, in string fileNameWithExtension);
 
-        void BulkLoadRetroCessionMetrics(in string filePath, in string fileNameWithExtension);
+        void BulkLoadRetroCessionMetrics(in int calculationId, in string filePath, in string fileNameWithExtension);
 
-        void BulkLoadRetroLayerCessionMetrics(in string filePath, in string fileNameWithExtension);
+        void BulkLoadRetroLayerCessionMetrics(in int calculationId, in string filePath, in string fileNameWithExtension);
     }
 }
